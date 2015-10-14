@@ -1,0 +1,1775 @@
+//goodstuff's Reset Helper 2.0
+//Credits to Kolton & Stairbuilder, used some of their code/functions
+
+// Follower Settings -
+var _followRange = 3;			// max range from leader before catching up recommended between 2-6
+var _attackRange = 12;			// this is the range they will search for monsters to attack recommended between 11-14
+var _maxAttackRange = 16;		// this is the max range bot(s) will be from leader, if they are past this range and attacking they will stop and catch up recommended between 11-16
+
+var _stairAttackRange = 7;		// in close quarter areas eg catacombs this use this range recommended half of _attackRange
+var _stairMaxRange = 9;			// in close quarter areas eg catacombs this use this maxattack range recommended half of _maxAttackRange
+
+var printUsedCommands = true;	// prints when using a command, helps with learning commands
+
+var _UseTelePads = true;		// if true bot(s) will auto use the telepads in Arcane Sanctuary
+var _autoTown = false;			// if You(leader) dies the bot(s) will make a tp and town
+
+//Enchanter Settings -
+var Enchant_Party = true;			// Enchant Party if have Enchant Skill | Default : true
+var Enchant_Merc = true;			// Enchant Party Mercs/Summons, Enchant_Party must be true | Default : true
+var printEnchants = true;			// Prints players/mercs being enchanted on screen | Default : true (recommended)
+									// Useful to catch anything being spammed(15+) with Enchant(which would need to be blacklisted below)
+									
+var doNotEnchant_Class = [];		// Choose which classes Not to Enchant | Default : [] Enchant Everyone
+
+var doNotEnchant_ClassMerc = [];	// Default : [2] ignores ALL Necromancers mercs & minions		
+									// Use this Format: [0,1,2] etc. Add or Remove to your Preference.
+									// 0:Amazon, 1:Sorceress, 2:Necromancer, 3:Paladin, 4:Barbarian, 5:Druid, 6:Assassin
+													
+var Enchant_BlackList = [			// People/Mercs to Exclude from Enchant Buff / Names Are Case Sensitive
+									// Add any mercs/summons being spammed(15+) with Enchant using printEnchants = true;				
+							"Lightning Sentry",		// Must be Blacklisted
+							"Charged Bolt Sentry",	// Must be Blacklisted 
+							"Blade Sentinel",		// Must be Blacklisted
+							"Mind Maw the Slasher",	// Must be Blacklisted
+							"Cycle of Life",		// Must be Blacklisted
+							"Dire Wolf",			// Must be Blacklisted
+							"Spirit Wolf",			// Must be Blacklisted
+							"Vine Creature",		// Must be Blacklisted
+							"Plague Poppy",			// Must be Blacklisted
+							"Hydra",				// Must be Blacklisted
+							"Rock Worm Young",		// Must be Blacklisted
+							"Blood Maggot Young",	// Must be Blacklisted
+							"Death Sentry",
+							"Raven",
+							"Oak Sage",
+							"Decoy",
+							"Enslaved",
+							"Necroskeleton",
+							"Necromage"
+							];
+							
+//Do Not Edit These
+var chanterVersion = "1.0", _EnchantPlayer = [], _canEnchant, lastposx, lastposy, firstCheck = true, busy = false;
+var _player, _leaderUnit, _townArea, _quest = "", _extras = false, _attack = true, paused = false, _questing = false, _tele = false;
+var usedItem = false, questItem = -1;
+var _staticattackrange, _staticmaxrange;
+//
+
+function NTMain()
+{
+	Include("libs/common/NTCommon.ntl");
+	NTC_IncludeLibs();
+	NTC_IncludeConfig("NTBot/char_configs");
+	
+	NT_LoadConfig();
+	NTSI_LoadNIPFiles("NTBot/item_configs");	
+	NTA_Initialize();
+	_staticattackrange = _attackRange;//do not edit
+	_staticmaxrange = _maxAttackRange;//do not edit
+	
+	me.maxgametime = 0;	
+	NTConfig_SnagRange = 20; //keep this between 15-25
+	NTConfig_MinGoldToStash = 200;
+		
+	RegisterEvent(EVENT_GAMEMSG, chat);
+	
+	GS_LeaderCheck(NTConfig_Leader);
+	
+	if(NTC_InTown())
+		NTTMGR_TownManager();
+	
+	while(NTC_InMyParty(NTConfig_Leader)){
+		if(me.mode != 17 && me.mode != 0)
+			GS_FollowLeader(NTConfig_Leader);
+		NTC_Delay(150);
+	}
+	
+	NTC_SendMsgToScript("NTBotGame.ntj", "SCRIPT_END");	
+}
+
+function GS_LeaderCheck(leader)
+{
+        _limit = NTConfig_PartyMaxTime;
+       
+        if(!NTC_InMyParty(leader))
+        {              
+                for(i = _limit ; i > 0 ; i--){ 
+                        NTC_Delay(1000);
+                        if(NTC_InMyParty(leader)){
+                                Print(COLOR_10 + "Leader : " + leader);
+                                break;
+                        }
+                        Say("!Waiting " + i + " seconds for " + leader);
+                        if(i <= 1){
+                                Say("!" + leader + " isn't here, Leaving Game!");
+                                NTC_Delay(1000);
+                        }
+                }
+        }
+        else if(NTC_InMyParty(leader)){               
+                Print(C_GREEN + "Leader : " + leader);
+        }
+        return true;
+}
+
+function chat(msg, type)
+{
+    if(type == 0){	
+        var _split = msg.split(":");
+        if(_split.length >= 1 && _split[1] != undefined){
+            var _sender = _split[0].substring(3, _split[0].length - 3);
+            var _msg = _split[1].substring(1);
+            if(_sender == NTConfig_Leader){
+                switch(_msg)
+                {								
+					case "1" : if(IsWayPoint(_player) && me.areaid != _player.areaid){ if(printUsedCommands) Print(C_WHITE + "Taking Leaders Waypoint"); return WPleader(_player, NTConfig_Leader); } else if(!IsWayPoint(_player) && !GS_OutsideTown(_player)) Print(C_RED + "Can't Waypoint there."); break;					
+					case "2" : if(NTC_InTown()){ if(printUsedCommands) Print(C_WHITE + "Taking Leaders Portal"); return TakePortal(NTConfig_Leader); } break;	
+					case "3" : if(!WPHome(_townArea)) return false; break;	
+					case "4" : if(!NTC_InTown()){ if(printUsedCommands) Print(C_WHITE + "Using TP to Town"); PortHome(); if(NTC_InTown() && !GS_HaveItem()) return NTTMGR_TownManager(); } break;	
+					case "5" : if(!NTC_InTown(me)){ if(printUsedCommands) Print(C_WHITE + "TPing to Town"); NTM_MakeTP(true);  if(NTC_InTown() && !GS_HaveItem()) return NTTMGR_TownManager(); } break;		
+					case "6" : return NTC_CancelOut(1); break;	
+					case "7" : if(GS_OutsideTown(_player) && GS_CanLeaveTown(_player)){ if(printUsedCommands) Print(C_WHITE + "Leaving Town"); GS_WalkOutofTown(me.areaid, _player); } else if((GS_OutsideTown(_player) && !GS_CanLeaveTown(_player)) || !GS_OutsideTown(_player) && !GS_CanLeaveTown(_player)) Print(C_RED + "I can't leave town from here, I must be in same act and you must be just outside town"); break;
+					case "b" : if(printUsedCommands) Print(C_WHITE + "Grabbing Corpse"); return NTT_GetCorpses(); break;	
+					case ";" : if(!paused){ paused = true; Print(C_RED + "------------------------| PAUSED |------------------------"); } else if(paused){ paused = false; Print(C_WHITE + "-----------------------| UnPaused |-----------------------"); } return paused; break;		
+					case "tele" : var canTele = NTC_GetSkillLevel(54); if(canTele && !_tele){ Print(C_GREEN + "Teleport On"); _tele = true; } else if(canTele && _tele){ Print(C_GREEN + "Teleport Off"); _tele = false; } else if(!canTele) Print(C_RED + "I Don't Have Teleport"); break;	
+					case "wp" : return GS_GrabWayPoint(); break;	
+					case "mh" : return me.revealautomap = true; break;	
+					case "atk" : if(!_attack){ _attack = true; Print(C_WHITE + "------------- Attacking Resumed -------------"); } else if(_attack){ _attack = false; Print(C_RED + "------------- Not Attacking -------------"); } return _attack; break;	
+					case "buff" : NTP_DoPrecast(true); if(me.classid == 1){ _canEnchant = NTC_GetSkillLevel(52); if(_canEnchant){ Print(COLOR_4 + "AutoEnchanter " + C_GREEN + chanterVersion + COLOR_4 + " Active"); } } break;	
+					case "goeast" : if(printUsedCommands) Print(C_WHITE + "Moving East"); return GoEast(); break;
+					case "akara" : return GS_InteractNPC("akara"); break;
+					case "alkor" : return GS_InteractNPC("alkor"); break;
+					case "charsi" : return GS_InteractNPC("charsi"); break;
+					case "cain" : return GS_InteractNPC("cain"); break;
+					case "drog" : return GS_InteractNPC("drognan"); break;
+					case "jer" : return GS_InteractNPC("palace"); break;
+					case "tyrael" : return GS_InteractNPC("tyrael"); break;
+					case "malah" : return GS_InteractNPC("malah"); break;
+					case "anya" : return GS_InteractNPC("anya"); break;
+					case "left" : return GS_Moving("Left"); break;
+					case "right" : return GS_Moving("Right"); break;	
+					case "up" : return GS_Moving("Up"); break;	
+					case "down" : return GS_Moving("Down"); break;					
+					case me.name + " commands" : return ListCommands(); break;	
+					case me.name + " tp" : if(!NTC_InTown()) return NTM_MakeTP(); break;
+					case me.name + " tele" : var canTele = NTC_GetSkillLevel(54); if(canTele && !_tele){ Print(C_GREEN + "Teleport On"); _tele = true; } else if(canTele && _tele){ Print(C_GREEN + "Teleport Off"); _tele = false; } else if(!canTele) Print(C_RED + "I Don't Have Teleport"); break;
+					
+                }
+            }
+        }
+	}
+	else if(type == 4 && ((msg.indexOf("weaken") != -1) || (msg.indexOf("timeout") != -1)) && (msg.indexOf(NTConfig_Leader) != -1)) {
+        NTC_Delay(NTConfig_LeechExitDelay);
+		NTC_SendMsgToScript("NTBotGame.ntj", "SCRIPT_END");	
+    }
+}
+
+function GS_FollowLeader(leader)
+{	
+	_player = GS_GetLeader(leader);
+	_leaderUnit = GetLeaderUnit(leader);
+	
+	if(_player && !paused){
+		if(_player.name == leader && me.mode != 17){						
+			if(me.areaid <= 39 && _townArea != 1)
+				_townArea = 1;	
+			else if(me.areaid >= 40 && me.areaid <= 74 && _townArea != 40)
+				_townArea = 40;
+			else if(me.areaid >= 75 && me.areaid <= 102 && _townArea != 75)
+				_townArea = 75;
+			else if(me.areaid >= 103 && me.areaid <= 108 && _townArea != 103)
+				_townArea = 103;
+			else if(me.areaid >= 109 && _townArea != 109)
+				_townArea = 109;
+			
+			if((GS_OutsideTown(_player) && NTC_InTown() || NTC_InTown() && !NTC_InTown(_player)) && !GS_HaveItem() && questItem == -1){
+				GS_Idle(3, _player);
+			}
+			else if((GS_OutsideTown(_player) && NTC_InTown() || NTC_InTown() && !NTC_InTown(_player)) && GS_HaveItem() && questItem != -1){
+				GS_UseItem(questItem);
+			}
+			else if(!GS_OutsideTown(_player) && NTC_InTown() && !NTC_InTown(_player) && !GS_HaveItem()){
+				GS_Idle(4, _player);
+			}
+			if(me.areaid != _player.areaid && !NTC_InTown() && !_questing){
+				if(!NTC_InTown() && me.areaid != _player.areaid){
+					if(_player.areaid == 108 && me.areaid == 107){
+						GS_MoveTo(108, 7796, 5588);
+					}
+					else if(((!NTC_InTown(_player) && me.areaid != 53 && !InTomb() && GS_InStrangePortalArea(_player) && !GS_CanPath(_player) && !GS_NearWaypoint() && me.areaid != _player.areaid) && (me.areaid != 10 || _player.areaid == 73 || me.areaid == 102)) || me.areaid == 102 && _player.areaid == 103 || _player.areaid == 73 && InTomb()){
+						GS_UseStrangePortal(_player, _player.areaid);		
+					}
+					else if(((me.areaid == _player.areaid+1 || me.areaid == _player.areaid-1 || GS_CanPath(_player)) && _player.areaid != 132) && !NTC_InTown(_player) && !GS_NearWaypoint() && me.areaid != _player.areaid){
+						if(!InTomb() && !InStair()){
+							GS_MoveToArea(_player.areaid);
+						}
+						else if((InStair(_player) || InStair()) || (InStair(_player) && InStairOpenArea() || InStair() && InStairOpenArea(_player))){
+							if(GS_MoveStair(me.areaid, _player.areaid)){
+								NTM_TakeStair(_player.areaid);
+							}
+						}
+					}
+					else if((InStair(_player) || InStair()) && !NTC_InTown(_player) || (InStair(_player) && InStairOpenArea() || InStair() && InStairOpenArea(_player)) && !NTC_InTown(_player)){
+						if(GS_MoveStair(me.areaid, _player.areaid)){
+							NTM_TakeStair(_player.areaid);
+						}
+					}
+					else if(me.areaid != _player.areaid && !IsWayPoint(_player) && GS_CanPath(_player) && !NTC_InTown(_player)){
+						GS_MoveToArea(_player.areaid);
+						for(var i = 0 ; i < 21 && !_questing && me.areaid != _player.areaid ; i+=1){
+							if(i == 2)
+								Print(C_RED + "Cannot Switch Areas : " + C_WHITE + "Use up | down | left | right");
+							NTC_Delay(200);
+						}
+					}
+					else						
+						if(_attack && !NTC_InTown())
+							GS_ClearPosition(_attackRange,true);
+				}
+			}
+			else if(me.areaid === _player.areaid && !_questing && !_extras){
+				if(NTC_InTown() && NTC_InTown(_player)){
+					if(!GS_HaveItem() && questItem == -1){
+						GS_Idle(2, _player);
+					}
+					else if(GS_HaveItem() && questItem != -1){
+						GS_UseItem(questItem);
+					}
+				}
+				else if(!NTC_InTown(_player) && !NTC_InTown()){		
+					if(InStairOpenArea() && _attackRange != _staticattackrange){						
+						_attackRange = _staticattackrange ? _staticattackrange : _attackRange; 
+						_maxAttackRange = _staticmaxrange ? _staticmaxrange : _maxAttackRange;
+					}
+					if(InStair() && _attackRange != _stairAttackRange){										
+						_attackRange = _stairAttackRange ? _stairAttackRange : _attackRange;
+						_maxAttackRange = _stairMaxRange ? _stairMaxRange : _maxAttackRange;
+					}
+					
+					if(GetDistance(me,_leaderUnit) != -1 && me.areaid == _player.areaid){
+						NTP_DoPrecast(false);						
+						if(_autoTown && _leaderUnit.mode == 17)
+							NTM_MakeTP(true);
+						if(me.areaid == 74 && _UseTelePads)
+							GS_TakeTelepad(_leaderUnit);
+						if(Enchant_Party && me.classid == 1)
+							GS_AutoEnchant();
+						if(GetDistance(me,_leaderUnit) > _followRange && _leaderUnit.mode != 17){							
+							if(GS_GetCloserLeader(_leaderUnit)){
+								if(_attack)
+									GS_ClearPosition(_attackRange, true);			
+							}
+							else if(!GS_GetCloserLeader(_leaderUnit) && GetDistance(me,_leaderUnit) > 10 && GetDistance(me,_leaderUnit) < 80 && GetDistance(me,_leaderUnit) != -1 && me.areaid == _leaderUnit.areaid){
+								GS_Unstuck(_leaderUnit);
+								//GS_Move(me.areaid, _leaderUnit.x, _leaderUnit.y, 2);
+							}
+						}
+						else if(GetDistance(me,_leaderUnit) <= _followRange+1 && GetDistance(me,_leaderUnit) != -1 && _leaderUnit.mode != 17){
+							if(_attack){
+								if(GS_ClearPosition(_attackRange, true)){
+									for(var i = 0 ; i < 100 && me.areaid == _player.areaid && GetDistance(me,_leaderUnit) < _followRange ; i++){
+										//GS_ClearPosition(_attackRange, true);
+										Delay(100);
+									}
+								}
+							}
+							else
+								for(var i = 0 ; i < 100 && me.areaid == _player.areaid && GetDistance(me,_leaderUnit) < _followRange ; i++){
+									Delay(100);
+								}
+						}
+					}		
+				}
+			}
+			else if(_extras && _questing){
+				GS_Quester(_quest);
+			}
+		}return false;
+	}
+}
+
+function WPleader(unit, name)
+{	
+	if(unit.name == name){
+		if(NTC_InTown())
+			NTTM_TownMove("waypoint");		
+		return NTM_TakeWaypoint(unit.areaid);
+	}
+	else if(unit.name != name){
+		unit = GetPlayerUnit();
+		if(unit){
+			do{
+				if(unit.name == name){
+					if(NTC_InTown())
+						NTTM_TownMove("waypoint");		
+					return NTM_TakeWaypoint(unit.areaid);
+				}				
+			}while(unit.GetNext());
+		}
+	}	
+	return true;
+}
+
+function WPHome(town)
+{
+	if(!NTC_InTown()){
+		if(GS_NearWaypoint() || me.areaid == 46 || me.areaid == 74){
+			if(printUsedCommands)
+				Print(C_WHITE + "Using Waypoint to Town");
+			NTM_TakeWaypoint(town);
+		}
+		else if(!GS_NearWaypoint()){
+			Print(C_RED + "I'm not close enough to a Waypoint");
+			return false;
+		}
+		
+	}
+	if(NTC_InTown() && !GS_HaveItem()){
+		return NTTMGR_TownManager();
+	}
+}
+
+function GS_HaveItem()
+{
+	var haveitem = false;
+		
+	if(me.GetQuest(37, 1) && me.GetQuest(37, 2) && me.GetQuest(37, 3) && !me.GetQuest(37, 8)){
+		if(me.areaid == 109){
+			Pring(C_ORANGE + "Grabbing Scroll from Malah");
+			GS_InteractNPC("malah");
+		}
+	}
+	
+	if(me.GetQuest(9, 4) && me.GetQuest(9, 5)){
+		questItem = -1 ? me.GetItems(552) : -1;
+	}
+	else if(me.GetQuest(20, 5) && me.GetQuest(20, 0)){
+		questItem = -1 ? me.GetItems(545) : -1;
+	}
+	else if(me.GetQuest(37, 8) && !me.GetQuest(37, 7)){
+		questItem = -1 ? me.GetItems(646) : -1;
+	}
+	
+	if(questItem.length < 0){ haveitem = false; return haveitem;}
+	else if(questItem.length > 0){
+		haveitem = true;
+	}
+	return haveitem;
+	
+}
+
+function GS_UseItem(item)
+{
+	var i, itemUsed = false;
+	
+	if(item.length != 0){		
+		Print(C_WHITE + "Quest Item - " + C_BROWN + item[0].name.split("\n") + C_WHITE + " : in Inventory");
+		GS_CancelMenus();
+		Delay(200);		
+		SetUIState(0x01, true);
+		Delay(200);		
+		if(item.length > 0 && item[0]){
+			for(i = 0; i < 5; i++){
+				if(me.ClickItem(1, item[0])){
+					Print(C_WHITE + "Quest Item : Used!");
+					itemUsed = true;
+					questItem = -1;
+				}
+				Delay(200);		
+				if(me.itemoncursor)
+					break;
+			}
+		}
+		if(i < 5){
+			for(i = 0; i < 5; i++){
+				if(me.ClickItem(1, item[0])){
+					Print(C_WHITE + "Quest Item : Used!");
+					itemUsed = true;
+					questItem = -1;
+				}		
+				Delay(200);		
+				if(!me.itemoncursor)
+					break;
+			}
+		}
+		me.Cancel(1);
+	}
+	
+	if(itemUsed){
+		if(me.areaid == 40 && me.GetQuest(9, 4) && me.GetQuest(9, 5)){
+			GS_InteractNPC("atma");
+			NTC_Delay(200, 200);
+			NTTM_TownMove("stash");
+		}
+		else if(me.areaid == 75 && me.GetQuest(20, 5) && me.GetQuest(20, 0)){
+			GS_InteractNPC("alkor");
+			NTC_Delay(500, 200);
+			NTTM_TownMove("stash");
+		}
+		else if(me.areaid == 109 && me.GetQuest(37, 8) && !me.GetQuest(37, 7)){
+			GS_InteractNPC("anya");
+		}
+			
+	}
+}
+
+
+function GS_UIState()
+{		
+	return (GetUIState(0x01) || GetUIState(0x08) || GetUIState(0x0C) || GetUIState(0x0F) || GetUIState(0x14) || GetUIState(0x17) || GetUIState(0x19) ||   GetUIState(0x1A) || GetUIState(0x24));
+}
+
+function GS_IsUIState()
+{		
+	return (!GetUIState(0x01) && !GetUIState(0x08) && !GetUIState(0x0C) && !GetUIState(0x0F) && !GetUIState(0x14) && !GetUIState(0x17) && !GetUIState(0x19) &&  !GetUIState(0x1A) && !GetUIState(0x24));
+}
+
+function GS_CancelMenus(){
+
+	if(GS_UIState()){
+		for (var i = 0; i < 100 && !GS_IsUIState() ; i++){
+			me.Cancel(1);
+			Delay(50);
+		}
+	}
+}
+
+function GS_InteractNPC(who)
+{
+	var _npc;	
+	
+	if(!NTTM_TownMove(who)){ return false; }
+	
+	switch(who)
+	{
+		case "atma" : _npc = NTC_FindUnit(NTC_UNIT_NPC, 176, 5); break;
+		case "akara" : _npc = NTC_FindUnit(NTC_UNIT_NPC, 148, 5); break;
+		case "charsi" : _npc = NTC_FindUnit(NTC_UNIT_NPC, 154, 5); break;
+		case "cain" : _npc = NTC_FindUnit(NTC_UNIT_NPC, GetLocaleString(2890), 5); break;
+		case "alkor" : _npc = NTC_FindUnit(NTC_UNIT_NPC, GetLocaleString(1010), 5); break;
+		case "drognan" : _npc = NTC_FindUnit(NTC_UNIT_NPC, GetLocaleString(3023), 5); break;
+		case "palace" : _npc = NTC_FindUnit(NTC_UNIT_NPC, 201, 5); break;
+		case "hratli" : _npc = NTC_FindUnit(NTC_UNIT_NPC, 235, 5); break;
+		case "tyrael" : _npc = NTC_FindUnit(NTC_UNIT_NPC, GetLocaleString(1013), 5); break;
+		case "anya" : _npc = NTC_FindUnit(NTC_UNIT_NPC, NTC_NPC_ID_ANYA_TOWN, 5); break;
+		case "malah" : _npc = NTC_FindUnit(NTC_UNIT_NPC, 513, 5); break;		
+	} 
+	if(_npc){
+		if(NTT_VisitNpc(_npc)){
+			GS_CancelMenus();
+		}
+	}
+	return;
+}
+
+function GoEast()
+{	
+	switch(me.areaid){
+		case 1 :
+			NTTM_TownMove("warriv");
+			_npc = NTC_FindUnit(NTC_UNIT_NPC, 155, 5);
+			if(_npc){
+				if(NTT_VisitNpc(_npc)){
+					GS_CancelMenus();
+				}
+				if(NTT_DoInteract(_npc)){
+					for(var i = 0 ; i < 4 ; i++){
+						if((i % 4) == 0)
+						me.SelectNPCMenu(0x0D36);
+						NTC_Delay(200);
+					}
+				}
+			}return true;
+		break;
+		case 40 :
+			NTTM_TownMove("meshif");
+			_npc = NTC_FindUnit(NTC_UNIT_NPC, 210, 5);			  
+			if(_npc){
+				if(NTT_VisitNpc(_npc)){
+					GS_CancelMenus();
+				}
+				if(NTT_DoInteract(_npc)){
+					for(var i = 0 ; i < 4 ; i++){
+						if((i % 4) == 0)
+						me.SelectNPCMenu(0x0D38);
+						NTC_Delay(100);
+					}
+					NTC_Delay(500);
+				}
+				if(me.areaid == 75){
+					_npc = NTC_FindUnit(NTC_UNIT_NPC, 253, 5);	
+					if(_npc){						
+						if(NTT_VisitNpc(_npc)){
+							GS_CancelMenus();
+						}
+					}
+					NTTM_TownMove("portalspot");
+				}
+			}
+			return true;
+		break;
+		case 103 :
+			NTTM_TownMove("tyrael");
+			_npc = NTC_FindUnit(NTC_UNIT_NPC, GetLocaleString(1013), 5);      
+			if(_npc){
+				if(NTT_VisitNpc(_npc)){
+					GS_CancelMenus();
+				}Delay(500);
+			}
+			GS_IsStrangePortal(4);
+			return true;
+		break;
+	}
+return;
+}
+
+function GS_UseStrangePortal(unit, unitarea)
+{
+	switch(unitarea)
+	{
+		case 4 : GS_EnterStrangePortal(0, unit); break;
+		case 38: GS_EnterStrangePortal(0, unit); break;
+		case 46 : GS_EnterStrangePortal(1, unit); break;
+		case 54 : GS_EnterStrangePortal(1, unit); break;
+		case 73 : GS_EnterStrangePortal(1, unit); break;
+		case 74 : GS_EnterStrangePortal(1, unit); break;
+		case 111 : GS_EnterStrangePortal(1, unit); break;
+		case 112 : GS_EnterStrangePortal(1, unit); break;
+		case 117 : GS_EnterStrangePortal(1, unit); break;
+		case 125 : GS_EnterStrangePortal(1, unit); break;
+		case 126 : GS_EnterStrangePortal(1, unit); break;
+		case 127 : GS_EnterStrangePortal(1, unit); break;
+		case 103 : GS_EnterStrangePortal(2, unit); break;
+		case 109 : GS_EnterStrangePortal(2, unit); break;
+		case 132 : GS_EnterStrangePortal(2, unit); break;
+	}
+	if(NTC_InTown() && !GS_HaveItem())
+		return NTTMGR_TownManager();
+}
+
+function GS_NearWaypoint()
+{	
+	var nearwp;
+	var wps = [];
+	var unit = GetUnit(NTC_UNIT_OBJECT);
+	
+	if(!unit){ return false; }
+	
+	if(unit){
+		do{
+			if(me.areaid != 74 && me.areaid != 46){
+				if(unit.name == "Waypoint" && GetDistance(me, unit) <= 30){
+					wps.push(unit.name);
+				}
+			}
+			else if(me.areaid == 74 || me.areaid == 46){
+				if(unit.name == "Waypoint" && GetDistance(me, unit) <= 10){
+					wps.push(unit.name);
+				}
+			}
+		}while(unit.GetNext());
+	}
+	if(wps.indexOf("Waypoint") != -1)
+		nearwp = true;
+	else if(wps.indexOf("Waypoint") == -1)
+		nearwp = false;
+	
+	return nearwp;
+}
+
+function GS_TakeTelepad(leaderUnit)
+{	
+	var unit = GetUnit(NTC_UNIT_OBJECT);		
+	if(unit){
+		do{
+			if(unit.name == "Teleport Pad" && GetDistance(me, unit) < 6 && GetDistance(me, leaderUnit) > 11){
+				if(NTM_GetCloserInt(unit)){
+					NTC_Delay(1000);
+					NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, unit);
+					return true;
+				}
+			}
+		}while(unit.GetNext());
+	}return false;
+	
+}
+
+function GS_IsStrangePortal(type)
+{
+	var _portal;
+	
+	switch(type)
+	{
+		case 0 : _portal = NTM_TakeUnit(NTC_UNIT_OBJECT, 60); break; //RedPortals
+		case 1 : _portal = NTM_TakeUnit(NTC_UNIT_OBJECT, 298); break; //Arcane
+		case 2 : _portal = NTM_TakeUnit(NTC_UNIT_OBJECT, 100); break; //Duriel
+		case 3 : _portal = NTM_TakeUnit(NTC_UNIT_OBJECT, 342); break; //Mephistos Portal
+		case 4 : _portal = NTM_TakeUnit(NTC_UNIT_OBJECT, 566); break; //Harrogath
+		case 5 : _portal = NTC_FindUnit(NTC_UNIT_OBJECT, 563, 1); break; //WorldstoneChamber
+	}
+	if(!_portal){ Print(C_RED + "Cant take Portal"); return false;}
+	if(_portal && me.areaid == 131){
+		GS_MoveTo(me.areaid, 15092, 5010);
+		return NTM_UsePortal("Portal", 132, true, _portal);
+	}
+	else if(_portal && me.areaid != 131){
+		NTM_MoveTo(_portal.areaid, _portal.x+1, _portal.y+1, 0);
+		if(GetDistance(me,_portal) < 15){
+			GS_GetCloserLeader(_portal);
+			return NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _portal);
+		}
+	}
+}
+
+function GS_EnterStrangePortal(type, unit)
+{
+	switch(type)
+	{
+		case 0 :
+			if(unit.areaid == 38 && me.areaid == 4){
+				return NTM_UsePortal("Portal", 38);
+			}
+			else if(unit.areaid == 4 && me.areaid == 38){
+				return NTM_UsePortal("Portal", 4);
+			}
+		break;
+		case 1 :
+			if(unit.areaid == 73 && InTomb(me)){
+				GS_IsStrangePortal(2);
+			}
+			else if(unit.areaid == 74 && me.areaid == 46 || unit.areaid == 46 && me.areaid == 74 ){
+				GS_IsStrangePortal(0);
+			}
+			else if(unit.areaid == 125 && me.areaid == 111 || me.areaid == 125 && unit.areaid == 111){
+				GS_IsStrangePortal(0);
+			}
+			else if( me.areaid == 126 && unit.areaid == 112 || unit.areaid == 126 && me.areaid == 112){
+				GS_IsStrangePortal(0);
+			}
+			else if( me.areaid == 127 && unit.areaid == 117 || unit.areaid == 127 && me.areaid == 117){
+				GS_IsStrangePortal(0);
+			}
+			else if(unit.areaid == 74 && me.areaid == 54 || unit.areaid == 54 && me.areaid == 74){
+				GS_IsStrangePortal(1);
+			}
+		break;
+		case 2 :
+			if(unit.areaid == 103 && me.areaid == 102){
+				GS_IsStrangePortal(3);
+			}
+			else if(unit.areaid == 132 && me.areaid == 131){
+				NTP_DoPrecast(true);
+				GS_IsStrangePortal(5);
+			}
+		break;
+	}
+}
+		 
+function GS_WalkOutofTown(area, unit)
+{			
+	switch(area)
+	{
+		case 1 : if(NTC_InTown()){ NTTM_TownMove("exit"); } return GS_MoveTo(2, unit.x+1, unit.y); break;
+		case 40 : return GS_MoveTo(41, unit.x+1, unit.y); break;
+		case 75 : if(NTC_InTown()){ NTTM_TownMove("exit"); } return GS_MoveTo(76, unit.x+1, unit.y); break;
+		case 103 : if(NTC_InTown()){ NTTM_TownMove("exit"); } return GS_MoveTo(104, unit.x+1, unit.y); break;
+		case 109 : if(NTC_InTown()){ NTTM_TownMove("exit"); } return GS_MoveTo(110, unit.x+1, unit.y); break;
+	}
+	return false;
+}
+
+function GS_AutoEnchant()
+{	
+	if(!NTC_InTown() && me.classid == 1 && !busy && me.mode != 0 && me.mode != 17){
+		if(firstCheck){
+			_canEnchant = NTC_GetSkillLevel(52); 
+			if(_canEnchant){ 
+				firstCheck = false; 
+				Print(COLOR_4 + "AutoEnchanter " + C_GREEN + chanterVersion + COLOR_4 + " Active"); 
+			}
+		}
+		if(_canEnchant)
+			EnchantPlayer();
+	}
+}
+
+function EnchantPlayer()
+{			
+	var _unit = NTC_FindUnit(NTC_UNIT_PLAYER);
+	if(_canEnchant && _unit){
+		busy = true;
+		if(me.areaid == 131){ lastposx = me.x; lastposy = me.y; }			
+		do{			
+			if (Enchant_BlackList.indexOf(_unit.name) == -1 && doNotEnchant_Class.indexOf(_unit.classid) == -1 && _unit.areaid == me.areaid && _unit.name != me.name && NTC_InMyParty(_unit.name) && !_unit.GetState(16) && _unit.mode != 0 && _unit.mode != 17){
+				if(_EnchantPlayer.indexOf(_unit.name) == -1 && Enchant_Merc)
+					_EnchantPlayer.push(_unit.name);
+				if(!_unit.GetState(16) && me.mp >= 25){
+					if(GetDistance(me,_unit) < 15){
+						if(!NTC_CastSkill(52, NTC_HAND_RIGHT, _unit))
+							return false;
+					}
+					else if(GetDistance(me,_unit) > 20){
+						if(GS_GetCloserLeader(_unit)){	
+							if(!NTC_CastSkill(52, NTC_HAND_RIGHT, _unit))
+								return false;
+						}
+					}
+					if(_unit.GetState(16)){
+						if(printEnchants){
+							Print(COLOR_8 + "Enchanted Player : " + COLOR_4 + _unit.name);
+						}
+					}
+				} if(me.areaid == 131 && me.x != lastposx && me.y != lastposy) if(!_tele)NTM_WalkTo(lastposx, lastposy); else if(_tele)NTM_MoveTo(me.areaid, lastposx, lastposy);
+			}
+		}while (_unit.GetNext()); if(Enchant_Merc) EnchantMerc(); busy = false;
+	}
+	
+	return false;			
+	function EnchantMerc(){			
+		var mercOwner;
+		var _unit = NTC_FindUnit(NTC_UNIT_MERC);
+		
+		if (_unit){
+			do{
+				for(var i = 0 ; i < _EnchantPlayer.length ; i++){
+					if (NTC_CheckOwner(_unit, _EnchantPlayer[i]) && !_unit.GetState(16) && _unit.mode != 12 && _unit.mode != 0){
+						mercOwner = GS_GetUnit(_EnchantPlayer[i]);
+						if(Enchant_BlackList.indexOf(_unit.name) == -1 && doNotEnchant_ClassMerc.indexOf(mercOwner.classid) == -1){
+							if(!_unit.GetState(16) && me.mp >= 25){
+								if(GetDistance(me,_unit) < 15){
+									if(printEnchants)
+										Print(COLOR_9 + "Enchanting [ " + COLOR_4 + mercOwner.name + "'s" + COLOR_9 + " ] Merc : " + COLOR_0 + _unit.name);																						
+									if(!NTC_CastSkill(52, NTC_HAND_RIGHT, _unit))
+										return false;
+								}
+							} if(me.areaid == 131 && me.x != lastposx && me.y != lastposy) NTM_MoveTo(me.areaid, lastposx, lastposy);
+						}
+					}
+				}
+			}while(_unit.GetNext());
+		}return false;
+		
+	}
+
+	function ClassIDToName(classid){
+		var id2name;
+		
+		switch(classid){
+			case 0 : id2name = "Amazon"; break;
+			case 1 : id2name = "Sorceress"; break;
+			case 2 : id2name = "Necromancer"; break;
+			case 3 : id2name = "Paladin"; break;
+			case 4 : id2name = "Barbarian"; break;
+			case 5 : id2name = "Druid"; break;
+			case 6 : id2name = "Assassin"; break;
+		}
+		return id2name;
+	}
+
+	function GS_GetUnit(name){
+		var _unit = GetPlayerUnit();
+		
+		if (_unit){
+			do{
+				if (_unit.name === name){
+					return _unit;
+				}
+			}while(_unit.GetNext());
+		}			
+		return false;
+	}
+}
+
+function GS_Quester(quest)
+{
+	//Currently not being used, maybe i'll add more to this and implement it at a later point
+	switch(quest)
+	{
+		case "TOME" :			
+			if(me.areaid == 80){
+				Print(C_WHITE + "Doing Quest : " + C_RED + quest);
+				
+				GS_MoveToStair(me.areaid, 94, 1, 1, true);
+				NTM_TakeStair(94);
+				
+				if(me.areaid == 94){
+					_questing = false;
+					_extras = false;
+					_quest = "";
+				}
+			}
+			else if(me.areaid != 80){
+				Print(C_RED + "I must be in " + C_WHITE + "Kurast Bazaar" + C_RED + " to move there");
+				 _questing = false;
+				_extras = false;
+				_quest = "";
+			}
+			break;
+	}
+}
+
+function ListCommands()
+{
+	var commands = [
+		"1 - bot takes your current waypoint (Also use to Change Acts)",
+		"2 - while in town bot moves to portalspot and uses your TP",
+		"3 - bot takes nearby waypoint back to town",
+		"4 - bot use's nearby TP back to town",
+		"5 - bot creates and enters TP",
+		"6 - cancel current menu eg 'Death Screen' (to release)",
+		"7 - bot Exits Town (YOU must be outside town first)",
+		"; - use to Pause bot(s) they stop following/attacking",
+		"tele - enable/disable teleporting",
+		"wp - bot grabs waypoint",
+		"mh - maphack",
+		"atk - bot enables/disables attacking",
+		"b - bot grabs corpse",
+		"buff - bot precast eg Battle Orders, Holy Shield, ect.",
+		"goeast - bot use's NPC : Act 1 (Warriv), Act 2 (Meshif), Act 4 (Harrogath Portal)",
+		"akara - talk to Akara",
+		"charsi - talk to Charsi",
+		"alkor - talk to Alkor",
+		"cain - talk to Cain",
+		"jer - talk to Jerhyn at the Palace",
+		"drog - talk to Drognan",
+		"tyrael - talk to Tyrael",
+		"malah - talk to Malah",
+		"anya - talk to Anya",
+		"up - bot moves up (if bots trap you in corner)",
+		"down - bot moves down (if bots trap you in corner)",
+		"left - bot moves left (if bots trap you in corner)",
+		"right - bot moves right (if bots trap you in corner)",
+		"botName tp - named bot creates TP",
+		"botName tele - named bot creates TP",
+		"botName commands - this list"
+	];
+	
+	for(var i = 0 ; i < commands.length && !paused; i += 1){
+		Say(commands[i]);
+		if(i >= 0 && i <= 14 && i != 9 && i != 10 )
+			NTC_Delay(2300);
+		else
+			NTC_Delay(1200);
+	}
+}
+
+function GS_Moving(type)
+{
+	switch(type)
+	{
+		case "Left" : return NTM_WalkTo(me.x-20,me.y ); break;
+		case "Right" : return NTM_WalkTo(me.x+20,me.y ); break;
+		case "Up" : return NTM_WalkTo(me.x,me.y-20 ); break;
+		case "Down" : return NTM_WalkTo(me.x,me.y+20 ); break;
+	}
+	return false;
+}
+
+function GS_Idle(type, unit)
+{
+	switch(type)
+	{
+		case 0 : for(var i = 0 ; i < 100 && unit.areaid == 0 ; i++){ NTC_Delay(100); } break;
+		case 1 : for(var i = 0 ; i < 100 && !NTC_InTown(unit) ; i++){ NTC_Delay(100); } break;
+		case 2 : for(var i = 0 ; i < 100 && NTC_InTown(unit) ; i++){ NTC_Delay(100); } break;
+		case 3 : for(var i = 0 ; i < 100 && GS_OutsideTown(unit) ; i++){ NTC_Delay(100); } break;
+		case 4 : for(var i = 0 ; i < 100 && me.areaid != unit.areaid ; i++){ NTC_Delay(100); } break;
+	}
+	return false;
+}
+
+function PortHome()
+{
+	var _portal = NTC_FindUnit(NTC_UNIT_OBJECT, 59);
+	var _preareaid = me.areaid;
+	if(_portal){
+		do{
+			if(_portal.mode == 2 && GetDistance(me, _portal) <= 30){
+				while(me.areaid == _preareaid && _portal){
+					if(!_tele)
+						NTM_WalkTo(_portal.x+1, _portal.y);
+					else if(_tele)
+						NTM_MoveTo(_portal.areaid, _portal.x+1, _portal.y);
+					
+					NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _portal);						
+					Delay(500);					
+					if(me.areaid != _preareaid)
+						return;
+				}
+			}
+		} while(_portal.GetNext());
+	}
+	return false;
+}
+
+function TakePortal(leader)
+{
+	if(NTC_InTown())
+		NTTM_TownMove("portalspot");
+	
+	var _portal = NTC_FindUnit(NTC_UNIT_OBJECT, 59);
+	var _preareaid = me.areaid;
+	if(_portal){
+		do{
+			if(_portal.mode == 2 && NTC_CheckOwner(_portal, leader) && GetDistance(me, _portal) <= 30){
+				while(me.areaid == _preareaid && _portal){
+					if(!_tele)
+						NTM_WalkTo(_portal.x+1, _portal.y);
+					else if(_tele)
+						NTM_MoveTo(_portal.areaid, _portal.x+1, _portal.y);
+						
+					NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _portal);						
+					Delay(500);
+					
+					if(me.areaid != _preareaid)
+						return;
+				}
+			}
+		} while(_portal.GetNext());
+	}
+	if(NTC_InTown())
+		return true;
+	else 
+		return false;
+}
+
+function GS_GetCloserLeader(unit)
+{ 
+
+	if(!_tele || GetDistance(me, unit) < 15){		
+		if(GetDistance(me, unit) > _followRange){
+			if(NTM_WalkTo(unit.x+1, unit.y))
+				return true;
+			else
+				return false;
+		}
+	}
+	else if(_tele && GetDistance(me, unit) > 15 && GetDistance(me, unit) != -1){
+		NTM_MoveTo(unit.areaid, unit.x+1, unit.y);
+	}
+	else
+		return false;
+		
+}
+
+function GS_Unstuck(unit)
+{
+	var i, mx, my;
+		mx =  unit.x > me.x ? me.x-Random(-10, 10) : me.x+Random(-10, 10);
+		my =  unit.y > me.y ? me.y+Random(-10, 10) : me.y-Random(-10, 10);
+		NTM_WalkTo(mx, my);
+}
+
+function GS_GetCloserMonster(monster)
+{ 
+	if(GetDistance(me, monster) < _maxAttackRange){		
+		if(GetDistance(me, monster) > 1){
+			if(NTM_WalkTo(monster.x+1, monster.y))
+				return true;
+		}
+	}
+	else
+		return false;
+		
+}
+
+function GS_GetLeader(name)
+{
+	var _unit = GetPlayerUnit();
+	
+	if (_unit) {
+		do {
+			if (_unit.name === name) {
+				return _unit;
+			}
+		} while (_unit.GetNext());
+	}	
+	return false;
+}
+
+function GS_CanLeaveTown(unit)
+{
+	if(me.areaid == 1 && unit.areaid == 2)
+		return true;
+	else if(me.areaid == 40 && unit.areaid == 41)
+		return true;
+	else if(me.areaid == 75 && unit.areaid == 76)
+		return true;
+	else if(me.areaid == 103 && unit.areaid == 104)
+		return true;
+	else if(me.areaid == 109 && unit.areaid == 110)
+		return true;
+	else 
+		return false;
+}
+
+function GS_CanPath(unit)
+{		
+	if(unit.areaid == 2 && me.areaid == 3 || unit.areaid == 3 && me.areaid == 2)
+		return true;
+	else if(me.areaid == 3 && unit.areaid == 17 || me.areaid == 17 && unit.areaid == 3)
+		return true;
+	else if(unit.areaid == 3 && me.areaid == 4 || unit.areaid == 4 && me.areaid == 3)
+		return true;
+	else if(unit.areaid == 4 && me.areaid == 5 || unit.areaid == 5 && me.areaid == 4)
+		return true;
+	else if(unit.areaid == 6 && me.areaid == 5 || unit.areaid == 5 && me.areaid == 6)
+		return true;
+	else if(unit.areaid == 6 && me.areaid == 7 || unit.areaid == 7 && me.areaid == 6)
+		return true;
+	else if(me.areaid == 7 && unit.areaid == 26 || me.areaid == 26 && unit.areaid == 7)
+		return true;
+	else if(me.areaid == 27 && unit.areaid == 26 || me.areaid == 26 && unit.areaid == 27)
+		return true;
+	else if(unit.areaid == 27 && me.areaid == 28 || unit.areaid == 28 && me.areaid == 27)
+		return true;
+	else if(unit.areaid == 32 && me.areaid == 33 || unit.areaid == 33 && me.areaid == 32)
+		return true;
+	else if(unit.areaid == 41 && me.areaid == 42 || unit.areaid == 42 && me.areaid == 41)
+		return true;
+	else if(unit.areaid == 43 && me.areaid == 42 || unit.areaid == 42 && me.areaid == 43)
+		return true;
+	else if(unit.areaid == 43 && me.areaid == 44 || unit.areaid == 44 && me.areaid == 43)
+		return true;
+	else if(unit.areaid == 45 && me.areaid == 44 || unit.areaid == 44 && me.areaid == 45)
+		return true;
+	else if(unit.areaid == 76 && me.areaid == 77 || unit.areaid == 77 && me.areaid == 76)
+		return true;
+	else if(unit.areaid == 78 && me.areaid == 77 || unit.areaid == 77 && me.areaid == 78)
+		return true;
+	else if(unit.areaid == 78 && me.areaid == 79 || unit.areaid == 79 && me.areaid == 78)
+		return true;
+	else if(unit.areaid == 79 && me.areaid == 80 || unit.areaid == 80 && me.areaid == 79)
+		return true;
+	else if(unit.areaid == 80 && me.areaid == 81 || unit.areaid == 81 && me.areaid == 80)
+		return true;
+	else if(unit.areaid == 81 && me.areaid == 82 || unit.areaid == 82 && me.areaid == 81)
+		return true;
+	else if(unit.areaid == 83 && me.areaid == 82 || unit.areaid == 82 && me.areaid == 83)
+		return true;
+	else if(unit.areaid == 104 && me.areaid == 105 || unit.areaid == 105 && me.areaid == 104)
+		return true; 
+	else if(unit.areaid == 105 && me.areaid == 106 || unit.areaid == 106 && me.areaid == 105)
+		return true;
+	else if(unit.areaid == 107 && me.areaid == 108 || unit.areaid == 108 && me.areaid == 107)
+		return true;
+	else if(unit.areaid == 109 && me.areaid == 110)
+		return true;
+	else if(unit.areaid == 111 && me.areaid == 110 || unit.areaid == 110 && me.areaid == 111)
+		return true;
+	else if(unit.areaid == 111 && me.areaid == 112 || unit.areaid == 112 && me.areaid == 111)
+		return true;
+	else
+		return false;
+}
+
+function InTomb(who)
+{
+	var _areaid;	
+	if(arguments.length < 1)
+		who = me;		
+	while(who.areaid == 0)
+		NTC_Delay(NTC_DELAY_FRAME);		
+	_areaid = who.areaid;	
+	return (_areaid == 66 || _areaid == 67 || _areaid == 68 || _areaid == 69 || _areaid == 70 || _areaid == 71 || _areaid == 72);
+}
+
+function InStairOpenArea(who)
+{	
+	var _areaid;	
+	if(arguments.length < 1)
+		who = me;		
+	while(who.areaid == 0)
+		NTC_Delay(NTC_DELAY_FRAME);		
+	_areaid = who.areaid;	
+	return (_areaid == 2 || _areaid == 3 || _areaid == 4 || _areaid == 5 || _areaid == 6 || _areaid == 7 || _areaid == 41 || _areaid == 42 
+		|| _areaid == 43 || _areaid == 44 || _areaid == 46 || _areaid == 76 || _areaid == 77 || _areaid == 78 || _areaid == 79 || _areaid == 80 
+		|| _areaid == 81 || _areaid == 82 || _areaid == 83 || _areaid == 104 || _areaid == 105 || _areaid == 106 || _areaid == 107 || _areaid == 108 
+		|| _areaid == 110 || _areaid == 111 || _areaid == 112 || _areaid == 117);
+}
+
+function GS_InStrangePortalArea(who)
+{	
+	var _areaid, myareaid;	
+	if(arguments.length < 1)
+		who = me;		
+	while(who.areaid == 0)
+		NTC_Delay(NTC_DELAY_FRAME);		
+	_areaid = who.areaid;	
+	
+	return (_areaid == 4 || _areaid == 38 || _areaid == 46 || _areaid == 54 || _areaid == 73 || _areaid == 74 || _areaid == 103
+		|| _areaid == 111 || _areaid == 112 || _areaid == 117 || _areaid == 125 || _areaid == 126 || _areaid == 127 || _areaid == 132 );
+}
+
+function InStair(who)
+{
+	var _areaid;	
+	if(arguments.length < 1)
+		who = me;		
+	while(who.areaid == 0)
+		NTC_Delay(NTC_DELAY_FRAME);		
+	_areaid = who.areaid;	
+	return (_areaid == 8 || _areaid == 9 || _areaid == 10 || _areaid == 11 || _areaid == 12 || _areaid == 13 || _areaid == 14 
+		|| _areaid == 15 || _areaid == 16 || _areaid == 18 || _areaid == 19 || _areaid == 20 || _areaid == 21 || _areaid == 22 || _areaid == 23 
+		|| _areaid == 24 || _areaid == 25 || _areaid == 29 || _areaid == 30 || _areaid == 31 || _areaid == 32 || _areaid == 34 || _areaid == 35 
+		|| _areaid == 36 || _areaid == 37 || _areaid == 38 || _areaid == 45 || _areaid == 47 || _areaid == 48 || _areaid == 49 || _areaid == 50 
+		|| _areaid == 51 || _areaid == 52 || _areaid == 53 || _areaid == 54 || _areaid == 55 || _areaid == 56 || _areaid == 57 || _areaid == 58 
+		|| _areaid == 59 || _areaid == 60 || _areaid == 61 || _areaid == 62 || _areaid == 63 || _areaid == 64 || _areaid == 65 || _areaid == 66 
+		|| _areaid == 67 || _areaid == 68 || _areaid == 69 || _areaid == 70 || _areaid == 71 || _areaid == 72 || _areaid == 84 || _areaid == 85
+		|| _areaid == 86 || _areaid == 87 || _areaid == 88 || _areaid == 89 || _areaid == 90 || _areaid == 91 || _areaid == 92 || _areaid == 93 
+		|| _areaid == 94 || _areaid == 95 || _areaid == 96 || _areaid == 97 || _areaid == 98 || _areaid == 99 || _areaid == 100 || _areaid == 101 
+		|| _areaid == 102 || _areaid == 113 || _areaid == 114 || _areaid == 115 || _areaid == 116  || _areaid == 106 || _areaid == 107 
+		|| _areaid == 118 || _areaid == 119 || _areaid == 120 || _areaid == 121 || _areaid == 122 || _areaid == 123 || _areaid == 124 || _areaid == 125 
+		|| _areaid == 126 || _areaid == 127 || _areaid == 128 || _areaid == 129 || _areaid == 130 || _areaid == 131);
+}
+
+function IsWayPoint(who)
+{
+	var _areaid;	
+	if(arguments.length < 1)
+		who = me;		
+	while(who.areaid == 0)
+		NTC_Delay(NTC_DELAY_FRAME);		
+	_areaid = who.areaid;	
+	return (_areaid == 3 || _areaid == 4 || _areaid == 5 || _areaid == 6 || _areaid == 27 || _areaid == 29 || _areaid == 32 || _areaid == 35 || _areaid == 48 || _areaid == 42 
+		|| _areaid == 57 || _areaid == 43 || _areaid == 44 || _areaid == 52 || _areaid == 74 || _areaid == 46 || _areaid == 76 || _areaid == 77 || _areaid == 78 || _areaid == 79 
+		|| _areaid == 80 || _areaid == 81 || _areaid == 83 || _areaid == 101 || _areaid == 106 || _areaid == 107 || _areaid == 111 || _areaid == 112 || _areaid == 113 || _areaid == 117 
+		|| _areaid == 118 || _areaid == 123 || _areaid == 129 || _areaid == 109 || _areaid == 40 || _areaid == 1 || _areaid == 75 || _areaid == 103 );
+}
+
+function IsPathConnecting(who)
+{
+	var _areaid, myareaid;	
+	if(arguments.length < 1)
+		who = me;		
+	while(who.areaid == 0)
+		NTC_Delay(NTC_DELAY_FRAME);		
+	_areaid = who.areaid;	
+	
+	return (_areaid == 2 || _areaid == 3 || _areaid == 4 || _areaid == 5 || _areaid == 6 || _areaid == 7 | _areaid == 17 || _areaid == 26 || _areaid == 27 
+		|| _areaid == 28 || _areaid == 32 || _areaid == 33 || _areaid == 41 || _areaid == 42 || _areaid == 43 || _areaid == 44 || _areaid == 45 || _areaid == 76 
+		|| _areaid == 77 || _areaid == 78 || _areaid == 79 || _areaid == 80 || _areaid == 81 || _areaid == 82 || _areaid == 83 || _areaid == 104 || _areaid == 105 
+		|| _areaid == 106 || _areaid == 107 || _areaid == 108 || _areaid == 110 || _areaid == 111 || _areaid == 112);
+}
+
+function GS_OutsideTown(who)
+{
+	var _areaid;	
+	if(arguments.length < 1)
+		who = me;		
+	while(who.areaid == 0)
+		NTC_Delay(NTC_DELAY_FRAME);		
+	_areaid = who.areaid;	
+	return (_areaid == 2 || _areaid == 41 || _areaid == 76 || _areaid == 104 || _areaid == 110);
+}
+
+function GetLeaderUnit(name)
+{
+	var _unit = NTC_FindUnit(NTC_UNIT_PLAYER);	
+	if (_unit) {
+		do {
+			if (_unit.name === name) {
+				return _unit;
+			}
+		} while (_unit.GetNext());
+	}	
+	return false;
+}
+
+function GS_MoveToArea(Dest) {  //stairbuilders NTVT_MoveToClosestPreSetUnit(); from NTVoyageTo.ntl
+
+	var allUnits = [];
+	var presetUnit = GetPresetUnits(Dest);
+	
+	if(!presetUnit) {
+		return false;
+	}
+	if(presetUnit) {
+		for (var i = 0; i < presetUnit.length; i++) {
+			allUnits.push([presetUnit[i].roomx*5+presetUnit[i].x, presetUnit[i].roomy*5+presetUnit[i].y]);			
+		}
+	}
+	allUnits.sort(SortCoords);
+	if(!GS_MoveTo(Dest, allUnits[0][0], allUnits[0][1], 0))
+		return false;
+}
+
+function SortCoords(a, b) { //stairbuilders from NTVoyageTo.ntl
+	return (GetDistance(me.x, me.y, a[0], a[1]) - GetDistance(me.x, me.y, b[0], b[1]));
+}
+
+function GS_MoveStair(areaid, subareaid, offsetx, offsety, clearpath)
+{
+	var i, n;
+	var _unit;
+
+	if(arguments.length < 3)
+	{
+		offsetx = 0;
+		offsety = 0;
+	}
+
+	if(arguments.length < 5)
+		clearpath = false;
+
+	for(i = 0 ; i <= 2 && me.areaid != _player.areaid && !paused ; i++)
+	{
+		_unit = GetPresetUnits(areaid, NTC_UNIT_TILE);
+
+		if(_unit)
+		{
+			for(n = 0 ; n < _unit.length && me.areaid != _player.areaid && !paused ; n++)
+			{
+				if(_unit[n].subareaid == subareaid) { if(!_tele) return NTM_WalkTo(_unit[n].roomx*5+_unit[n].x+offsetx, _unit[n].roomy*5+_unit[n].y+offsety, 2, clearpath); else if(_tele) return GS_MoveTo(areaid, _unit[n].roomx*5+_unit[n].x+offsetx, _unit[n].roomy*5+_unit[n].y+offsety, 2, clearpath); }
+			}
+		}
+
+		if(i < 2)
+			NTC_Delay(500);
+		if(me.areaid == _player.areaid)
+			break;
+	}
+
+	return false;
+}
+
+function GS_MoveToStair(areaid, subareaid, offsetx, offsety, clearpath)
+{
+	var i, n;
+	var _unit;
+	if(arguments.length < 3){
+		offsetx = 0;
+		offsety = 0;
+	}
+	if(arguments.length < 5)
+		clearpath = false;
+
+	for(i = 0 ; i <= 2 ; i++){
+		_unit = GetPresetUnits(areaid, NTC_UNIT_TILE);
+
+		if(_unit){
+			for(n = 0 ; n < _unit.length ; n++){
+				if(!_tele){
+					if(_unit[n].subareaid == subareaid) { return NTM_WalkTo(_unit[n].roomx*5+_unit[n].x+offsetx, _unit[n].roomy*5+_unit[n].y+offsety); }
+				}
+				else if(clearpath || _tele){
+					if(_unit[n].subareaid == subareaid) { return NTM_MoveTo(areaid, _unit[n].roomx*5+_unit[n].x+offsetx, _unit[n].roomy*5+_unit[n].y+offsety, 3, clearpath); }
+				}
+			}
+		}
+		if(i < 2)
+			NTC_Delay(500);
+	}
+	return false;
+}
+
+function GS_GrabWayPoint() // modified stairbuilder's function to work with this script
+{
+	var _unit;
+	var _wp;
+	_open = true;
+	var _areaid = me.areaid;
+	switch(_areaid){
+		case 3: _wp = 119; break;
+		case 4: _wp = 119; break;
+		case 5: _wp = 119; break;
+		case 6: _wp = 119; break;
+		case 27: _wp = 119; break;
+		case 29: _wp = 157; break;
+		case 32: _wp = 119; break;
+		case 35: _wp = 157; break;
+		case 42: _wp = 156; break;
+		case 43: _wp = 156; break;
+		case 44: _wp = 156; break;
+		case 46: _wp = 402; break;
+		case 48: _wp = 323; break;
+		case 52: _wp = 288; break;
+		case 57: _wp = 156; break;
+		case 74: _wp = 402; break;
+		case 76: _wp = 237; break;
+		case 77: _wp = 237; break;
+		case 78: _wp = 237; break;
+		case 79: _wp = 237; break;
+		case 80: _wp = 237; break;
+		case 81: _wp = 237; break;
+		case 83: _wp = 237; break;
+		case 101: _wp = 324; break;
+		case 106: _wp = 238; break;
+		case 107: _wp = 238; break;
+		case 111: _wp = 496; break;
+		case 112: _wp = 496; break;
+		case 113: _wp = 511; break;
+		case 115: _wp = 511; break;
+		case 117: _wp = 496; break;
+		case 118: _wp = 511; break;
+		case 123: _wp = 496; break;
+		case 129: _wp = 494; break;
+	}
+	GS_MoveToPresetUnit(_areaid, NTC_UNIT_OBJECT, _wp, 1, 1, true);
+	if(_open){
+		_unit = NTC_FindUnit(NTC_UNIT_OBJECT, _wp);
+		if(_unit){
+			if(GetDistance(me, _unit) > 2){
+				if(!_tele)
+					NTM_WalkTo(_unit.x+1, _unit.y);
+				else if(_tele)
+					NTM_MoveTo(_unit.areaid, _unit.x+1, _unit.y);
+			}
+			NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _unit);
+			NTC_PingDelay(1000);
+			me.Cancel(1);
+			return true;
+		}
+	}
+	return false;
+}
+
+function GS_MoveToPresetUnit(areaid, unittype, classid, offsetx, offsety, clearpath)
+{
+	var i, n;
+	var _unit;
+	if(arguments.length < 4){
+		offsetx = 0;
+		offsety = 0;
+	}
+	if(arguments.length < 6)
+		clearpath = false;
+	
+	for(i = 0 ; i <= 2 && !paused; i++){
+		_unit = GetPresetUnits(areaid, unittype);
+		if(_unit){
+			for(n = 0 ; n < _unit.length ; n++){
+				if(_unit[n].id == classid){
+					if(!clearpath){
+						return NTM_WalkTo(_unit[n].roomx*5+_unit[n].x+offsetx, _unit[n].roomy*5+_unit[n].y+offsety);
+					}
+					else if(clearpath){
+						return NTM_MoveTo(_unit[n].areaid, _unit[n].roomx*5+_unit[n].x+offsetx, _unit[n].roomy*5+_unit[n].y+offsety, clearpath);
+					}
+				}
+			}
+		}
+		if(i < 2)
+			NTC_Delay(500);
+	}
+
+	return false;
+}
+
+function GS_WalkTo(x, y) { // kolton's updated walkto
+	var i, distance, nTimer,
+		nFail = 0,
+		attemptCount = 0;
+
+	if (me.runwalk === 0) {
+		me.runwalk = 1;
+	}
+	
+	MoveLoop : while (GetDistance(me.x, me.y, x, y) > 3 && me.areaid != _player.areaid && me.mode !== 17) {
+		if (me.classid == 3) {
+			NTC_PutSkill(115, NTC_HAND_RIGHT);
+		}
+		
+		ClickMap(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, x, y);
+		NTC_Delay(40);
+		ClickMap(NTC_CLICK_LUP, NTC_SHIFT_NONE, null);
+		
+		attemptCount += 1;
+		nTimer = GetTickCount();
+		
+		while (me.mode !== 2 && me.mode !== 3 && me.mode !== 6 && me.areaid != _player.areaid) {
+			if (me.mode === 17) {
+				break MoveLoop;
+			}
+			
+			if ((GetTickCount() - nTimer) > 500) {
+				nFail++;
+				
+				if (nFail === 2) {
+					return false;
+				}
+				
+				ClickMap(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, me.x + Random(-3, 3), me.y + Random(-3, 3));
+				NTC_Delay(40);
+				ClickMap(NTC_CLICK_LUP, NTC_SHIFT_NONE, null);
+				
+				continue MoveLoop;
+			}
+			
+			NTC_Delay(40);
+		}
+		
+		while (me.mode !== 1 && me.mode !== 5 && me.mode !== 17) {
+			NTC_Delay(40);
+		}
+		
+		if (attemptCount >= 3) {
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+function GS_Move(areaid, x, y, retry, clearpath)
+{
+	var i, n;
+	var _teleport;
+    var _path = undefined; // houstin add
+	var _retry = 0;
+	var _attacked = false;
+
+	if(x == me.x && y == me.y) { return true; }
+
+	if(arguments.length < 4) { retry = 3; }
+
+	if(arguments.length < 5) { clearpath = false; }	
+	
+	if(NTC_InTown() && !_tele) { _teleport = false; }
+	
+	else if (_tele && !NTC_InTown()) { _teleport = true; }
+	
+	_path = GetPath(areaid, me.x, me.y, x, y, _teleport);
+
+	if(!_path) { return (NTC_InTown() && (NTM_WalkTo(x, y) || NTTM_TownMoveXY(x, y))); }
+	
+	for(i = 0 ; i < _path.length && GetDistance(me, _leaderUnit) > 10 && !paused ; i++)
+	{
+		for(n = 0 ; n < 2 && GetDistance(me, _leaderUnit) > 10 && !paused ; n++)
+		{
+			if(_teleport)
+			{
+				if(NTM_TeleportTo(_path[i][0]+Random(-n, n), _path[i][1]+Random(-n, n))) { break; }
+			}
+			else
+			{
+				if(GS_WalkTo(_path[i][0], _path[i][1])) { break; }
+			}
+			
+		}
+				
+		if(n < 2 && GetDistance(me, _leaderUnit) > 10 && !paused)
+		{
+			if(clearpath)
+			{
+				if(!NTA_ClearPosition('10', true, '2')) { return false; }
+				NTP_DoPrecast(false);
+				GS_MoveTo(_path[i].areaid, _path[i][0], _path[i][1], retry, clearpath);
+			}
+		}
+		else if(_retry < retry && GetDistance(me, _leaderUnit) > 10 && !paused)
+		{
+			_path = GetPath(areaid, me.x, me.y, x, y, _teleport);
+
+			if(!_path) { return false; }
+
+			i = -1;
+			_retry++;
+			_attacked = false;
+		}
+		else if((!_attacked) && (!NTConfig_SwitchTele) && GetDistance(me, _leaderUnit) > 10 && !paused)
+		{
+			NTA_ClearPosition(10, true);
+			//NTSI_PickItems();
+			_attacked = true;
+			_retry = 0;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+function GS_MoveTo(areaid, x, y, retry, clearpath)
+{
+	var i, n;
+	var _teleport;
+    var _path = undefined; // houstin add
+	var _retry = 0;
+	var _attacked = false;
+
+	if(x == me.x && y == me.y) { return true; }
+
+	if(arguments.length < 4) { retry = 3; }
+
+	if(arguments.length < 5) { clearpath = false; }	
+	
+	if(NTC_InTown() && !_tele) { _teleport = false; }
+	
+	else if (_tele && !NTC_InTown()) { _teleport = true; }
+	
+	_path = GetPath(areaid, me.x, me.y, x, y, _teleport);
+
+	if(!_path) { return (NTC_InTown() && (NTM_WalkTo(x, y) || NTTM_TownMoveXY(x, y))); }
+	
+	for(i = 0 ; i < _path.length && me.areaid != _player.areaid && !paused ; i++)
+	{
+		for(n = 0 ; n < 2 && me.areaid != _player.areaid && !paused ; n++)
+		{
+			if(_teleport)
+			{
+				if(NTM_TeleportTo(_path[i][0]+Random(-n, n), _path[i][1]+Random(-n, n))) { break; }
+			}
+			else
+			{
+				if(GS_WalkTo(_path[i][0], _path[i][1])) { break; }
+			}
+			
+		}
+				
+		if(n < 2 && me.areaid != _player.areaid && !paused)
+		{
+			if(clearpath)
+			{
+				if(!NTA_ClearPosition('10', true, '2')) { return false; }
+				NTP_DoPrecast(false);
+				GS_MoveTo(_path[i].areaid, _path[i][0], _path[i][1], retry, clearpath);
+			}
+		}
+		else if(_retry < retry && me.areaid != _player.areaid && !paused)
+		{
+			_path = GetPath(areaid, me.x, me.y, x, y, _teleport);
+
+			if(!_path) { return false; }
+
+			i = -1;
+			_retry++;
+			_attacked = false;
+		}
+		else if((!_attacked) && (!NTConfig_SwitchTele) && me.areaid != _player.areaid && !paused)
+		{
+			NTA_ClearPosition(10, true);
+			//NTSI_PickItems();
+			_attacked = true;
+			_retry = 0;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+function GS_ClearPosition(range, pickitem, safelevel) {
+	var _orgx, _orgy;
+	var _spectype = [0x0A, 0x01];
+	var _skiplist;
+	var _gid_attackcount;
+	var _attackcount = 0;
+	var _target;
+	var _distance, _mingid, _minshamangid, _mindistance, _minshamandistance;
+	var _result;
+
+    if (NTConfig_PrioritizeWeakerFoes && NTConfig_PrioritizeWeakerFoesAreaDisable.indexOf(me.areaid) < 0) {
+        _spectype = [0x10, 0x01, 0x04, 0x0A];
+    }	
+	
+	if (NTConfig_AttackSkill[1] < 0 || NTConfig_AttackSkill[3] < 0) { return false; }
+
+	switch (arguments.length) {
+	case 0:
+		range = 20;
+		break;
+	case 1:
+		pickitem = true;
+		break;
+	case 2:
+		safelevel = 0;
+		break;
+	default:
+		if ((NTConfig_CheckSelfSafe.length < 1) && (NTConfig_CheckMercSafe.length < 1)) { safelevel = 0; }
+		break;
+	}
+
+	_orgx = me.x;
+	_orgy = me.y;
+
+	for (var i = 0; i < _spectype.length && GetDistance(me, _leaderUnit) <= _maxAttackRange && !NTC_InTown() && !paused; i++) {
+		_skiplist = new Array();
+		var	_gid_lastKnownHealth = new Array();
+		var	_gid_goodattackcount = new Array();
+
+		while (_attackcount < (i + 1) * 100 && !NTC_InTown() && GetDistance(me, _leaderUnit) <= _maxAttackRange && !paused) {
+			if(GetDistance(me, _leaderUnit) > _maxAttackRange)
+				break;
+			_minshamandistance = 100000;
+			_mindistance = 100000;
+
+			_target = NTC_FindUnit(NTC_UNIT_MONSTER);
+
+			if (_target) {
+				do {
+					if(GetDistance(me, _leaderUnit) > _maxAttackRange)
+						break;
+					if (_skiplist.indexOf(_target.gid) < 0) {
+						if (_target.IsAttackable() && (_target.spectype & _spectype[i])) {
+							if (GetDistance(_orgx, _orgy, _target.x, _target.y) <= range && NTA_IsValidMonster(_target) && GetDistance(me,_target) <= _maxAttackRange && GetDistance(me, _leaderUnit) <= _maxAttackRange) {
+								_distance = GetDistance(me, _target);
+								if (_distance < _mindistance) {
+									_mingid = _target.gid;
+									_mindistance = _distance;
+										if(GetDistance(me,_target) > 1 && GetDistance(me,_target) <= _maxAttackRange && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0)){
+											 //Print(C_DARK_GREEN + "Getting Closer 1468 - " + _target.name); 
+											 GS_GetCloserMonster(_target);
+											 NTA_Attack(_target, (_attackcount % 30) == 0);
+										}
+								}
+								if ((MonstersToAttackFirst.indexOf(_target.classid) > -1) && _distance < _minshamandistance) {
+									_minshamangid = _target.gid;
+									_minshamandistance = _distance;
+								}
+							}
+						} else { _skiplist.push(_target.gid);
+						}
+					}
+				} while(_target.GetNext());
+			}
+
+			if (_minshamandistance < 100000) {
+				_target = NTC_FindUnit(NTC_UNIT_MONSTER, _minshamangid);
+
+				if (_target) {
+					if (_gid_lastKnownHealth[_minshamangid] == undefined) {
+						_gid_lastKnownHealth[_minshamangid] = _target.hp; 
+					} else { 
+						if (_target.hp >= _gid_lastKnownHealth[_minshamangid]*0.98) {
+							if (_gid_goodattackcount[_minshamangid] == undefined) {
+								_gid_goodattackcount[_minshamangid] = 1; 
+								_gid_lastKnownHealth[_minshamangid] = _target.hp; 
+								if(GetDistance(me,_target) > 1 && GetDistance(me,_target) <= _maxAttackRange && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0)){
+									 //Print(C_DARK_GREEN + "Getting Closer 1496 - " + _target.name); 
+									 GS_GetCloserMonster(_target);
+									 NTA_Attack(_target, (_attackcount % 30) == 0);
+								}
+							} else { 
+								//Print(COLOR_1 + "Incrementing attack count: " + _target.name + ", " + _gid_lastKnownHealth[_minshamangid] + ", " + _target.hp +  ", " + _gid_goodattackcount[_minshamangid]);
+								_gid_goodattackcount[_minshamangid]++; 
+								_gid_lastKnownHealth[_minshamangid] = _target.hp; 
+							}
+						}
+					}
+					if (NTconfig_HighMaxAttack || NTA_HighMaxAttackAreas()) {
+						if (_gid_goodattackcount[_minshamangid] > NTConfig_HighMaxAttacks) {
+							_skiplist.push(_minshamangid);
+						}
+					} else if (!NTconfig_HighMaxAttack || !NTA_HighMaxAttackAreas()) {
+						if (_gid_goodattackcount[_minshamangid] > NTConfig_LowMaxAttacks) {
+							//NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_2 + "Skipped: " + _target.name + ", " + _gid_lastKnownHealth[_minshamangid] + ", " + _target.hp +  ", " + _gid_goodattackcount[_minshamangid]);
+							// Print(COLOR_1 + "I can't hit him!!! -> skipped");
+							_skiplist.push(_minshamangid);
+						}
+					}
+
+					if(GetDistance(me,_target) > 1 && GetDistance(me,_target) <= _maxAttackRange && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0)){
+						 //Print(C_DARK_GREEN + "Getting Closer 1520 - " + _target.name); 
+						 GS_GetCloserLeader(_target);
+						 NTA_Attack(_target, (_attackcount % 30) == 0);
+					}
+					_result = NTA_Attack(_target, (_attackcount % 30) === 0);
+
+					switch (_result) {
+					case 1:
+						_skiplist.push(_minshamangid);
+						break;
+					case 2:
+						break;
+					case 3:
+						if (_target.mode === 0 || _target.mode === 12) {
+							NTSI_FastPick();
+						}
+						_attackcount++;
+						break;
+					default:
+						return false;
+					}
+				}
+			} else if (_mindistance < 100000) {
+				_target = NTC_FindUnit(NTC_UNIT_MONSTER, _mingid);
+
+				if (_target) {
+				
+					if (_gid_lastKnownHealth[_mingid] == undefined) {
+						_gid_lastKnownHealth[_mingid] = _target.hp; 
+					} else { 
+						if (_target.hp >= _gid_lastKnownHealth[_mingid]*0.98) {
+							if (_gid_goodattackcount[_mingid] == undefined) {
+								_gid_goodattackcount[_mingid] = 1; 
+								_gid_lastKnownHealth[_mingid] = _target.hp; 
+							} else { 
+								//Print(COLOR_1 + "Incrementing attack count: " + _target.name + ", " + _gid_lastKnownHealth[_mingid] + ", " + _target.hp +  ", " + _gid_goodattackcount[_mingid]);
+								_gid_goodattackcount[_mingid]++; 
+								_gid_lastKnownHealth[_mingid] = _target.hp; 
+							}
+						}
+					}
+					if (NTconfig_HighMaxAttack || NTA_HighMaxAttackAreas()) {
+						if (_gid_goodattackcount[_mingid] > NTConfig_HighMaxAttacks) {
+							_skiplist.push(_mingid);
+						}
+					} else if (!NTconfig_HighMaxAttack || !NTA_HighMaxAttackAreas()) {
+						if (_gid_goodattackcount[_mingid] > NTConfig_LowMaxAttacks) {
+							//NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_2 + "Skipped: " + _target.name + ", " + _gid_lastKnownHealth[_minshamangid] + ", " + _target.hp +  ", " + _gid_goodattackcount[_minshamangid]);
+							Print(COLOR_1 + "I can't hit him!!! -> skipped");
+							_skiplist.push(_mingid);
+						}
+					}
+
+					if(GetDistance(me,_target) > 1 && GetDistance(me,_target) <= _maxAttackRange && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0)){
+						 //Print(C_DARK_GREEN + "Getting Closer 1575 - " + _target.name); 
+						 GS_GetCloserMonster(_target);
+						 NTA_Attack(_target, (_attackcount % 30) == 0);
+					}
+					
+					_result = NTA_Attack(_target, (_attackcount % 30) === 0);
+
+					switch (_result) {
+					case 1:
+						_skiplist.push(_mingid);
+						break;
+					case 2:
+						break;
+					case 3:
+						if (_target.mode === 0 || _target.mode === 12) {
+							NTSI_FastPick();
+						}
+						_attackcount++;
+						break;
+					default:
+						return false;
+					}
+				}
+			} else { break; }
+		}
+	}
+
+	if (me.classid == NTC_CHAR_CLASS_PALADIN) {
+		if (_attackcount > 2 && ((parseFloat(me.hp * 100 / me.hpmax) < NTConfig_UseRedemptionHP) || (parseInt(me.mp * 100 / me.mpmax, 10) < NTConfig_UseRedemptionMP))) {
+			if (NTC_PutSkill(124, NTC_HAND_RIGHT)) { NTC_PingDelay(1000); }
+		}
+	} else if (me.classid == NTC_CHAR_CLASS_NECROMANCER) {
+		NTA_SkeletonArmy(NTConfig_SkeletonArmy);
+		NTA_MageArmy(NTConfig_MageArmy);
+		NTA_ReviveArmy(NTConfig_ReviveArmy);
+	} else if (me.classid == NTC_CHAR_CLASS_BARBARIAN) {
+		if (NTConfig_UseFindItem && _attackcount > 2) {
+			if (!NTA_CheckForCloseMonsters(10)) {
+				//Print(COLOR_25 + "No Monsters close - looting");
+				NTA_FindItem(NTConfig_FindItemRange);
+			}
+		}
+	}
+
+	if(NTConfig_IdInField){
+		if (!NTT_CheckSpace(NTConfig_FreeSpaceXY[0], NTConfig_FreeSpaceXY[1])) { 
+			NT_FieldID(); 
+		} // id in field add
+	}
+	
+	if (pickitem && _attackcount > 0) { NTSI_PickItems(); }	
+
+	return true;
+}

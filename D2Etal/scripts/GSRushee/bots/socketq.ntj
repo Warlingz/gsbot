@@ -1,0 +1,628 @@
+// Written by goodstuff for Automated Rushee/Rusher 7/22/13
+
+
+// Do Not Edit Below
+
+var rushComplete = false, havestaff = false, nospam = false, ara, _ladder;
+function NTMain()
+{
+	Include("libs/common/NTCommon.ntl");
+	NTC_IncludeLibs();
+	NTC_IncludeConfig("GSRushee/char_configs");
+
+	NT_LoadConfig();
+	NTSI_LoadNIPFiles("GSRushee/item_configs");
+
+	_ladder = me.ladder;
+	
+	Print(C_WHITE + "Ladder - " + _ladder);
+	
+	if(me.areaid == 40){
+		NTR_CheckQuestItem();		
+	}
+	
+	NTConfig_Leader = NTR_FindRusher();
+	
+	RegisterEvent(EVENT_GAMEMSG, chat);
+	
+	while(!NTC_InMyParty(NTConfig_Leader)){
+		NTC_Delay(500);
+	}
+	
+	while(NTC_InMyParty(NTConfig_Leader)){
+		if(me.hp < 1){
+			NTR_Death();
+		}		
+		if(NTC_InTown() && me.hp < me.hpmax){
+			NTR_Heal();
+		}		
+		if(!NTC_InTown() && me.mode != 17 && me.mode != 0 && me.hp < me.hpmax){
+			NTR_HPCheck();
+		}		
+		if(me.hp > 1){
+			Questing(me.areaid);
+		}		
+		NTC_Delay(100);		
+	}
+					
+}
+
+// #####_DO_NOT_EDIT_THESE_###### //
+	var LocationChecka1 = false;
+	var LocationChecka2 = false;
+	var LocationChecka3 = false;
+// ############################# //
+// Main Script Function ---------------------------------------------
+function Questing(area)
+{	
+	switch(area){
+		case 0 :
+			NTC_Delay(500);
+			break;
+		case 1 : // ACT 1 ---------------------------------------------
+			NTC_Delay(1000);		
+			if(NTC_InTown() && !LocationChecka1){			
+				NTR_CheckLocation();
+				LocationChecka1 = true;
+				return LocationChecka1;
+			}
+			break;
+			
+		case 8 :
+			NTC_Delay(1000);		
+			if((!me.GetQuest(1, 4) && !me.GetQuest(1, 1) || !me.GetQuest(1,12) && !me.GetQuest(1,0)) && me.areaid == 8){
+				NTC_Delay(1000);
+				NTR_ClearLevel(NTConfig_Leader);
+			}
+			else if((me.GetQuest(1, 4) && me.GetQuest(1, 1) || me.GetQuest(1,12) && me.GetQuest(1,0)) && me.areaid == 8){
+				NTC_PingDelay(300);
+				if(!NTR_UseScrollOfTownPortal()){
+					Say("Cant TownPortal");
+				}
+			}		
+			break;
+		case 40 : // ACT 2 ---------------------------------------------
+			NTC_Delay(1000);		
+			if(NTC_InTown() && !LocationChecka2){
+				NTR_CheckLocation();
+				LocationChecka2 = true;
+				return LocationChecka2;
+			}
+			break;			
+		case 75 : // ACT 3 ---------------------------------------------
+			NTC_Delay(1000);		
+			if((!me.GetQuest(22,12) && !me.GetQuest(22,0)) && !LocationChecka3){
+				NTR_CheckLocation();
+				LocationChecka3 = true;
+				return LocationChecka3;
+			}
+			if( NTC_InTown() && !LocationChecka3){
+				NTR_CheckLocation();
+				LocationChecka3 = true;
+				return LocationChecka3;
+			}
+			break;				
+		case 103 : // ACT 4 ---------------------------------------------
+			NTC_Delay(1000);		
+			break;	
+		case 109 : // ACT 5 ---------------------------------------------
+			NTC_Delay(1000);		
+			break;	
+		default :
+			NTC_Delay(500);
+			break;
+	}
+	return false;
+}
+
+
+// Leader Commands ---------------------------------------------
+
+function chat(msg, type)
+{
+var i;
+    if(type == 0){
+        var _split = msg.split(":");
+        if(_split.length >= 1 && _split[1] != undefined){
+            var _sender = _split[0].substring(3, _split[0].length - 3);
+            var _msg = _split[1].substring(1);
+            if(_sender == NTConfig_Leader){
+                switch(_msg){				
+				// ACT 1 Case's---------------------------------------------
+					case "test" : Testing(13); break;
+					case "Den up!" :
+						NTC_Delay(200);
+						if(me.areaid == 1){
+							NTM_UsePortal("BluePortal", 8, NTConfig_Leader);
+						}
+						if(me.areaid == 8){
+							NTR_Den(NTConfig_Leader);
+							if(me.GetQuest(1, 4) && me.GetQuest(1, 1) && me.areaid == 8){
+								NTR_LeaveDen();
+							}
+						}		
+						break;
+						
+                    case "Andariel up!" :
+						NTC_Delay(200);
+						if(me.areaid == 1)
+							for(var i = 0 ; i < 100 && me.areaid == 1 ; i++){
+								NTM_UsePortal("BluePortal", 37, NTConfig_Leader);
+							}
+						break;
+
+                    case "Andariel is dead!" :
+						if(me.areaid == 37 && me.mode != 17){
+							ara = me.areaid;
+							NTC_Delay(200);
+							NTR_TakePortal();
+							NTC_Delay(200);
+						}
+						if(me.areaid == 1)
+							NTR_GoEast(0);
+						break;  
+				// ACT 2 Case's---------------------------------------------
+					case "Radament up!" :
+						if(me.areaid == 40){
+							NTM_UsePortal("BluePortal", 49, NTConfig_Leader);
+						}
+						break;
+						
+					case "Radament dead!" :
+						if(me.areaid == 49 && me.mode != 17){
+							ara = me.areaid;
+							NTR_TakePortal();
+						}
+						break;
+						
+					case "Get the book!" :
+						if (me.areaid == 40){
+							NTM_UsePortal("BluePortal", 49, NTConfig_Leader);
+						}
+						if(me.areaid == 49){
+							NTC_PingDelay(200);
+							NTR_PickItems();
+							NTC_PingDelay(200);
+							NTR_TakePortal();
+						}
+						if(NTC_InTown()){	
+							NTC_PingDelay(500);
+							NTR_ReadBook();
+							NTC_PingDelay(200);
+							NTR_GoCain();
+						}
+						break;
+						
+					case "Cube up!" :
+						NTC_PingDelay(100);
+						if(me.areaid == 40){
+							NTM_UsePortal("BluePortal", 60, NTConfig_Leader);
+						}
+						if(me.areaid == 60){
+							ara = me.areaid;
+							NTR_PickItems();
+							NTC_PingDelay(500);
+							NTR_TakePortal();
+						}			
+						if(NTC_InTown()){							
+							NTC_PingDelay(500);
+							NTR_GoCain();
+						}			
+						break;
+
+					case "Ammy up!" :
+						NTC_PingDelay(100);
+						if(me.areaid == 40){
+							NTM_UsePortal("BluePortal", 61, NTConfig_Leader);
+						}
+						if(me.areaid == 61){
+							ara = me.areaid;
+							NTR_OpenAmmy();
+							NTC_PingDelay(500);
+							NTR_GetAmmy();
+							NTR_TakePortal();
+						}
+						if(NTC_InTown()){							
+							NTC_PingDelay(1000);
+							NTR_GoCain();
+						}
+						break;
+
+					case "Staff up!" :
+						NTC_Delay(100);
+						if(me.areaid == 40){
+							NTM_UsePortal("BluePortal", 64, NTConfig_Leader);
+						}
+						if(me.areaid == 64){
+							ara = me.areaid;
+							NTR_GetStaff();
+							havestaff = true;				
+							NTC_Delay(250);
+							NTR_TakePortal();				
+							NTC_Delay(250);
+						}
+						if(NTC_InTown()){
+							Delay(200);
+							NTR_CubeStaff();
+						}
+						break;
+
+					case "Talk to Drognan!" :
+						NTR_GoDrognan();
+						break;
+
+					case "Summoner up!" :
+						NTC_Delay(100);
+						if(me.areaid == 40){
+							if(!NTM_UsePortal("BluePortal", 74, NTConfig_Leader)){
+								NTC_Delay(300);
+								NTR_GoCain();
+								NTC_Delay(300);
+								NTM_UsePortal("BluePortal", 74, NTConfig_Leader);
+							}
+						}
+						break;
+
+					case "Summoner is dead!" :
+						if(me.areaid == 74 && me.mode != 17){
+							ara = me.areaid;
+							NTC_PingDelay(200);
+							NTR_TakePortal();
+							NTC_PingDelay(200);
+						}
+						if(me.areaid == 40){
+							NTR_GoCain();
+						}
+						break;
+
+					case "Leeches Talk to Tyrael!" :
+						if(me.areaid == 40){
+							NTC_PingDelay(100);
+							if(NTM_UsePortal("BluePortal", 73, NTConfig_Leader)){
+								NTC_PingDelay(200);								
+							}
+						}
+						if(!NTC_InTown())
+						{							
+							NTR_TalkTyraelSpirit();
+							NTC_PingDelay(200);
+							NTR_TakePortal();
+							NTC_PingDelay(200);
+							while(!NTC_InTown()){
+								NTC_PingDelay(200);
+								NTR_TakePortal();
+							}
+						}
+						if(NTC_InTown())							
+							NTR_TalkJer();
+						break;
+
+					case "Duriel up!" :
+						if(me.areaid == 40){
+							NTC_CheckPlayer(NTConfig_Leader);
+							if(!NTM_UsePortal("BluePortal", _leaderareaid, NTConfig_Leader)){
+								NTC_Delay(300);
+								if(NTC_InTown())
+									NTR_GoCain();
+								NTC_Delay(300);
+								if(!NTM_UsePortal("BluePortal", _leaderareaid, NTConfig_Leader)){
+									var rusheepos = NTR_RetrieveRusheePos();
+									NTC_Delay(200);		
+									var pos = (parseInt(rusheepos) + 1);
+									NTC_Delay(200);		
+									NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_1 + "Rush [ " + COLOR_1 + pos + COLOR_1 + " ] Failed at Duriel".split("\n")[0] + ";" + COLOR_1 + "------------------------------\n" + COLOR_1 + "Rush : [ " + pos + " ]\n" + "Failed!" + "\n" + C_WHITE + "My Last Area : " + ara + "\n" + C_RED + "Couldn't Enter Portal To Duriel" + "\n" + "Probably Missed Summoner Kill" + "\n" + C_BROWN + "Rushee Name : " + me.charname + "\n" + COLOR_1 + "---------------------------------");	
+									NTC_SendMsgToScript("Manager.ntj", "SCRIPT_END");	
+								}								
+							}
+						}
+						ara = me.areaid;
+						NTR_PlaceStaff();
+						NTC_PingDelay(500);
+						NTR_TakePortal();
+						break;
+				// ACT 3 Case's---------------------------------------------	
+					case "Tome up!" :
+						NTC_Delay(100);
+						if(me.areaid == 75){
+							NTM_UsePortal("BluePortal", 94, NTConfig_Leader);
+						}
+						if(me.areaid == 94){
+							NTC_PingDelay(300);
+							NTR_OpenAltar();
+							NTC_PingDelay(300);
+							NTR_GetTome();
+							NTC_PingDelay(300);
+							NTR_TakePortal();
+						}
+						if(me.areaid == 75){
+							NTC_PingDelay(300);
+							NTR_GoAlkor();
+							NTC_PingDelay(300);
+							NTR_CheckLocation();
+						}
+						break;
+					case "Council up!" :
+						NTC_Delay(100);
+						if(me.areaid == 75){
+							NTM_UsePortal("BluePortal", 83, NTConfig_Leader);
+						}
+						break;
+
+					case "Council is dead!" :
+						if(me.mode != 17){
+							ara = me.areaid;
+							NTC_Delay(100);
+							NTR_TakePortal();
+							NTC_PingDelay(500);
+							if(NTC_InTown())
+								NTR_GoCain();
+						}
+						break;
+
+					case "Mephisto up!" :
+						NTC_Delay(100);
+						if(me.areaid == 75){
+							if(!NTM_UsePortal("BluePortal", 102, NTConfig_Leader)){
+								NTC_Delay(300);
+								NTR_GoCain();
+								NTC_Delay(300);
+								if(!NTM_UsePortal("BluePortal", 102, NTConfig_Leader)){
+									NTC_Delay(750);	
+									var rusheepos = NTR_RetrieveRusheePos();
+									NTC_Delay(200);		
+									var pos = (parseInt(rusheepos) + 1);
+									NTC_Delay(200);		
+									NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_1 + "Rush [ " + COLOR_1 + pos + COLOR_1 + " ] Failed at Mephisto".split("\n")[0] + ";" + COLOR_1 + "------------------------------\n" + COLOR_1 + "Rush : [ " + pos + " ]\n" + "Failed!" + "\n" + C_WHITE + "My Last Area : " + ara + "\n" + C_RED + "Couldn't Enter Portal To Mephisto" + "\n"  + "Probably Missed Council Kill" + "\n" +  C_BROWN + "Rushee Name : " + me.charname + "\n" + COLOR_1 + "---------------------------------");	
+									NTC_SendMsgToScript("Manager.ntj", "SCRIPT_END");	
+								}									
+							}
+						}
+						break;
+
+					case "Mephisto is dead!" :
+						if(me.areaid == 102 && me.mode != 17 && me.mode != 0){
+							ara = me.areaid;
+							NTC_Delay(100);
+							NTM_MoveTo(me.areaid, 17590, 8068);
+							NTC_Delay(1500);
+							if(!NTM_TakeUnit(NTC_UNIT_OBJECT, 342)){
+								NTM_MoveTo(me.areaid, 17590, 8068);
+								NTC_Delay(200);
+								if(!NTM_TakeUnit(NTC_UNIT_OBJECT, 342))
+									ExitGame();
+							}
+						}
+						break;
+						
+				// ACT 4 Case's---------------------------------------------
+					case "Hammer up!" :
+						if(me.areaid == 103){
+							NTC_PingDelay(200);
+							NTR_GoCain();
+							NTC_PingDelay(400);
+							NTM_UsePortal("BluePortal", 107, NTConfig_Leader);
+						}
+						if(me.areaid == 107){
+							NTC_PingDelay(200);
+							NTC_SwapWeapons();
+							NTC_PingDelay(500);
+							NTR_GetHammer();
+							NTC_PingDelay(200);
+							NTR_TakePortal();
+							NTC_PingDelay(200);
+							NTR_GoCain();
+							NTC_PingDelay(400);
+							NTR_SSCheck();
+						}
+						break;
+					
+					case "Hellforge up!" :
+						if(me.areaid == 103){
+							NTC_PingDelay(200);
+							NTR_TakePortal();
+						}
+						while(me.areaid == 107){
+							NTC_PingDelay(300);
+							NTR_SmashNdatShit();
+							NTC_PingDelay(200);
+							NTR_TakePortal();
+						}
+						if(me.areaid == 103){
+							NTC_PingDelay(200);
+							NTC_SwapWeapons();
+						}					
+						break;
+
+					case "Izzy up!" :
+						if(me.areaid == 103){
+							NTM_UsePortal("BluePortal", 105, NTConfig_Leader);
+						}
+						break;
+
+					case "Izzy dead!" :
+						NTC_Delay(100);
+						if(me.areaid == 105 && me.mode != 17){
+							NTC_PingDelay(500);
+							NTR_TakePortal();
+							NTC_PingDelay(500);
+							NTR_TalkTyrael();
+						}
+						break;
+
+					case "Diablo up!" :
+						NTC_Delay(100);
+						if(me.areaid == 103){
+							NTM_UsePortal("BluePortal", 108, NTConfig_Leader);
+						}
+						if(me.areaid === 108){
+							NTM_MoveTo(108, 7767, 5263); //safe spot
+						}
+						break;
+
+					case "Diablo is dead!" :
+						if(me.areaid == 108 && me.mode != 17){
+							ara = me.areaid;
+							NTC_Delay(100);
+							NTR_TakePortal();
+							NTC_PingDelay(500);
+						}
+						if(NTC_InTown())
+							NTR_GoTyrael();
+						break;	
+				// ACT 5 Case's---------------------------------------------
+					case "Anya up!" :
+						NTC_PingDelay(300);
+						NTR_TalkMalah();
+						NTC_PingDelay(400);
+						NTR_TalkAnya();
+						NTC_PingDelay(400);
+						NTR_TakePortal();
+						NTC_PingDelay(400);
+						NTR_TalkMalah();
+						NTC_Delay(400);
+						NTR_ReadScroll();
+						break;
+						
+					case "Shenk up!" :
+						NTC_Delay(100);
+						if(me.areaid == 109){
+							NTM_UsePortal("BluePortal", 110, NTConfig_Leader);
+							NTC_PingDelay(500);
+						}
+						break;
+					
+					case "Shenk is dead!" :
+						NTC_Delay(100);
+						if(me.areaid == 110 && me.mode != 17){
+							ara = me.areaid
+							NTC_PingDelay(100);
+							NTR_TakePortal();
+						}
+						if(me.areaid > 108){							
+							var _area = GetArea();
+							NTC_Delay(150);				
+							NTR_IncrementRusheePos(); // For automated rusher bot
+							rushComplete = true;
+							var _account = NT_File("logs/namelog/" + me.account + "-SocketAccount.txt", 0);
+							var _password = NT_File("logs/namelog/" + me.account + "-SocketPW.txt", 0);
+							NTC_Delay(150);			
+							var rusheepos = NTR_RetrieveRusheePos();	
+							NTC_Delay(100);	
+							if(rusheepos < 8){
+								if(_account == 1 || _account == 0){
+									NT_File("logs/namelog/" + me.account + "-SocketAccount.txt", 1, _account);		
+									NTC_Delay(150);					
+									NT_File("logs/namelog/" + me.account + "-SocketPW.txt", 1, _password);	
+								}
+								NTC_Delay(100);
+								NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_3 + "Rush [ " + COLOR_1 + rusheepos + COLOR_3 + " ] Completed on Account [ " + COLOR_5 + _account + COLOR_3 + " ]".split("\n")[0] + ";" 
+								+ COLOR_1 + "------------------------------\n" + C_ORANGE + "Rush : [ " + rusheepos + " ]\n" + COLOR_2 + "Completed!" + "\n" + C_BROWN + "Ladder - " + _ladder + "\n" + C_WHITE + "My Last Area : " + ara + "-" + _area.name + "\n" + C_BROWN + "Rushee Name : " + me.charname + "\n" + C_ORANGE + "Account : " + _account + "\n" + COLOR_1 + "---------------------------------");								
+							}
+							NTC_Delay(100);	
+							if(rusheepos == 8){								
+								if(_ladder)
+									NT_File("logs/xCompleted Accounts/AccountComplete-" + _account + ".txt", 1, "Account : " + _account + " Password : " + _password);
+								else if(!_ladder)
+									NT_File("logs/xCompleted Accounts Non Ladder/NonLadder - AccountComplete-" + _account + ".txt", 1, "Account : "+ _account + " Password : " + _password);								
+																
+								NTR_IncrementRusheeAccPos();
+								NTC_Delay(150);
+								if(_account == "thisacc"){
+									NT_File("logs/namelog/" + me.account + "-SocketAccount.txt", 1, "accname");			
+									NTC_Delay(150);				
+									NT_File("logs/namelog/" + me.account + "-SocketPW.txt", 1, "accpassword");		
+									NTC_Delay(100);
+								}
+								else{
+									NT_File("logs/namelog/" + me.account + "-SocketAccount.txt", 1, 1);			
+									NTC_Delay(150);				
+									NT_File("logs/namelog/" + me.account + "-SocketPW.txt", 1, 1);		
+									NTC_Delay(100);
+								}
+								NTC_SendLogToOOG(NTC_LOG_COMMON, C_BROWN + "Completed Account Rush [ " + COLOR_5 + _account + C_BROWN + " ]".split("\n")[0] + ";" 
+								+ COLOR_1 + "------------------------------\n" + C_ORANGE + "Rush : [ " + rusheepos + " ]\n" + COLOR_2 + "Account Complete!" + "\n" + C_BROWN + "Ladder - " + _ladder + "\n" + C_WHITE + "My Last Area : " + ara + "-" + _area.name + "\n" + C_BROWN + "Rushee Name : " + me.charname + "\n" + C_ORANGE + "Account : " + _account + "\n" + COLOR_1 + "---------------------------------");						
+							}
+															
+						}
+						break;
+					case "Throne up!" :
+						NTC_Delay(100);
+						if(me.areaid == 110 && me.mode != 17){
+							NTC_PingDelay(500);
+							if(!NTM_UsePortal("Blue Portal", 131,NTConfig_Leader)){
+								NTC_Delay(1000);
+							}
+						}
+						NTC_PingDelay(100);
+						break;
+						
+					case "Rush Over!":
+						if(!rushComplete && !nospam){
+							nospam = true;
+							var rusheepos = NTR_RetrieveRusheePos();
+							NTC_Delay(200);		
+							var pos = (parseInt(rusheepos) + 1);
+							var _area = GetArea();
+							NTC_Delay(1000);	
+							NTC_Delay(100);	
+							NT_File("logs/loc/rusheegame.txt", 1, 0);
+							NTC_Delay(100);	
+							NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_1 + "Rush [ " + COLOR_1 + pos + COLOR_1 + " ] Failed : Rusher Left Game".split("\n")[0] + ";" + COLOR_1 + "------------------------------\n" + COLOR_1 + "Rush : [ " + pos + " ]\n" + "Failed!" + "\n" + "Rusher Left Game" + "\n" + C_WHITE + "My Last Area : " + ara + "-" + _area.name + "\n" + C_BROWN + "Rushee Name : " + me.charname + "\n" + COLOR_1 + "---------------------------------");	
+							NTC_Delay(1000);
+							NTC_SendMsgToScript("Manager.ntj", "SCRIPT_END");	
+						}
+						else{
+							NTC_Delay(100);	
+							NT_File("logs/loc/rusheegame.txt", 1, 0);
+							NTC_Delay(100);	
+							NTC_SendMsgToScript("Manager.ntj", "SCRIPT_END");							
+						}	
+						break;
+					case "Quest item" :
+						NTR_CheckQuestItem();
+						break;
+                }
+            }
+        }
+    }
+    else if(type == 4 && !rushComplete)
+	{
+		 if(msg.indexOf("weaken") != -1 && msg.indexOf(NTConfig_Leader) != -1){
+			if(!rushComplete && !nospam){
+				var rusheepos = NTR_RetrieveRusheePos();
+				NTC_Delay(200);		
+				var pos = (parseInt(rusheepos) + 1);
+				var _area = GetArea();
+				NTC_Delay(1000);	
+				NTC_Delay(100);	
+				NT_File("logs/loc/rusheegame.txt", 1, 0);
+				NTC_Delay(100);	
+				NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_1 + "Rush [ " + COLOR_1 + pos + COLOR_1 + " ] Failed : Rusher Left Game".split("\n")[0] + ";" + COLOR_1 + "------------------------------\n" + COLOR_1 + "Rush : [ " + pos + " ]\n" + "Failed!" + "\n" + "Rusher Left Game" + "\n" + C_WHITE + "My Last Area : " + ara + "-" + _area.name + "\n" + C_BROWN + "Rushee Name : " + me.charname + "\n" + COLOR_1 + "---------------------------------");	
+				NTC_Delay(1000);
+				NTC_SendMsgToScript("Manager.ntj", "SCRIPT_END");	
+			}
+		 }
+		 else if(msg.indexOf("timeout") != -1 && msg.indexOf(NTConfig_Leader) != -1){
+			if(!rushComplete && !nospam){
+				var rusheepos = NTR_RetrieveRusheePos();
+				NTC_Delay(200);		
+				var pos = (parseInt(rusheepos) + 1);
+				var _area = GetArea();
+				NTC_Delay(1000);	
+				NTC_Delay(100);	
+				NT_File("logs/loc/rusheegame.txt", 1, 0);
+				NTC_Delay(100);	
+				NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_1 + "Rush [ " + COLOR_1 + pos + COLOR_1 + " ] Failed : Rusher Left Game".split("\n")[0] + ";" + COLOR_1 + "------------------------------\n" + COLOR_1 + "Rush : [ " + pos + " ]\n" + "Failed!" + "\n" + "Rusher Left Game" + "\n" + C_WHITE + "My Last Area : " + ara + "-" + _area.name + "\n" + C_BROWN + "Rushee Name : " + me.charname + "\n" + COLOR_1 + "---------------------------------");	
+				NTC_Delay(1000);
+				NTC_SendMsgToScript("Manager.ntj", "SCRIPT_END");	
+			}			 
+		 }
+    }
+}
+
+function Testing(quest)
+{				
+	for(var i = 0 ; i < 13 ; i++){
+		Print(C_WHITE + i + " = " + me.GetQuest(quest ,i));
+	}
+}

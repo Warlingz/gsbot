@@ -1,0 +1,106 @@
+//Written by goodstuff 8/03/15
+
+//Do Not Edit
+var _picker = "";
+var Rev = "";
+var CurScriptIndex = 0;
+
+function NTMain(){
+	Include("libs/common/NTCommon.ntl");
+	NTC_IncludeLibs();
+	NTC_IncludeConfig("NTBot/char_configs");
+	NT_LoadConfig();		
+	
+	Print(C_ORANGE + "goodstuffs " + C_BROWN + "DClone Killer" + C_ORANGE + " Activated");
+		
+	NTTMGR_TownManager();
+	
+	NTTM_TownMove("waypoint");
+	NTM_TakeWaypoint(4);
+	NTP_DoPrecast(true, true);
+	
+	if(!NTM_MoveToPresetUnit(me.areaid, NTC_UNIT_MONSTER, 737, 10, -10)){
+		Print(C_ORANGE + "Moving TO DCLONE");
+		if(!NTM_MoveToPresetUnit(me.areaid, NTC_UNIT_MONSTER, 333, 10, -10)){
+			return;
+		}
+	}
+	if(NTConfig_DCloneHandler > 0)		
+		_picker = NT_File("logs/AnniLog/AnniPicker.txt", 0);
+	
+	if(NTA_KillMonster(333)){
+		if(NTConfig_DCloneHandler == 0){
+			Delay(100);		
+			NTSI_PickItems(); 
+			NTA_ClearPosition(15);
+			NTM_MakeTP(true);	
+		}
+		else if(NTConfig_DCloneHandler > 0){
+			NTM_MakeTP();	
+			NTA_ClearPosition(30);
+			Delay(100);
+			NT_File("logs/AnniLog/AnniOwner.txt", 1, me.gamename + "/" + me.gamepassword);
+			Delay(100);
+			NT_File("logs/AnniLog/Annilog.txt", 1, "anniup");
+			GS_FindPicker();
+			NTA_ClearPosition(30);
+			NTSI_PickItems(); 
+			Delay(5000);
+			NTM_UsePortal("BluePortal", 1, me.charname);
+		}
+	}
+	
+	GS_ScriptRev();
+	
+	if(CurScriptIndex == "undefined")
+		CurScriptIndex = 0;
+	Load("NTBot/bots/" + NTConfig_Script[CurScriptIndex]);
+	SetStatusText(Rev + " " + NTConfig_Script[CurScriptIndex]);
+}
+
+function GS_FindPicker() {
+	var count = 0;
+	var _unit;
+	var found = false;
+	
+	do{
+		if(_picker == ""){			
+			_picker = NT_File("logs/AnniLog/AnniPicker.txt", 0);
+		}
+        NTC_Delay(2000);
+		_unit = GetPlayerUnit();
+		do {
+		  if (_unit.name == _picker)
+		  {
+			found = true;
+			break;
+		  }
+		} while (_unit.GetNext());
+		count ++;
+		if(count == 10 || count == 20 || count == 30 || count == 50 || count == 70 || count == 100 || count == 130 || count == 160 || count == 200 || count == 220 || count == 240 || count == 260 || count == 280 || count == 300){			
+			NT_File("logs/AnniLog/AnniOwner.txt", 1, me.gamename + "/" + me.gamepassword);	
+			NT_File("logs/AnniLog/Annilog.txt", 1, "anniup");
+		}
+	} while ((!found) && (count < 300));	
+	
+	if (found) {
+		Print(COLOR_8 + "Anni Picker found");
+		return found;
+	}
+	
+}
+
+function GS_ScriptRev() {
+	var grabLine;
+	var grabInfo = FileOpen("logs/AnniLog/utility.txt", 0);
+	if(!grabInfo){
+		var grabInfo = FileOpen("logs/AnniLog/utility.txt", 1);
+	}
+	if(grabInfo){ 
+		grabLine = grabInfo.ReadLine();
+		Rev = grabLine.substring(0, grabLine.indexOf('/'));
+		CurScriptIndex = grabLine.substring(grabLine.indexOf('/') + 1, grabLine.length);
+		grabInfo.Close();	
+	}
+	return;
+}

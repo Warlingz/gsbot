@@ -1,0 +1,80 @@
+//Written by goodstuff 8/03/15
+
+
+function NTMain()
+{	
+	Include("libs/common/NTCommon.ntl");
+	NTC_IncludeLibs();
+	NTC_IncludeConfig("NTBot/char_configs");
+	
+	NT_LoadConfig();
+	NTSI_LoadNIPFiles("NTBot/item_configs");
+	NTA_Initialize();	
+	
+	if(me.diff == 0) {
+		Delay(1000);
+		dropAnni();
+		Delay(1500);
+		NT_File("logs/AnniLog/Annixfer.txt", 1, "none");
+		NT_File("logs/AnniLog/Annilog.txt", 1, "none");
+		NT_File("logs/AnniLog/Anni.txt", 1, "no");
+		Delay(1500);
+		NTC_SendMsgToScript("NTBotGame.ntj", "SCRIPT_END");	
+	}
+	else if(me.diff == 2){
+		NT_File("logs/AnniLog/AnniOwner.txt", 1, 0);
+		if(!NTTM_TownMove("portalspot"))
+		{
+			NTC_SendMsgToScript("NTBotGame.ntj", "NTTM_TownMove()");
+			return;
+		}
+		for(var i = 0; i < 500 && NTC_InTown() ; i++){
+			if(!NTM_UsePortal("BluePortal", 4)){
+				NTC_Delay(500);
+			}
+		}
+		if(me.areaid == 4){
+			Delay(1000);
+			NTSI_PickItems();
+			if(haveAnni()){
+				NT_File("logs/AnniLog/Annilog.txt", 1, "anni");
+				NT_File("logs/AnniLog/Anni.txt", 1, "yes");
+			}
+			Delay(2000);
+			NTC_SendMsgToScript("NTBotGame.ntj", "SCRIPT_END");	
+		}
+	}
+	
+}
+
+function haveAnni() {	
+	var _anni = false;
+	var _items = me.GetItems();
+	if(!_items)
+		return false;	
+	for(var i = 0 ; i < _items.length ; i++) {
+		if(_items[i].classid == 603 && _items[i].quality == 7){
+			if(_items[i].itemloc == 0){
+				Print(C_BROWN + "Picked up Anni!");
+				_anni = true;
+			}
+		}
+	}
+	return _anni;
+}
+
+function dropAnni() {	
+	var _items = me.GetItems();
+	if(!_items)
+		return false;	
+	for(var i = 0 ; i < _items.length ; i++) {
+		if(_items[i].classid == 603 && _items[i].quality == 7){
+			if(_items[i].itemloc == 0) {
+				Print(C_WHITE + "Dropping Anni");
+				SetUIState(0x01, true);
+				if(NTT_DropItem(_items[i]))
+					NTC_PingDelay(200);
+			}
+		}
+	}
+}

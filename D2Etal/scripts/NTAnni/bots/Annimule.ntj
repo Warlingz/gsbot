@@ -1,0 +1,122 @@
+//Written by goodstuff 8/03/15
+
+//Do Not Edit
+var _picker = "";
+
+function NTMain()
+{	
+	Include("libs/common/NTCommon.ntl");
+	NTC_IncludeLibs();
+	NTC_IncludeConfig("NTAnni/char_configs");
+	
+	NT_LoadConfig();
+	NTSI_LoadNIPFiles("NTBot/item_configs");
+	NTA_Initialize();		
+	
+	Delay(1000);
+	NT_File("logs/AnniLog/Annimuler.txt", 1, "ingame");
+	NT_File("logs/AnniLog/Annixfer.txt", 1, "xfer");
+	
+	_picker = NT_File("logs/AnniLog/AnniPicker.txt", 0);
+	
+	var sh = GS_FindDropper();
+	
+	NTC_Delay(1500, 300);
+	
+	if(sh){
+		while(!haveAnni()){
+			NTC_Delay(1000, 300);
+			NTSI_PickItems();
+		}
+		Print(C_BROWN + "Picked up Anni!");
+	}
+	NTC_Delay(1200, 300);
+	NTSI_PickItems();
+	
+	if(haveAnni()){
+		NTC_Delay(150);				
+		NTR_IncrementRusheePos();
+		var _account = NT_File("logs/namelog/" + me.account + "-AnnimulerAcc.txt", 0);
+		var _password = NT_File("logs/namelog/" + me.account + "-AnnimulerPW.txt", 0);
+		NTC_Delay(150);			
+		var mypos = NTR_RetrieveRusheePos();	
+		NTC_Delay(100);	
+		if(mypos < 8){
+			if(_account == 1 || _account == 0){
+				NT_File("logs/namelog/" + me.account + "-AnnimulerAcc.txt", 1, _account);		
+				NTC_Delay(150);					
+				NT_File("logs/namelog/" + me.account + "-AnnimulerPW.txt", 1, _password);	
+			}
+			NTC_Delay(100);
+			NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_3 + "[ " + COLOR_1 + mypos + COLOR_3 + " ] Annis on Account [ " + COLOR_5 + _account + COLOR_3 + " ]".split("\n")[0] + ";" 
+			+ COLOR_1 + "------------------------------\n" + C_ORANGE + "Annis on Account : [ " + mypos + " ]\n" + COLOR_2 + "Anni Picked!" + "\n"+ C_BROWN + "Char Name : " + me.charname + "\n" + C_ORANGE + "Account : " + _account + "\n" + COLOR_1 + "---------------------------------");								
+		}
+		NTC_Delay(100);	
+		if(mypos == 8){
+			NTR_IncrementRusheeAccPos();
+			NTC_Delay(150);
+			if(_account == "thisacc"){
+				NT_File("logs/namelog/" + me.account + "-AnnimulerAcc.txt", 1, "accname");			
+				NTC_Delay(150);				
+				NT_File("logs/namelog/" + me.account + "-AnnimulerPW.txt", 1, "accpassword");		
+				NTC_Delay(100);
+			}
+			else{
+				NT_File("logs/namelog/" + me.account + "-AnnimulerAcc.txt", 1, 1);			
+				NTC_Delay(150);				
+				NT_File("logs/namelog/" + me.account + "-AnnimulerPW.txt", 1, 1);		
+				NTC_Delay(100);
+			}
+			NTC_SendLogToOOG(NTC_LOG_COMMON, C_BROWN + "Anni Account Completed [ " + COLOR_5 + _account + C_BROWN + " ]".split("\n")[0] + ";" 
+			+ COLOR_1 + "------------------------------\n" + C_ORANGE + "Annis on Account : [ " + mypos + " ]\n" + COLOR_2 + "Account Full!" + "\n" + C_BROWN + "Char Name : " + me.charname + "\n" + C_ORANGE + "Account : " + _account + "\n" + COLOR_1 + "---------------------------------");						
+		}
+	}
+	NTC_Delay(2000);	
+	NTC_SendMsgToScript("NTAnniMuleGame.ntj", "SCRIPT_END");
+	
+}
+
+function haveAnni() {	
+	var _anni = false;
+	var _items = me.GetItems();
+	if(!_items)
+		return false;	
+	for(var i = 0 ; i < _items.length ; i++) {
+		if(_items[i].classid == 603 && _items[i].quality == 7){
+			if(_items[i].itemloc == 0){
+				_anni = true;
+			}
+		}
+	}
+	return _anni;
+}
+
+function GS_FindDropper() {
+	var count = 0;
+	var _unit;
+	var found = false;
+	
+	do{
+		if(_picker == ""){			
+			_picker = NT_File("logs/AnniLog/AnniPicker.txt", 0);
+		}
+        NTC_Delay(2000);
+		_unit = GetPlayerUnit();
+		do {
+		  if (_unit.name == _picker)
+		  {
+			found = true;
+			break;
+		  }
+		} while (_unit.GetNext());
+		count ++;
+		if(count == 5 || count == 15 || count == 30 || count == 45 || count == 65 || count == 85 || count == 100 || count == 120 || count == 130 || count == 140 || count == 150 || count == 185 || count == 200 || count == 210 || count == 230 || count == 250 || count == 280 || count == 300){			
+			NT_File("logs/AnniLog/Annixfer.txt", 1, "xfer");
+		}
+	} while ((!found) && (count < 300));	
+	
+	if (found) {
+		Print(COLOR_8 + "Dropper found");
+		return found;
+	}
+}

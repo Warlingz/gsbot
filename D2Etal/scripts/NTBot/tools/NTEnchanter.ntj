@@ -1,0 +1,218 @@
+//Written by goodstuff 12/16/14
+
+var Version = "v1.0";
+var _player = [];
+var _lowPlayer = [];
+var CurrHP, _area, _canEnchant, _canBO, lastposx, lastposy;
+var firstcheck = true;
+var busy = false;
+var BOHP = 0;
+
+function NTMain(){
+	Include("libs/common/NTCommon.ntl");
+	NTC_IncludeLibs();
+	NTC_IncludeConfig("NTBot/char_configs");
+	NT_LoadConfig();		
+	
+	if(me.classid == 1 && NTConfig_Enchanter){
+		_canEnchant = NTC_GetSkillLevel(52);
+		if(_canEnchant){
+			Print(COLOR_11 + "Enchanter " + COLOR_4 + Version + COLOR_11 + " Active");			
+			while(me.ingame){
+				if(!NTC_InTown() && !busy && me.mode != 0 && me.mode != 17){
+					EnchantPlayer();
+				}
+				Delay(500);
+			}
+		}
+	}
+	// else if(me.classid == 4 && NTConfig_BOBarb){
+		// _canBO = NTC_GetSkillLevel(149);
+		// if(_canBO){
+			// Print(COLOR_11 + "BO Barb Active");	
+			// while(me.ingame){
+				// if(!NTC_InTown() && !busy && me.mode != 0 && me.mode != 17){
+					// BOBarb();
+				// }
+				// Delay(500);
+			// }
+		
+		// }
+	// }
+	
+	function BOBarb(){
+		var _unit = NTC_FindUnit(NTC_UNIT_PLAYER);
+		if(_canBO && _unit){
+			busy = true;
+			if(!me.GetState(32)){
+				CurrHP = me.hpmax;
+				Print(COLOR_8 + "Current HP : " + COLOR_4 + CurrHP);
+				NTP_DoPrecast();
+				if(me.GetState(32)){
+					if(CurrHP < me.hpmax){
+						BOHP = me.hpmax;
+						Print(COLOR_8 + "BO HP : " + COLOR_4 + BOHP);
+					}
+				}
+			}
+			else if(me.hpmax < BOHP && me.GetState(32)){				
+				Print(COLOR_8 + "Lower BO Level Detected, Recasting BO");
+				NTP_DoPrecast();
+				BOHP = me.hpmax;
+				Print(COLOR_8 + "BO HP : " + COLOR_4 + BOHP);
+			}
+			if(!_unit.GetState(32))
+				if(me.areaid == 131){ lastposx = me.x; lastposy = me.y; }			
+				do{			
+					if (_unit.areaid == me.areaid && minLevelBO <= _unit.GetStat(12) && _unit.name != me.name && NTC_InMyParty(_unit.name) && !_unit.GetState(32) && _unit.mode != 0 && _unit.mode != 17){
+						if(!_unit.GetState(32)){
+							if(GetDistance(me,_unit) < 15){
+								if(NT_GetCloserIntS(_unit)){
+									if(GetDistance(me,_unit) < 15){
+										NTP_DoPrecast(false,true);
+									}
+									else
+										NT_GetCloserIntS(_unit);
+								}			
+							}
+							else if(GetDistance(me,_unit) > 15 && GetDistance(me,_unit) < 40){
+								if(NT_GetCloserIntS(_unit)){
+									if(GetDistance(me,_unit) < 15 && GetDistance(me,_unit) < 40){
+										NTP_DoPrecast(false,true);
+									}
+									else
+										NT_GetCloserIntS(_unit);
+								}
+							}
+							if(_unit.GetState(32)){
+								Print(COLOR_8 + "BO'd Player : " + COLOR_4 + _unit.name);
+							}
+						} if(me.areaid == 131 && me.x != lastposx && me.y != lastposy) NTM_MoveTo(me.areaid, lastposx, lastposy);
+					}					
+					else if(_unit.areaid == me.areaid && _unit.name != me.name && minLevelBO >= _unit.GetStat(12) && NTC_InMyParty(_unit.name) && !_unit.GetState(32) && _unit.mode != 0 && _unit.mode != 17 && _lowPlayer.indexOf(_unit.name) == -1){
+						Print(COLOR_11 + "[ BO Barb ] " + COLOR_8 + _unit.name + COLOR_9 + " is too low level, minimum level (" + COLOR_8 + minLevelBO + COLOR_9 + ")");
+						_lowPlayer.push(_unit.name);
+					}
+				}while (_unit.GetNext());
+			}busy = false;
+	
+	}
+	
+	function EnchantPlayer(){			
+		var _unit = NTC_FindUnit(NTC_UNIT_PLAYER);
+		if(_canEnchant && _unit){
+			busy = true;
+			if(NTConfig_WaitforBO && firstcheck && !me.GetState(51)){
+				Print(COLOR_11 + "[ Enchanter ] " + COLOR_0 + "Waiting for BO before Enchanting");
+				firstcheck = false;
+				busy = false;
+			}
+			else if(!NTConfig_WaitforBO || me.GetState(51)){
+				if(me.areaid == 131){ lastposx = me.x; lastposy = me.y; }			
+				do{			
+					if (Enchant_BlackList.indexOf(_unit.name) == -1 && doNotEnchant_Class.indexOf(_unit.classid) == -1 && _unit.areaid == me.areaid && _unit.name != me.name && minLevelEnchant <= _unit.GetStat(12) && NTC_InMyParty(_unit.name) && !_unit.GetState(16) && _unit.mode != 0 && _unit.mode != 17){
+						if(_player.indexOf(_unit.name) == -1 && NTConfig_EnchantMerc)
+							_player.push(_unit.name);
+						if(!_unit.GetState(16) && me.mp >= 25){
+							if(GetDistance(me,_unit) < 20){
+								if(!NTC_CastSkill(52, NTC_HAND_RIGHT, _unit))
+									return false;
+							}
+							else if(GetDistance(me,_unit) > 20 && GetDistance(me,_unit) < 50){
+								if(NT_GetCloserIntS(_unit)){	
+									if(!NTC_CastSkill(52, NTC_HAND_RIGHT, _unit))
+										return false;
+								}
+							}
+							if(_unit.GetState(16)){
+								if(printEnchants){
+									Print(COLOR_8 + "Enchanted Player : " + COLOR_4 + _unit.name);
+									Say("!" + _unit.name + " is Enchanted");
+								}
+								if(printToManager){
+									_area = GetArea();
+									NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_2 + " Enchanted Player : " + COLOR_4 + _unit.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + "Name : " + _unit.name + "\n" + COLOR_9 + "Class : " + ClassIDToName(_unit.classid) + "\n" + COLOR_4 + "Level : " + _unit.GetStat(12) + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
+								}
+							}
+						} if(me.areaid == 131 && me.x != lastposx && me.y != lastposy) NTM_MoveTo(me.areaid, lastposx, lastposy);
+					}
+					else if(Enchant_BlackList.indexOf(_unit.name) == -1 && doNotEnchant_Class.indexOf(_unit.classid) == -1 && _unit.areaid == me.areaid && _unit.name != me.name && minLevelEnchant >= _unit.GetStat(12) && NTC_InMyParty(_unit.name) && !_unit.GetState(16) && _unit.mode != 0 && _unit.mode != 17 && _lowPlayer.indexOf(_unit.name) == -1){
+						if(printEnchants){
+							Print(COLOR_11 + "[ Enchanter ] " + COLOR_8 + _unit.name + COLOR_9 + " is too low level, minimum level (" + COLOR_8 + minLevelEnchant + COLOR_9 + ")");
+						}
+						_lowPlayer.push(_unit.name);
+					}
+				}while (_unit.GetNext()); if(NTConfig_EnchantMerc) EnchantMerc();
+			}busy = false;
+		}
+		
+		return false;
+				
+		function EnchantMerc(){			
+			var mercOwner;
+			var _unit = NTC_FindUnit(NTC_UNIT_MERC);
+			
+			if (_unit){
+				do{
+					for(var i = 0 ; i < _player.length ; i++){
+						if (NTC_CheckOwner(_unit, _player[i]) && !_unit.GetState(16) && _unit.mode != 12 && _unit.mode != 0){
+							mercOwner = GetUnit(_player[i]);
+							if(Enchant_BlackList.indexOf(_unit.name) == -1 && doNotEnchant_ClassMerc.indexOf(mercOwner.classid) == -1){
+								if(!_unit.GetState(16) && me.mp >= 25){
+									if(GetDistance(me,_unit) < 20){																	
+										if(!NTC_CastSkill(52, NTC_HAND_RIGHT, _unit))
+											return false;
+										}
+									else if(GetDistance(me, _unit) > 20){
+										if(NT_GetCloserIntS(_unit)){																	
+											if(!NTC_CastSkill(52, NTC_HAND_RIGHT, _unit))
+												return false;
+										}
+									}
+									if(printEnchants)
+										Print(COLOR_9 + "Enchanting [ " + COLOR_4 + mercOwner.name + "'s" + COLOR_9 + " ] Merc : " + COLOR_0 + _unit.name);
+								} if(me.areaid == 131 && me.x != lastposx && me.y != lastposy) NTM_MoveTo(me.areaid, lastposx, lastposy);
+							}
+						}
+					}
+				}while(_unit.GetNext());
+			}
+			return false;
+			
+		}
+		
+		function ClassIDToName(classid){
+			var id2name;
+			
+			switch(classid){
+				case 0 : id2name = "Amazon"; break;
+				case 1 : id2name = "Sorceress"; break;
+				case 2 : id2name = "Necromancer"; break;
+				case 3 : id2name = "Paladin"; break;
+				case 4 : id2name = "Barbarian"; break;
+				case 5 : id2name = "Druid"; break;
+				case 6 : id2name = "Assassin"; break;
+			}
+			return id2name;
+		}
+		
+		function GetUnit(name){
+			var _unit = GetPlayerUnit();
+			
+			if (_unit){
+				do{
+					if (_unit.name === name){
+						return _unit;
+					}
+				}while(_unit.GetNext());
+			}			
+			return false;
+		}
+		
+	}
+
+	function NT_GetCloserIntS(unit){ 
+		if(GetDistance(me, unit) > 2)
+			return NTM_MoveTo(unit.areaid, unit.x+1, unit.y);
+	}
+}
