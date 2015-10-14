@@ -429,9 +429,10 @@ function locationAction(location)
 			if(!accNumbered)
 				_newAccount = makeAccount();			
 			else if(accNumbered){
-				if(!_accNumber)
+				if(!_accNumber){
 					_accNumber = 0;
-				NT_File("logs/loc/rushbot-"+ me.account + "-Accnumber.txt", 1, "0");
+					NT_File("logs/loc/rushbot-"+ me.account + "-Accnumber.txt", 1, "0");
+				}
 				_newAccount = _accNumber;
 			}
 			if(allPasswords == "" || allPasswords == " "){
