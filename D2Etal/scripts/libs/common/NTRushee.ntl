@@ -90,7 +90,7 @@ function NTR_GoRushee()
 			NTR_ClearSpot(200);
 			NTC_Delay(1200);
 		}
-		else if(me.areaid != 110 && _player.name != me.name && _player.areaid == me.areaid && rushee.areaid != me.areaid && _player.mode != 0 && _player.mode != 17){
+		else if(me.areaid != 110 && me.areaid != 108 && _player.name != me.name && _player.areaid == me.areaid && rushee.areaid != me.areaid && _player.mode != 0 && _player.mode != 17){
 			TelePlayer();
 			NTM_MakeTP();
 			NTC_Delay(100);		

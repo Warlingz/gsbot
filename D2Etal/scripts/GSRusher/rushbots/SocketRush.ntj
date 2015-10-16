@@ -1395,14 +1395,8 @@ function DoDiablo()
 			ExitGame();
 		}
 	}
-	NTM_MoveTo(108, 7768, 5255);
-	NTC_Delay(200);
-	NTM_MakeTP();
-	NTC_Delay(200);
-	NTM_MoveTo(108, 7792, 5291);
-	NTC_Delay(200);
-	Say("Diablo is dead!");
 	NTSI_PickItems();
+	NTR_GoRushee();
 	NTC_Delay(3500);
 	if(!NTM_UsePortal("BluePortal", 103, me.charname))
 		NTM_MakeTP(true);
