@@ -205,8 +205,8 @@ function NTC_IncludeConfig(filepath, createCharConfigsOverride)
 					_configfile.Close();
 				else if(createCharConfigs && filepath == "NTBot/char_configs") {
 					createCharConfigs = false;
-					_customcharconfig = FileOpen("NTBot/char_configs" + _fullconfigname, 1);
-					_defaultcharconfig = FileOpen("NTBot/char_configs" + _shortconfigname, 0);
+					_customcharconfig = FileOpen(filepath + "/" + _fullconfigname, 1);
+					_defaultcharconfig = FileOpen(filepath + "/" + _shortconfigname, 0);
 					while(!_defaultcharconfig.eof) {
 						_customcharconfig.WriteLine(_defaultcharconfig.ReadLine());
 					}
