@@ -1140,9 +1140,9 @@ function DoTrav()
 
 	for(i = 0 ; i < _pretp.length ; i += 2) {
 		if(NTM_MoveTo(me.areaid, _pretp[i], _pretp[i+1])){
-			NTA_ClearPosition(12);
+			NTA_ClearPosition(20);
+			NTC_PingDelay(200);
 		}
-		NTC_PingDelay(200);
 	}
 
 	NTM_MakeTP();

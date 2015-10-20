@@ -126,7 +126,7 @@ var i;
 					case "ql" : NTR_OpenQuest(); break;
 				// ACT 1 Case's---------------------------------------------				
                     case "Andariel up!" :
-						NTC_Delay(200);
+						NTC_Delay(200, 500);
 						for(var i = 0 ; i < 100 && me.areaid == 1 ; i++){
 							NTM_UsePortal("BluePortal", 37, NTConfig_Leader);
 						}
@@ -135,47 +135,48 @@ var i;
                     case "Andariel is dead!" :
 						if(me.areaid == 37 && me.mode != 17){
 							ara = me.areaid;
-							NTC_Delay(200);
+							NTC_Delay(200, 500);
 							NTR_TakePortal();
 							NTC_Delay(200);
 						}
-						NTC_Delay(2200);
+						NTC_Delay(500, 1500);
 						if(me.areaid == 1)
 							NTR_GoEast(1);
 						break;  
 				// ACT 2 Case's---------------------------------------------
 					case "Cube up!" :
-						NTC_Delay(1000, 2000);
+						NTC_Delay(500, 2000);
 						if(me.areaid == 40){
 							NTM_UsePortal("BluePortal", 60, NTConfig_Leader);
 						}
 						if(me.areaid == 60){
 							ara = me.areaid;
 							NTR_PickItems();
-							NTC_PingDelay(500);
+							NTC_Delay(200, 500);
 							NTR_TakePortal();
 						}			
-						if(NTC_InTown()){							
-							NTC_PingDelay(500);
+						if(NTC_InTown()){		
+							NTC_Delay(200, 1000);
 							NTR_GoCain();
 						}			
 						break;
 					case "Staff up!" :
-						NTC_Delay(8500);
+						NTC_Delay(8500, 9000);
 						NTR_GoCain();
 						break;
 					case "Summoner up!" :
-						NTC_Delay(100);
+						NTC_Delay(200, 1000);
 						break;
 
 					case "Summoner is dead!" :
 						if(me.areaid == 74 && me.mode != 17){
 							ara = me.areaid;
-							NTC_PingDelay(200);
+							NTC_Delay(200, 1000);
 							NTR_TakePortal();
-							NTC_PingDelay(600);
+							NTC_Delay(200, 1000);
 						}
 						if(me.areaid == 40){
+							NTC_Delay(100, 500);
 							NTR_GoCain();
 						}
 						break;
@@ -190,7 +191,7 @@ var i;
 
 				// ACT 3 Case's---------------------------------------------	
 					case "Council up!" :
-						NTC_Delay(100);
+						NTC_Delay(200, 500);
 						if(me.areaid == 75){
 							NTM_UsePortal("BluePortal", 83, NTConfig_Leader);
 						}
@@ -200,10 +201,10 @@ var i;
 						if(me.mode != 17){
 							ara = me.areaid;
 							while(!NTC_InTown()){	
-								NTC_Delay(100);
+								NTC_Delay(200, 1000);
 								NTR_TakePortal();							
 							}
-							NTC_PingDelay(200, 500);
+							NTC_Delay(200, 1000);
 							if(NTC_InTown())
 								NTR_GoCain();
 						}
@@ -216,7 +217,15 @@ var i;
 								NTC_Delay(300);
 								NTR_GoCain();
 								NTC_Delay(300);
-								NTM_UsePortal("BluePortal", 102, NTConfig_Leader);						
+								if(!NTM_UsePortal("BluePortal", 102, NTConfig_Leader)){
+									NTC_Delay(750);	
+									var rusheepos = NTR_RetrieveRusheePos();
+									NTC_Delay(200);		
+									var pos = (parseInt(rusheepos) + 1);
+									NTC_Delay(200);		
+									NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_1 + "Rush [ " + COLOR_1 + pos + COLOR_1 + " ] Failed at Mephisto".split("\n")[0] + ";" + COLOR_1 + "------------------------------\n" + COLOR_1 + "Rush : [ " + pos + " ]\n" + "Failed!" + "\n" + C_WHITE + "My Last Area : " + ara + "\n" + C_RED + "Couldn't Enter Portal To Mephisto" + "\n"  + "Probably Missed Council Kill" + "\n" +  C_BROWN + "Leecher Name : " + me.charname + "\n" + COLOR_1 + "---------------------------------");	
+									NTC_SendMsgToScript("NTLeechGame.ntj", "SCRIPT_END");	
+								}									
 							}
 						}
 						break;
@@ -224,12 +233,12 @@ var i;
 					case "Mephisto is dead!" :
 						if(me.areaid == 102 && me.mode != 17){
 							ara = me.areaid;
-							NTC_Delay(1800);
+							NTC_Delay(1200, 2000);
 							NTM_MoveTo(me.areaid, 17590, 8068);
-							NTC_Delay(200);
+							NTC_Delay(200, 1000);
 							if(!NTM_TakeUnit(NTC_UNIT_OBJECT, 342)){
 								NTM_MoveTo(me.areaid, 17590, 8068);
-								NTC_Delay(200);
+								NTC_Delay(200, 1000);
 								if(!NTM_TakeUnit(NTC_UNIT_OBJECT, 342))
 									ExitGame();
 							}
@@ -241,7 +250,7 @@ var i;
 						NTC_Delay(100);
 						if(me.areaid == 102 && me.mode != 17){
 							ara = me.areaid;
-							NTC_Delay(100);
+							NTC_Delay(200, 1000);
 							NTM_MoveTo(me.areaid, 17590, 8068);
 							NTC_Delay(200);
 							if(NTM_TakeUnit(NTC_UNIT_OBJECT, 342))
@@ -250,27 +259,33 @@ var i;
 						if(me.areaid == 103){
 							NTM_UsePortal("BluePortal", 108, NTConfig_Leader);
 						}
-						// if(me.areaid === 108){
-							// NTM_MoveTo(108, 7769, 5265); //safe spot
-						// }
+
+						if(me.areaid === 108){
+							var _randy = Random(0,3);
+							switch(_randy){
+								case 0: return NTM_MoveTo(108, 7767, 5258); break;
+								case 1: return NTM_MoveTo(108, 7767, 5260); break;
+								case 2: return NTM_MoveTo(108, 7767, 5262); break;
+								case 3: return NTM_MoveTo(108, 7767, 5264); break;
+							}
+						}
 						break;
 
 					case "Diablo is dead!" :
 						if(me.areaid == 108 && me.mode != 17){
 							ara = me.areaid;
-							NTC_Delay(100);
+							NTC_Delay(500, 1000);
 							NTR_TakePortal();
-							NTC_PingDelay(3000);
+							NTC_PingDelay(1000, 3000);
 						}
 						if(NTC_InTown())
 							NTR_GoTyrael();
 						break;		
 				// ACT 5 Case's---------------------------------------------
 					case "Shenk up!" :
-						NTC_Delay(100);
+						NTC_Delay(200, 500);
 						if(me.areaid == 109){
 							NTM_UsePortal("BluePortal", 110, NTConfig_Leader);
-							NTC_PingDelay(500);
 						}
 						break;
 					
