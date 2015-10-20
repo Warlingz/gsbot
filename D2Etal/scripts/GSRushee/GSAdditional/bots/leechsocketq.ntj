@@ -250,9 +250,9 @@ var i;
 						if(me.areaid == 103){
 							NTM_UsePortal("BluePortal", 108, NTConfig_Leader);
 						}
-						if(me.areaid === 108){
-							NTM_MoveTo(108, 7769, 5265); //safe spot
-						}
+						// if(me.areaid === 108){
+							// NTM_MoveTo(108, 7769, 5265); //safe spot
+						// }
 						break;
 
 					case "Diablo is dead!" :

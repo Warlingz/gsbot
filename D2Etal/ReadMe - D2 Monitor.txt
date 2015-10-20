@@ -28,12 +28,12 @@ Options : Window Control
 		"Tiled" checkbox must be checked and the 2 presets unchecked
 		To use the Left monitor use a (-) negative number of the Left monitors width eg. 1920x1080 is -1920
 		To use the Right monitor use the (Center monitors width + 5) eg. 1920x1080 is 1925
-		The other two textbox's named X : and Y : to the left of this panel are used as parameters to which it should be tiled.
-		The X : textbox if using Left monitor will be the (Left monitors width + game window width + 5) eg. Left Monitor is 1920x1080 for 640(small) windows would be -1920 + 640 + 5 = -1275 and for 800(big) windows -1920 + 800 + 5 = -1115
+		The textbox named Y : to the left of this panel is used as parameters to which it should be tiled.
 		The Y : textbox just determines how for down the windows will be, calculated by game window height + 30 eg 640x480 is 480+30= 510 and 800x600 is 600+30= 630
-		The Top TextBox Controls how far Right the windows will be tiled, and the Bottom TextBox Controls how far Down the windows will be tiled.
-		The two radio buttons within this panel (800 and 600) determines how far apart the windows tile (math is off after 6 or 8, I may fix this)
-
+		The Bottom TextBox Controls how far Down the windows will be tiled.
+		The two radio buttons within this panel (800 and 600) determines how far apart the windows tile
+	
+	(Tiles upto 14 clients across 3 screens)
 	
 Options : Sound On Event
 	Two events that can be watched and notified, Sound on Walk and Sound on Hostile
