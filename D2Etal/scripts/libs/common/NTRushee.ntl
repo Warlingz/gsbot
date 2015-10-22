@@ -80,7 +80,6 @@ function NTR_GoRushee()
 	do{
 		rushee = GetRushee(_rushee);
 		if(_player.name == rushee.name && _player.areaid == me.areaid){
-			//Print(C_WHITE + "Teleporting to " + _player.name);
 			TelePlayer();
 			NTM_MakeTP();
 			NTC_Delay(100);		
@@ -88,16 +87,6 @@ function NTR_GoRushee()
 			NTR_MoveOut(_player, 10);
 			NTR_ClearSpot(200);
 			NTC_Delay(1200);
-		}
-		else if(me.areaid != 110 && me.areaid != 108 && _player.name != me.name && _player.areaid == me.areaid && rushee.areaid != me.areaid && _player.mode != 0 && _player.mode != 17){
-			TelePlayer();
-			NTM_MakeTP();
-			NTC_Delay(100);		
-			Say(_msg);
-			NTC_Delay(100);	
-			NTR_MoveOut(_player, 10);
-			NTR_ClearSpot(200);
-			NTC_Delay(1200);			
 		}
 	}while(_player.GetNext());
 		
@@ -237,21 +226,21 @@ function NTR_Death(area)
 					while(me.areaid == _rusher.areaid){
 						NTC_Delay(200);
 					}
+					if(me.areaid == 8 && me.areaid !== _rusher.areaid){
+						NTC_Delay(100);
+						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
+						NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
+						NTC_Delay(100);
+						Say("I died I need a sec");
+						me.Cancel(0);
+						NTC_Delay(200);
+						if(GetUIState(0x09, true)){
+							NTC_CancelOut(1);
+						}
+						NTC_Delay(500);
+						NTR_GoAkara();
+					}
 				}
-			}
-			if(me.areaid == 8 && me.areaid !== _rusher.areaid){
-				NTC_Delay(100);
-				Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
-				NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
-				NTC_Delay(100);
-				Say("I died I need a sec");
-				me.Cancel(0);
-				NTC_Delay(200);
-				if(GetUIState(0x09, true)){
-					NTC_CancelOut(1);
-				}
-				NTC_Delay(500);
-				NTR_GoAkara();
 			}
 			break;
 		case 37 :
@@ -260,20 +249,20 @@ function NTR_Death(area)
 					while(me.areaid == _rusher.areaid){
 						NTC_Delay(200);
 					}
+					if(me.areaid == 37 && me.areaid !== _rusher.areaid){
+						NTC_Delay(100);
+						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
+						NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
+						NTC_Delay(100);
+						me.Cancel(0);
+						NTC_Delay(200);
+						if(GetUIState(0x09, true)){
+							NTC_CancelOut(1);
+						}
+						NTC_Delay(1000);
+						NTR_GoEast(0);
+					}
 				}
-			}
-			if(me.areaid == 37 && me.areaid !== _rusher.areaid){
-				NTC_Delay(100);
-				Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
-				NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
-				NTC_Delay(100);
-				me.Cancel(0);
-				NTC_Delay(200);
-				if(GetUIState(0x09, true)){
-					NTC_CancelOut(1);
-				}
-				NTC_Delay(1000);
-				NTR_GoEast(0);
 			}
 			break;
 		case 49 : 
@@ -282,22 +271,22 @@ function NTR_Death(area)
 					while(me.areaid == _rusher.areaid){
 						NTC_Delay(200);
 					}
+					if(me.areaid == 49 && me.areaid !== _rusher.areaid){
+						NTC_Delay(100);
+						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
+						NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
+						NTC_Delay(100);
+						Say("I died I need a sec");
+						NTC_Delay(100);
+						me.Cancel(0);
+						NTC_Delay(200);
+						if(GetUIState(0x09, true)){
+							NTC_CancelOut(1);
+						}
+						NTC_Delay(1000);
+						NTR_CheckLocation();
+					}
 				}
-			}
-			if(me.areaid == 49 && me.areaid !== _rusher.areaid){
-				NTC_Delay(100);
-				Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
-				NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
-				NTC_Delay(100);
-				Say("I died I need a sec");
-				NTC_Delay(100);
-				me.Cancel(0);
-				NTC_Delay(200);
-				if(GetUIState(0x09, true)){
-					NTC_CancelOut(1);
-				}
-				NTC_Delay(1000);
-				NTR_CheckLocation();
 			}
 			break;
 		case 74 :
@@ -306,21 +295,21 @@ function NTR_Death(area)
 					while(me.areaid == _rusher.areaid){
 						NTC_Delay(200);
 					}
+					if(me.areaid == 74 && me.areaid !== _rusher.areaid){
+						Say("I died I need a sec");
+						NTC_Delay(100);
+						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
+						NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
+						NTC_Delay(100);
+						me.Cancel(0);
+						NTC_Delay(200);
+						if(GetUIState(0x09, true)){
+							NTC_CancelOut(1);
+						}
+						NTC_Delay(1000);
+						NTR_GoCain();
+					}
 				}
-			}
-			if(me.areaid == 74 && me.areaid !== _rusher.areaid){
-				Say("I died I need a sec");
-				NTC_Delay(100);
-				Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
-				NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
-				NTC_Delay(100);
-				me.Cancel(0);
-				NTC_Delay(200);
-				if(GetUIState(0x09, true)){
-					NTC_CancelOut(1);
-				}
-				NTC_Delay(1000);
-				NTR_GoCain();
 			}
 			break;
 		case 83 : 
@@ -329,21 +318,21 @@ function NTR_Death(area)
 					while(me.areaid == _rusher.areaid){
 						NTC_Delay(200);
 					}
+					if(me.areaid == 83 && me.areaid !== _rusher.areaid){
+						Say("I died I need a sec");
+						NTC_Delay(100);
+						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
+						NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
+						NTC_Delay(100);
+						me.Cancel(0);
+						NTC_Delay(200);
+						if(GetUIState(0x09, true)){
+							NTC_CancelOut(1);
+						}
+						NTC_Delay(1000);
+						NTR_GoCain();
+					}
 				}
-			}
-			if(me.areaid == 83 && me.areaid !== _rusher.areaid){
-				Say("I died I need a sec");
-				NTC_Delay(100);
-				Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
-				NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
-				NTC_Delay(100);
-				me.Cancel(0);
-				NTC_Delay(200);
-				if(GetUIState(0x09, true)){
-					NTC_CancelOut(1);
-				}
-				NTC_Delay(1000);
-				NTR_GoCain();
 			}
 			break;
 		case 94 :
@@ -352,23 +341,23 @@ function NTR_Death(area)
 					while(me.areaid == _rusher.areaid){
 						NTC_Delay(200);
 					}
+					if(me.areaid == 94 && me.areaid !== _rusher.areaid){
+						Say("I died I need a sec");
+						NTC_Delay(100);
+						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
+						NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
+						NTC_Delay(100);
+						me.Cancel(0);
+						NTC_Delay(200);
+						if(GetUIState(0x09, true)){
+							NTC_CancelOut(1);
+						}
+						NTC_Delay(500);
+						NTR_CheckLocation();
+						NTC_Delay(1000);
+						NTR_GoAlkor();				
+					}
 				}
-			}
-			if(me.areaid == 94 && me.areaid !== _rusher.areaid){
-				Say("I died I need a sec");
-				NTC_Delay(100);
-				Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
-				NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
-				NTC_Delay(100);
-				me.Cancel(0);
-				NTC_Delay(200);
-				if(GetUIState(0x09, true)){
-					NTC_CancelOut(1);
-				}
-				NTC_Delay(500);
-				NTR_CheckLocation();
-				NTC_Delay(1000);
-				NTR_GoAlkor();				
 			}
 			break;
 		case 102 : 
@@ -377,29 +366,29 @@ function NTR_Death(area)
 					while(me.areaid == _rusher.areaid){
 						NTC_Delay(200);
 					}
-				}
-			}
-			if(me.areaid == 102 && me.areaid !== _rusher.areaid){
-				Say("I died I need a sec");
-				NTC_Delay(200);
-				Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
-				NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
-				NTC_Delay(100);
-				me.Cancel(0);
-				NTC_Delay(200);
-				if(GetUIState(0x09, true)){
-					NTC_CancelOut(1);
-				}
-				NTC_Delay(1000);
-				NTTM_TownMove("portalspot");
-				NTC_Delay(200);
-				NTM_UsePortal("BluePortal", 102, NTConfig_Leader);
-				if(me.areaid == 102){
-					NTC_Delay(200);
-					NTM_MoveTo(me.areaid, 17590, 8068);
-					NTC_Delay(1500);
-					if(NTM_TakeUnit(NTC_UNIT_OBJECT, 342)){
-						NTC_Delay(1500);
+					if(me.areaid == 102 && me.areaid !== _rusher.areaid){
+						Say("I died I need a sec");
+						NTC_Delay(200);
+						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
+						NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
+						NTC_Delay(100);
+						me.Cancel(0);
+						NTC_Delay(200);
+						if(GetUIState(0x09, true)){
+							NTC_CancelOut(1);
+						}
+						NTC_Delay(1000);
+						NTTM_TownMove("portalspot");
+						NTC_Delay(200);
+						NTM_UsePortal("BluePortal", 102, NTConfig_Leader);
+						if(me.areaid == 102){
+							NTC_Delay(200);
+							NTM_MoveTo(me.areaid, 17590, 8068);
+							NTC_Delay(1500);
+							if(NTM_TakeUnit(NTC_UNIT_OBJECT, 342)){
+								NTC_Delay(1500);
+							}
+						}
 					}
 				}
 			}
@@ -410,20 +399,20 @@ function NTR_Death(area)
 					while(me.areaid == _rusher.areaid){
 						NTC_Delay(200);
 					}
+					if(me.areaid == 105 && me.areaid !== _rusher.areaid){
+						NTC_Delay(100);
+						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
+						NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
+						NTC_Delay(100);
+						me.Cancel(0);
+						NTC_Delay(200);
+						if(GetUIState(0x09, true)){
+							NTC_CancelOut(1);
+						}
+						NTC_Delay(500);
+						NTR_TalkTyrael();
+					}
 				}
-			}
-			if(me.areaid == 105 && me.areaid !== _rusher.areaid){
-				NTC_Delay(100);
-				Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
-				NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
-				NTC_Delay(100);
-				me.Cancel(0);
-				NTC_Delay(200);
-				if(GetUIState(0x09, true)){
-					NTC_CancelOut(1);
-				}
-				NTC_Delay(500);
-				NTR_TalkTyrael();
 			}
 			break;
 		case 108 : 
@@ -432,20 +421,20 @@ function NTR_Death(area)
 					while(me.areaid == _rusher.areaid){
 						NTC_Delay(200);
 					}
+					if(me.areaid == 108 && me.areaid !== _rusher.areaid){
+						NTC_Delay(100);
+						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
+						NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
+						NTC_Delay(100);
+						me.Cancel(0);
+						NTC_Delay(200);
+						if(GetUIState(0x09, true)){
+							NTC_CancelOut(1);
+						}
+						NTC_Delay(1000);
+						NTR_GoTyrael();
+					}
 				}
-			}
-			if(me.areaid == 108 && me.areaid !== _rusher.areaid){
-				NTC_Delay(100);
-				Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
-				NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
-				NTC_Delay(100);
-				me.Cancel(0);
-				NTC_Delay(200);
-				if(GetUIState(0x09, true)){
-					NTC_CancelOut(1);
-				}
-				NTC_Delay(1000);
-				NTR_GoTyrael();
 			}
 			break;
 		case 110 : 
@@ -454,19 +443,19 @@ function NTR_Death(area)
 					while(me.areaid == _rusher.areaid){
 						NTC_Delay(200);
 					}
+					if(me.areaid == 110 && me.areaid !== _rusher.areaid){
+						NTC_Delay(100);
+						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
+						NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
+						NTC_Delay(100);
+						me.Cancel(0);
+						NTC_Delay(200);
+						if(GetUIState(0x09, true)){
+							NTC_CancelOut(1);
+						}
+						NTC_Delay(100);
+					}
 				}
-			}
-			if(me.areaid == 110 && me.areaid !== _rusher.areaid){
-				NTC_Delay(100);
-				Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
-				NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
-				NTC_Delay(100);
-				me.Cancel(0);
-				NTC_Delay(200);
-				if(GetUIState(0x09, true)){
-					NTC_CancelOut(1);
-				}
-				NTC_Delay(100);
 			}
 			break;
 		default :
@@ -475,21 +464,21 @@ function NTR_Death(area)
 					while(me.areaid == _rusher.areaid){
 						NTC_Delay(200);
 					}
+					if(me.areaid !== _rusher.areaid){
+						Say("I died I need a sec");
+						NTC_Delay(100);
+						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
+						NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
+						NTC_Delay(100);
+						me.Cancel(0);
+						NTC_Delay(200);
+						if(GetUIState(0x09, true)){
+							NTC_CancelOut(1);
+						}
+						NTC_Delay(1000);
+						NTR_CheckLocation();
+					}
 				}
-			}
-			if(me.areaid !== _rusher.areaid){
-				Say("I died I need a sec");
-				NTC_Delay(100);
-				Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
-				NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
-				NTC_Delay(100);
-				me.Cancel(0);
-				NTC_Delay(200);
-				if(GetUIState(0x09, true)){
-					NTC_CancelOut(1);
-				}
-				NTC_Delay(1000);
-				NTR_CheckLocation();
 			}
 			break;
 	}
@@ -506,7 +495,7 @@ function NTR_GoAkara()
 	if(me.areaid == 1){
 		Print(C_DARK_GREEN + "Completing the Den Quest");
 		NTR_TalkNPC("akara");
-		CheckLocation();
+		NTR_CheckLocation();
 	}
 	return false;
 }
@@ -556,6 +545,27 @@ function NTR_GoEast(type)
 				}
 			}
 		break;
+		case 2 :		
+			if(me.areaid == 40){
+				Print(C_DARK_GREEN + "Heading to A3");
+				NTTM_TownMove("meshif");   
+				_npc = NTC_FindUnit(NTC_UNIT_NPC, 210, 5);      
+				if(_npc){
+					if(NTT_VisitNpc(_npc)){				
+						NTC_CancelMenus();		
+						if(NTT_DoInteract(_npc)){
+							for(var i = 0 ; i < 4 ; i++){
+								if((i % 4) == 0)
+								me.SelectNPCMenu(0x0D38);
+								NTC_Delay(100);
+							}return true;
+						}
+					}
+				}
+				else
+					return false;
+			}
+		break;
 	}
 }
 
@@ -587,8 +597,10 @@ function NTR_TalkNPC(who)
 				NTC_Delay(100);
 			}
 		}
+		return true;
 	}
-	return;
+	else
+		return false;
 }
 
 function NTR_GoCain()
@@ -597,8 +609,9 @@ function NTR_GoCain()
 		Print(C_DARK_GREEN + "Talking to Cain");
 		NTR_TalkNPC("cain");
 		NTR_CheckLocation();
+		return true;
 	}
-	return;
+	return false;
 }
 
 function NTR_TalktoJeryhn()
@@ -625,27 +638,11 @@ function NTR_TalkJer()
 	NTC_Delay(200, 500);
 	if(me.areaid == 40){
 		Print(C_DARK_GREEN + "Talking to Jerhyn");
-		NTR_TalkNPC("palace");
-	}
-	NTC_Delay(100, 500);
-	if(me.areaid == 40){
-		Print(C_DARK_GREEN + "Heading to A3");
-		NTTM_TownMove("meshif");   
-      	_npc = NTC_FindUnit(NTC_UNIT_NPC, 210, 5);      
-      	if(_npc){
-			if(NTT_VisitNpc(_npc)){				
-				NTC_CancelMenus();		
-				if(NTT_DoInteract(_npc)){
-					for(var i = 0 ; i < 4 ; i++){
-						if((i % 4) == 0)
-						me.SelectNPCMenu(0x0D38);
-						NTC_Delay(100);
-					}
-				}
-			}
+		if(!NTR_TalkNPC("palace")){
+			return false;
 		}
-	}	
-	return;
+	}
+	return true;
 }
 function NTR_GoDrognan()
 {
@@ -727,25 +724,6 @@ function NTR_TalkTyrael()
 		NTR_CheckLocation();
 	}
 	return false;
-}
-function GS_UIState()
-{		
-	return (GetUIState(0x08) || GetUIState(0x0C) || GetUIState(0x0F) || GetUIState(0x14) || GetUIState(0x17) || GetUIState(0x19) || GetUIState(0x24));
-}
-
-function GS_IsUIState()
-{		
-	return (!GetUIState(0x08) && !GetUIState(0x0C) && !GetUIState(0x0F) && !GetUIState(0x14) && !GetUIState(0x17) && !GetUIState(0x19) && !GetUIState(0x24));
-}
-
-function NTC_CancelMenus(){
-
-	if(GS_UIState()){
-		for (var i = 0; i < 10 && !GS_IsUIState() ; i++){
-			me.Cancel(1);
-			Delay(50);
-		}
-	}
 }
 function NTR_GoTyrael()
 {
@@ -944,6 +922,9 @@ function NTR_CheckQuest()
 		NT_File("logs/questlog/QuestStatus.txt", 1, "duriel");			
 	}
 	else if(me.GetQuest(13, 0) && me.GetQuest(13, 2)&& horadricstaff.length < 1){
+		NT_File("logs/questlog/QuestStatus.txt", 1, "duriel");			
+	}
+	else if(me.GetQuest(13, 0) && me.GetQuest(13, 12) && horadricstaff.length < 1 || me.GetQuest(13,0)){
 		NT_File("logs/questlog/QuestStatus.txt", 1, "duriel");			
 	}
 	else					
@@ -1614,85 +1595,55 @@ function NTR_TakePortal()
 	
 	return false;
 }
-function NTR_ClearLevel()
-{
-	var area = me.areaid;
-	var _player = GetPlayerUnit();
-	
-	if(_player){
-		do{
-			if(_player.name != me.name){
-				Print(C_ORANGE + "Following Rusher");
-				FollowRusher();
-				if(me.GetQuest(1, 4) || me.GetQuest(1,12) && me.GetQuest(1,0)){
-					NTR_LeaveDen();
-					break;
-				}
+
+function NTR_ClearLevel(pickitem, safelevel) {
+	var i;
+	var _room, _rooms;
+	var _distance, _minindex, _mindistance;
+	_room = GetRoom();
+	if (!_room) { return false; }
+	switch (arguments.length){
+	case 0:
+		pickitem = true;
+		break;
+	case 1:
+		safelevel = 2;
+		break;
+	default:
+		if ((NTConfig_CheckSelfSafe.length < 1) && (NTConfig_CheckMercSafe.length < 1)) { safelevel = 0; }
+		break;
+	}
+
+	_rooms = new Array();
+
+	do {
+		_rooms.push([parseFloat(_room.x * 5 + _room.xsize * 5 / 2), parseFloat(_room.y * 5 + _room.ysize * 5 / 2)]);
+	} while(_room.GetNext());
+
+	while (_rooms.length > 0) {
+		_mindistance = 100000;
+		
+		if(me.GetQuest(1, 4) || me.GetQuest(1,12) && me.GetQuest(1,0)){
+			NTR_LeaveDen();
+			break;
+		}
+		for (i = 0; i < _rooms.length && !me.GetQuest(1,4) ; i++) {
+			_distance = GetDistance(me.x, me.y, _rooms[i][0], _rooms[i][1]);
+
+			if (_distance < _mindistance) {
+				_minindex = i;
+				_mindistance = _distance;
 			}
-		}while(_player.GetNext());
-		
-	}
-	function FollowRusher(){	
-	
-		var _leaderUnit = GetLeaderUnit(_player.name);
-	
-		if(GetDistance(me, _leaderUnit) > 3){
-			NT_GetCloserIntS(_leaderUnit);
 		}
-		else if((GetDistance(me, _leaderUnit) == -1 || GetDistance(me, _leaderUnit) > 30) && me.areaid == _player.areaid){
-			if(!NTM_MoveTo(me.areaid, _player.x, _player.y))
-				return false;
-		}
-	}
-}
-// function NTR_ClearLevel(pickitem, safelevel) {
-	// var i;
-	// var _room, _rooms;
-	// var _distance, _minindex, _mindistance;
-	// _room = GetRoom();
-	// if (!_room) { return false; }
-	// switch (arguments.length){
-	// case 0:
-		// pickitem = true;
-		// break;
-	// case 1:
-		// safelevel = 2;
-		// break;
-	// default:
-		// if ((NTConfig_CheckSelfSafe.length < 1) && (NTConfig_CheckMercSafe.length < 1)) { safelevel = 0; }
-		// break;
-	// }
-
-	// _rooms = new Array();
-
-	// do {
-		// _rooms.push([parseFloat(_room.x * 5 + _room.xsize * 5 / 2), parseFloat(_room.y * 5 + _room.ysize * 5 / 2)]);
-	// } while(_room.GetNext());
-
-	// while (_rooms.length > 0) {
-		// _mindistance = 100000;
-		
-		// if(me.GetQuest(1, 4) || me.GetQuest(1,12) && me.GetQuest(1,0)){
-			// NTR_LeaveDen();
-			// break;
-		// }
-		// for (i = 0; i < _rooms.length && !me.GetQuest(1,4) ; i++) {
-			// _distance = GetDistance(me.x, me.y, _rooms[i][0], _rooms[i][1]);
-
-			// if (_distance < _mindistance) {
-				// _minindex = i;
-				// _mindistance = _distance;
-			// }
-		// }
-		// if (NTM_MoveTo(me.areaid, _rooms[_minindex][0], _rooms[_minindex][1], 1, false, false)) {
-			// if (!NTA_ClearRoom(pickitem, safelevel)) { return false; }
+		if (NTM_MoveTo(me.areaid, _rooms[_minindex][0], _rooms[_minindex][1], 1, false, false)) {
+			if (!NTA_ClearRoom(pickitem, safelevel)) { return false; }
 				
-			// NTP_DoPrecast(false);
-		// }
-		// _rooms.splice(_minindex, 1);
-	// }
-	// return true;
-// }
+			NTP_DoPrecast(false);
+		}
+		_rooms.splice(_minindex, 1);
+	}
+	return true;
+}
 
 function NTR_ClearDen(pickitem, safelevel) {
 	var i;
@@ -1738,10 +1689,10 @@ function NTR_ClearDen(pickitem, safelevel) {
 	return true;
 }
 
-function NTR_Den(rusher)
+function NTR_Den()
 {
 	while(me.areaid == 8 && !me.GetQuest(1, 4) && !me.GetQuest(1, 1)){
-		NTR_ClearLevel(rusher);
+		NTR_ClearLevel(false);
 	}
 }
 function NTR_LeaveDen()
@@ -1771,190 +1722,6 @@ function GetLeaderUnit(name){
 		} while(_unit.GetNext());
 	}	
 	return false;
-}
-
-function NTR_DoPrecast(refresh, castbo)
-{
-	var _unit = me.GetMerc();
-	
-	if(arguments.length < 2)
-		castbo = true;
-	
-	switch(me.classid)
-	{
-	case NTC_CHAR_CLASS_AMAZON:
-		NTP_CastBC(refresh);
-
-		if(refresh || !NTP_GetMinion(357))
-			NTC_CastSkill(32, NTC_HAND_RIGHT); // Valkyrie
-
-		NTP_DoPrecastCTA(refresh, castbo);
-		break;
-
-	case NTC_CHAR_CLASS_SORCERESS:
-		NTP_DoPrecastCTA(refresh, castbo);	
-		// if(me.areaid > 82){
-			// if(refresh || !me.GetState(38)){
-				// Print(COLOR_8 + "Casting Thunder Storm!")
-				// NTC_CastSkill(57, NTC_HAND_RIGHT); // Thunder Storm
-			// }
-		// }
-		if(NTConfig_SwitchCastSorc)
-			NTC_SwapWeapons();
-			
-		if(refresh || me.GetState(30) == 0)
-			NTC_CastSkill(58, NTC_HAND_RIGHT); // Energy Shield
-			
-		if(refresh || (!me.GetState(10) && !me.GetState(88) && !me.GetState(20)))
-		{
-			if(!NTC_CastSkill(50, NTC_HAND_RIGHT)) // Shiver Armor
-				if(!NTC_CastSkill(60, NTC_HAND_RIGHT)) // Chilling Armor
-					NTC_CastSkill(40, NTC_HAND_RIGHT); // Frozen Armor
-		}
-		
-		if(NTConfig_SwitchCastSorc)
-			NTC_SwapWeapons();
-			
-		if((_unit != null && refresh) || (_unit != null && !_unit.GetState(16)))
-		  NTP_DoEnchant();  // Enchant Merc
-
-		break;
-
-	case NTC_CHAR_CLASS_NECROMANCER:
-		NTP_CastBC(refresh);
-		
-		if(refresh || !(NTP_GetMinion(289) || NTP_GetMinion(290) || NTP_GetMinion(291) || NTP_GetMinion(292)))
-		{
-			switch(NTConfig_Golem)
-			{
-			case 0:
-			case "None":
-			case "Iron":
-				break;
-			case 1:
-			case "Clay":
-				NTC_CastSkill(75, NTC_HAND_RIGHT); //Clay
-				break;
-			case 2:
-			case "Blood":
-				NTC_CastSkill(85, NTC_HAND_RIGHT); //Blood
-				break;
-			case 3:
-			case "Fire":
-				NTC_CastSkill(94, NTC_HAND_RIGHT); //Fire
-				break;
-			default:
-				Print(COLOR_1 + "Invalid Golem id. Check character configuration.")
-				break;
-			}
-		}
-		
-		if(NTC_GetSkillLevel(73))
-			NTC_CastSkill(73, NTC_HAND_LEFT); // Necro Poison dagger
-
-		NTP_DoPrecastCTA(refresh, castbo);
-
-		if(refresh || !me.GetState(14))
-			NTC_CastSkill(68, NTC_HAND_RIGHT); // Bone Armor
-		break;
-
-	case NTC_CHAR_CLASS_PALADIN:
-		NTP_DoPrecastCTA(refresh, castbo);
-		if(refresh || !me.GetState(101))
-			NTC_CastSkill(117, NTC_HAND_RIGHT); // Holy Shield
-		break;
-
-	case NTC_CHAR_CLASS_BARBARIAN:
-		if(refresh || !me.GetState(51) || !me.GetState(32) || !me.GetState(26))
-		{
-			if(BarbSwitch)
-				NTC_SwapWeapons();
-				
-			if(castbo)
-			{
-				NTC_CastSkill(155, NTC_HAND_RIGHT); // Battle Command
-				NTC_CastSkill(149, NTC_HAND_RIGHT); // Battle Orders
-			}
-			
-			NTC_CastSkill(138, NTC_HAND_RIGHT); // Shout
-				
-			if(BarbSwitch)
-				NTC_SwapWeapons();
-		}
-		
-		break;
-
-	case NTC_CHAR_CLASS_DRUID:
-		NTP_CastBC(refresh);
-
-		if(refresh || !NTP_GetMinion(428))
-			NTC_CastSkill(247, NTC_HAND_RIGHT); // Summon Grizzly
-
-		if(refresh || !NTP_GetMinion(426))
-			NTC_CastSkill(231, NTC_HAND_RIGHT); // Carrion Vine
-
-		if(refresh || !me.GetState(149))
-			NTC_CastSkill(226, NTC_HAND_RIGHT); // Oak Sage
-
-		if(refresh && NTConfig_CastRaven)
-		{
-			for (i = 0; i < 5; i++)
-			{
-				NTC_CastSkill(221, NTC_HAND_RIGHT); // raven
-				Delay(100);
-			}
-		}
-
-		NTP_DoPrecastCTA(refresh, castbo);
-
-		if(refresh || !me.GetState(151))
-			NTC_CastSkill(235, NTC_HAND_RIGHT); // Cyclone Armor
-
-		if(refresh || !me.GetState(144))
-			NTC_CastSkill(250, NTC_HAND_RIGHT); // Hurricane
-
-		break;
-
-	case NTC_CHAR_CLASS_ASSASSIN:
-		NTP_CastBC(refresh);
-	
-		if(refresh || !(NTP_GetMinion(417) || NTP_GetMinion(418)))
-		{
-			switch(NTConfig_UseShadow)
-			{
-			case 0:
-			case "None":
-				break;
-			case 1:
-			case "Warrior":
-				NTC_CastSkill(268, NTC_HAND_RIGHT); // Shadow Warrior
-				break;
-			case 2:
-			case "Master":
-				NTC_CastSkill(279, NTC_HAND_RIGHT); // Shadow Master
-				break;
-			}
-		}
-
-		NTP_DoPrecastCTA(refresh, castbo);
-
-		if((refresh || !me.GetState(157)) && NTConfig_UseBOS)
-			NTC_CastSkill(258, NTC_HAND_RIGHT); // Burst of Speed
-			
-		if((refresh || !me.GetStat(181)) && NTConfig_UseFade)
-			NTC_CastSkill(267, NTC_HAND_RIGHT); // Fade
-
-		if((refresh || me.GetState(158) == 0) && NTConfig_UseBladeShield)
-			NTC_CastSkill(277, NTC_HAND_RIGHT); // Blade Shield
-
-		if((refresh || !me.GetState(153)) && NTConfig_UseCloakOfShadows)
-			NTC_CastSkill(264, NTC_HAND_RIGHT); // Cloak of Shadows
-		if(NTConfig_Venom && (refresh ||!me.GetStat(101))){ // venom
-			//Print(COLOR_2 + "casting venom");
-			NTC_CastSkill(278, NTC_HAND_RIGHT);
-		}
-		break;
-	}
 }
 
 function NTR_RetrieveRusheeName() { //using Rugruth's NTR_RetrieveRushersName to get Rushee's Name

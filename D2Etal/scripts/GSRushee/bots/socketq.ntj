@@ -69,17 +69,8 @@ function Questing(area)
 			break;
 			
 		case 8 :
-			NTC_Delay(1000);		
-			if((!me.GetQuest(1, 4) && !me.GetQuest(1, 1) || !me.GetQuest(1,12) && !me.GetQuest(1,0)) && me.areaid == 8){
-				NTC_Delay(1000);
-				NTR_ClearLevel(NTConfig_Leader);
-			}
-			else if((me.GetQuest(1, 4) && me.GetQuest(1, 1) || me.GetQuest(1,12) && me.GetQuest(1,0)) && me.areaid == 8){
-				NTC_PingDelay(300);
-				if(!NTR_UseScrollOfTownPortal()){
-					Say("Cant TownPortal");
-				}
-			}		
+			NTC_Delay(1000);
+			NTR_ClearLevel(false);
 			break;
 		case 40 : // ACT 2 ---------------------------------------------
 			NTC_Delay(1000);		
@@ -135,12 +126,8 @@ var i;
 						if(me.areaid == 1){
 							NTM_UsePortal("BluePortal", 8, NTConfig_Leader);
 						}
-						if(me.areaid == 8){
-							NTR_Den(NTConfig_Leader);
-							if(me.GetQuest(1, 4) && me.GetQuest(1, 1) && me.areaid == 8){
-								NTR_LeaveDen();
-							}
-						}		
+						if(me.areaid == 8)
+							NTR_ClearLevel(false);
 						break;
 						
                     case "Andariel up!" :
@@ -189,7 +176,8 @@ var i;
 							NTC_PingDelay(500);
 							NTR_ReadBook();
 							NTC_PingDelay(200);
-							NTR_GoCain();
+							if(!NTR_GoCain())
+								NTR_GoCain();
 						}
 						break;
 						
@@ -206,7 +194,8 @@ var i;
 						}			
 						if(NTC_InTown()){							
 							NTC_PingDelay(500);
-							NTR_GoCain();
+							if(!NTR_GoCain())
+								NTR_GoCain();
 						}			
 						break;
 
@@ -224,7 +213,8 @@ var i;
 						}
 						if(NTC_InTown()){							
 							NTC_PingDelay(1000);
-							NTR_GoCain();
+							if(!NTR_GoCain())
+								NTR_GoCain();
 						}
 						break;
 
@@ -256,7 +246,8 @@ var i;
 						if(me.areaid == 40){
 							if(!NTM_UsePortal("BluePortal", 74, NTConfig_Leader)){
 								NTC_Delay(300);
-								NTR_GoCain();
+								if(!NTR_GoCain())
+									NTR_GoCain();
 								NTC_Delay(300);
 								NTM_UsePortal("BluePortal", 74, NTConfig_Leader);
 							}
@@ -271,7 +262,8 @@ var i;
 							NTC_PingDelay(200);
 						}
 						if(me.areaid == 40){
-							NTR_GoCain();
+							if(!NTR_GoCain())
+								NTR_GoCain();
 						}
 						break;
 
@@ -294,7 +286,16 @@ var i;
 							}
 						}
 						if(NTC_InTown())							
-							NTR_TalkJer();
+							if(!NTR_TalkJer()){
+								var rusheepos = NTR_RetrieveRusheePos();
+								NTC_Delay(200);		
+								var pos = (parseInt(rusheepos) + 1);
+								NTC_Delay(200);		
+								NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_1 + "Rush [ " + COLOR_1 + pos + COLOR_1 + " ] Failed at Jeryhn".split("\n")[0] + ";" + COLOR_1 + "------------------------------\n" + COLOR_1 + "Rush : [ " + pos + " ]\n" + "Failed!" + "\n" + C_WHITE + "My Last Area : " + ara + "\n" + C_RED + "Couldn't Talk to Jeryhn to leave Act 2" + "\n" + "Something odd happend.." + "\n" + C_BROWN + "Rushee Name : " + me.charname + "\n" + COLOR_1 + "---------------------------------");	
+								NTC_SendMsgToScript("Manager.ntj", "SCRIPT_END");
+							}
+							if(!NTR_GoEast(2))
+								NTR_GoEast(2);
 						break;
 
 					case "Duriel up!" :
@@ -303,7 +304,8 @@ var i;
 							if(!NTM_UsePortal("BluePortal", _leaderareaid, NTConfig_Leader)){
 								NTC_Delay(300);
 								if(NTC_InTown())
-									NTR_GoCain();
+									if(!NTR_GoCain())
+										NTR_GoCain();
 								NTC_Delay(300);
 								if(!NTM_UsePortal("BluePortal", _leaderareaid, NTConfig_Leader)){
 									var rusheepos = NTR_RetrieveRusheePos();
@@ -355,7 +357,8 @@ var i;
 							NTR_TakePortal();
 							NTC_PingDelay(500);
 							if(NTC_InTown())
-								NTR_GoCain();
+								if(!NTR_GoCain())
+									NTR_GoCain();
 						}
 						break;
 
@@ -364,7 +367,8 @@ var i;
 						if(me.areaid == 75){
 							if(!NTM_UsePortal("BluePortal", 102, NTConfig_Leader)){
 								NTC_Delay(300);
-								NTR_GoCain();
+								if(!NTR_GoCain())
+									NTR_GoCain();
 								NTC_Delay(300);
 								if(!NTM_UsePortal("BluePortal", 102, NTConfig_Leader)){
 									NTC_Delay(750);	
@@ -398,7 +402,8 @@ var i;
 					case "Hammer up!" :
 						if(me.areaid == 103){
 							NTC_PingDelay(200);
-							NTR_GoCain();
+							if(!NTR_GoCain())
+								NTR_GoCain();
 							NTC_PingDelay(400);
 							NTM_UsePortal("BluePortal", 107, NTConfig_Leader);
 						}
@@ -410,7 +415,8 @@ var i;
 							NTC_PingDelay(200);
 							NTR_TakePortal();
 							NTC_PingDelay(200);
-							NTR_GoCain();
+							if(!NTR_GoCain())
+								NTR_GoCain();
 							NTC_PingDelay(400);
 							NTR_SSCheck();
 						}

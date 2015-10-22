@@ -181,7 +181,7 @@ function WhatToDO()
 		{
 			case 1 : 
 					if(!busy && !andy && rushee.areaid == 1)
-						DoAndy(); 
+						DoAndy();
 					break;			
 			case 40 : 			
 						qitem = NT_File("logs/questlog/QuestItem.txt", 0);
@@ -324,9 +324,6 @@ function chat(msg, type)
 			Delay(600);
 			NTC_SendMsgToScript("loader.ntj", "end");
 		}
-		else if(msg.indexOf("slain") != -1 && (msg.indexOf(Rushee) != -1 || msg.indexOf(RusheeLeech) != -1)){
-			NTR_CoverRushee();
-		}
 		else if(msg.indexOf("timeout") != -1 && (msg.indexOf(Rushee) != -1 || msg.indexOf(RusheeLeech) != -1)){
 			Delay(600);
 			NTC_SendMsgToScript("loader.ntj", "end");
@@ -345,7 +342,7 @@ function Rush(area){
 		{
 			case 1 : 
 					if(!busy && !andy && rushee.areaid == 1)
-						DoAndy(); 
+						DoAndy();
 					else if(!busy && !duriel && rushee.areaid == 40){
 						DoCube(); DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
 					} 
@@ -429,7 +426,6 @@ function Rush(area){
 		}
 	}return;
 }
-
 function DoAndy()
 {
 	Print(COLOR_3 + "Starting Andy");
@@ -451,7 +447,7 @@ function DoAndy()
 		return;
 	}
 
-	NTR_DoPrecast(false);
+	NTP_DoPrecast(false);
 
 	for (i = 0; i < 2; i++) {
 		if (!NTM_MoveToStair(me.areaid, 36 + i)) {
@@ -489,7 +485,7 @@ function DoAndy()
 		NTC_TPGuard(5);
 	}
 
-	//NTR_DoPrecast(false);
+	//NTP_DoPrecast(false);
 
 	if (!NTM_MoveTo(me.areaid, 22532, 9553)) {
 		NTC_SendMsgToScript("loader.ntj", "NTM_MoveTo()");
@@ -554,7 +550,7 @@ function DoCube()
 			return;
 		}
 
-		NTR_DoPrecast(false);		
+		NTP_DoPrecast(false);		
 
 		if(!NTM_MoveToStair(me.areaid, 60)) {
 			NTC_SendMsgToScript("loader.ntj", "NTM_MoveToStair()");
@@ -566,7 +562,7 @@ function DoCube()
 			return;
 		}
 
-		//NTR_DoPrecast(false);
+		//NTP_DoPrecast(false);
 
 		if(!NTM_MoveToPresetUnit(me.areaid, NTC_UNIT_OBJECT, 354, -5, -5)) {
 			NTC_SendMsgToScript("loader.ntj", "NTM_MoveToPresetUnit()");
@@ -654,7 +650,7 @@ function DoAmmy()
 		return;
 	}
 		
-	NTR_DoPrecast(false);
+	NTP_DoPrecast(false);
 			
 	if(!NTM_MoveToStair(45, 58)) { 
 		NTC_SendMsgToScript("loader.ntj", "NTM_MoveToStair()"); 
@@ -742,7 +738,7 @@ function DoStaff()
 	}
 	Say("Talk to Drognan!");
 
-	NTR_DoPrecast(false);
+	NTP_DoPrecast(false);
 
 	for(i=0; i<3; i++) {		
 		if(!NTM_MoveToStair(me.areaid, 62+i)) { 
@@ -834,7 +830,7 @@ function DoSummoner()
 		return;
 	}
 
-	NTR_DoPrecast(false);
+	NTP_DoPrecast(false);
 		
 	_unit = GetPresetUnits(me.areaid, 2);
 		
@@ -922,7 +918,7 @@ function DoDuriel()
 		return;
 	}
 
-	NTR_DoPrecast(false);
+	NTP_DoPrecast(false);
 
 	_tombs = GetRoom();
 
@@ -987,7 +983,7 @@ function DoDuriel()
 			NTC_Delay(500);
 		}
 
-		NTR_DoPrecast(false);
+		NTP_DoPrecast(false);
 		
 		if(!NTM_TakeUnit(NTC_UNIT_OBJECT, 100)) {
 			NTC_SendMsgToScript("loader.ntj", "NTM_TakeUnit()");
@@ -1127,7 +1123,7 @@ function DoTrav()
 		
 	_deltay = _waypoint.y - 1584;
 
-	NTR_DoPrecast(false);
+	NTP_DoPrecast(false);
 
 	NT_FindDurance();
 
@@ -1195,7 +1191,6 @@ function NT_FindDurance()
 		}
 	}
 }
-
 function DoMeph()
 {	
 	Print(COLOR_3 + "Starting Mephisto");
@@ -1221,7 +1216,7 @@ function DoMeph()
 		return;
 	}
 
-	NTR_DoPrecast(false);
+	NTP_DoPrecast(false);
 
 	if(!NTM_MoveToStair(me.areaid, 102)) {
 		NTC_SendMsgToScript("loader.ntj", "NTM_MoveToStair()");
@@ -1284,7 +1279,7 @@ function DoMeph()
 	Say("Mephisto is dead!");
 	
 	NTC_Delay(1000);
-
+		
 	if(!NTM_UsePortal("BluePortal", 75, me.charname))
 		NTM_MakeTP(true);
 
@@ -1341,7 +1336,7 @@ function DoDiablo()
 		return;
 	}
 
-	NTR_DoPrecast(false);
+	NTP_DoPrecast(false);
 
 	if (!NTM_MoveTo(108, 7790, 5544)) {
 		NTC_SendMsgToScript("loader.ntj", "NTM_MoveTo()");
@@ -1355,7 +1350,7 @@ function DoDiablo()
 		return;
 	}
 
-	NTM_MoveTo(108, 7768, 5255);
+	NTM_MoveTo(108, 7767, 5253); //safe spot
 
 	NTM_MakeTP();
 		
@@ -1365,7 +1360,7 @@ function DoDiablo()
 		NTC_TPGuard(5);
 	}
 
-	NTM_MoveTo(108, 7792, 5291); //safe spot
+	NTM_MoveTo(108, 7794, 5298);
 	
 	Print(COLOR_8 + "Waiting for Diablo to spawn..");
 
@@ -1396,7 +1391,10 @@ function DoDiablo()
 		}
 	}
 	NTSI_PickItems();
-	NTR_GoRushee();
+	NTM_MoveTo(108, 7767, 5253); //safe spot
+	NTM_MakeTP();
+	NTC_Delay(200);
+	Say("Diablo is dead!");
 	NTC_Delay(3500);
 	if(!NTM_UsePortal("BluePortal", 103, me.charname))
 		NTM_MakeTP(true);
@@ -1449,7 +1447,7 @@ function DoShenk()
 		return;
 	}
 
-	NTR_DoPrecast(false);	
+	NTP_DoPrecast(false);	
 
 	if(!NTM_MoveTo(110, 3855, 5125)) {
 		NTC_SendMsgToScript("loader.ntj", "NTM_MoveTo()");
@@ -1551,7 +1549,7 @@ function NT_OpenSealsInt() {
 		_result = NT_OpenVizierSealInt(2);
 	}
 
-	NTR_DoPrecast(false);
+	NTP_DoPrecast(false);
 		
 	_unit = GetPresetUnits(108, NTC_UNIT_OBJECT, 394);
 	if (_unit[0].roomx * 5 + _unit[0].x == 7773) {
@@ -1575,7 +1573,7 @@ function NT_OpenSealsInt() {
 	if(NTConfig_IdInField){
 		NT_FieldID();
 	} 
-	NTR_DoPrecast(false);
+	NTP_DoPrecast(false);
 	return _result;
 }
 
@@ -1684,7 +1682,7 @@ function NT_OpenSealInt(classid) {
 	case 396:
 	case 394:
 	case 392:
-		warn = true;
+		warn = false;
 		break;
 	default:
 		warn = false;
