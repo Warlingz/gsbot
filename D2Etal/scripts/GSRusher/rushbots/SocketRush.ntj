@@ -25,21 +25,62 @@ function NTMain()
 	if(!NTTM_CheckAct()) {
 		NTC_SendMsgToScript("loader.ntj", "NTTM_CheckAct()");
 		return;
-	}
+	}	
+	
+	SetBelt();
+	
+	Delay(200);
+	
+	NTTMGR_TownManager();
 	
 	if(!NTTM_TownMove("waypoint"))
 	{
 		NTC_SendMsgToScript("loader.ntj", "NTTM_TownMove()");
 		return;
 	}
-	NTTMGR_TownManager();
 	
 	GS_Loading();
+	
 	while(me.ingame){
 		Rush();
 		Delay(200);
 	}
 	
+}
+function SetBelt()
+{	
+	var i;
+	var _result;
+	var _items;
+	do{
+		_items = me.GetItems();
+		if(!_items){
+			_result = false;
+			break;
+		}
+		_result = true;
+		for(i = 0 ; i < _items.length ; i++){
+			if(_items[i].mode == 2 && _items[i].x < 4){
+				switch(_items[i].itemtype){
+					case 76:
+						NTConfig_BeltColType[_items[i].x] = "hp";
+						break;
+					case 77:
+						NTConfig_BeltColType[_items[i].x] = "mp";
+						break;
+					case 78:
+						NTConfig_BeltColType[_items[i].x] = "rv";
+						break;
+					default:
+						break;
+				}
+			}
+		}
+	} while(!_result);	
+	
+	Print(COLOR_8 + "Belt Set to : " + NTConfig_BeltColType[0] + " | " + NTConfig_BeltColType[1] + " | " + NTConfig_BeltColType[2] + " | " + NTConfig_BeltColType[3]);
+	
+	return _result;
 }
 
 function SetSkills()
@@ -147,16 +188,16 @@ function SetSkills()
 	}return;
 }
 
-var WaitforLeecher = true;
+var WaitforLeecher;
 function GS_Loading()
 {	
 	Print(C_ORANGE + "Loading One Moment Please..");
-	SetSkills();	
-	Delay(800);	
+	SetSkills();
+	Delay(600);	
 	Rushee = NTR_FindRushee();
 	Delay(500);
 	GetPlayer();	
-	Delay(500);	
+	Delay(500);
 	var waitleech = NT_File("logs/loc/"+me.account+"-utility.txt", 0);
 	if(waitleech == "yes")
 		WaitforLeecher = true;
@@ -165,7 +206,8 @@ function GS_Loading()
 	if(WaitforLeecher){
 		Print(COLOR_5 + "Waiting for RusheeLeecher");	
 		RusheeLeech = NTR_RusheeLeecherHere();
-	}	
+	}
+	
 	WhatToDO();
 }
 
@@ -185,42 +227,45 @@ function WhatToDO()
 						DoAndy();
 					break;			
 			case 40 : 			
-						qitem = NT_File("logs/questlog/QuestItem.txt", 0);
-						qstatus = NT_File("logs/questlog/QuestStatus.txt", 0);
-						if(!busy && rushee.areaid == 1)
-							DoAndy();
-						else if(!busy && !duriel && qitem == "none" && rushee.areaid == 40){
-							DoCube(); DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
-						} 
-						else if(!busy && !duriel && qitem == "cube" && qstatus != "duriel"  && qstatus != "summoner" && rushee.areaid == 40){
-							DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
-						} 
-						else if(!busy && !duriel && qitem == "cube" && qstatus == "duriel" && rushee.areaid == 40){
-							DoDuriel();
-						}
-						else if(!busy && !duriel && qitem == "cube" && qstatus == "summoner" && rushee.areaid == 40){
-							DoSummoner(); DoDuriel();
-						}
-						else if(!busy && !duriel && qitem == "ammy" && rushee.areaid == 40){
-							DoStaff(); DoSummoner(); DoDuriel();
-						} 
-						else if(!busy && !duriel && qitem == "both" && rushee.areaid == 40){
-							DoAmmy(); DoSummoner(); DoDuriel();
-						} 
-						else if(!busy && !duriel && qitem == "horadricstaff" && (qstatus == "false" || !qstatus ) && rushee.areaid == 40){
-							DoSummoner(); DoDuriel();
-						}
-						else if(!busy && !duriel && qitem == "horadricstaff" && (qstatus == "true") && rushee.areaid == 40){
-							DoDuriel();
-						}
-						else if(!busy && rushee.areaid == 75){
-							DoTrav(); DoMeph(); 
-						} 
-						else if(!busy && !diablo && rushee.areaid == 103) 
-							DoDiablo(); 
-						else if(!busy && !shenk && rushee.areaid == 109) 
-							DoShenk(); 
-						break;
+					qitem = NT_File("logs/questlog/QuestItem.txt", 0);
+					qstatus = NT_File("logs/questlog/QuestStatus.txt", 0);						
+					if(rushee.areaid == 1)
+						DoAndy();
+					else if(!busy && !duriel && qitem == "none" && rushee.areaid == 40){
+						DoCube(); DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
+					} 
+					else if(!busy && !duriel && qitem == "JC" && qstatus == "CTS" && rushee.areaid == 40){
+						DoCube(); Delay(4000); DoSummoner(); DoDuriel();
+					} 
+					else if(!busy && !duriel && qitem == "cube" && qstatus != "duriel"  && qstatus != "summoner" && rushee.areaid == 40){
+						DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
+					} 
+					else if(!busy && !duriel && qitem == "cube" && qstatus == "duriel" && rushee.areaid == 40){
+						DoDuriel();
+					}
+					else if(!busy && !duriel && qitem == "cube" && qstatus == "summoner" && rushee.areaid == 40){
+						DoSummoner(); DoDuriel();
+					}
+					else if(!busy && !duriel && qitem == "ammy" && rushee.areaid == 40){
+						DoStaff(); DoSummoner(); DoDuriel();
+					} 
+					else if(!busy && !duriel && qitem == "both" && rushee.areaid == 40){
+						DoAmmy(); DoSummoner(); DoDuriel();
+					} 
+					else if(!busy && !duriel && qitem == "horadricstaff" && (qstatus == "false" || !qstatus ) && rushee.areaid == 40){
+						DoSummoner(); DoDuriel();
+					}
+					else if(!busy && !duriel && qitem == "horadricstaff" && (qstatus == "true") && rushee.areaid == 40){
+						DoDuriel();
+					}
+					else if(!busy && rushee.areaid == 75){
+						DoTrav(); DoMeph(); 
+					} 
+					else if(!busy && !diablo && rushee.areaid == 103) 
+						DoDiablo(); 
+					else if(!busy && !shenk && rushee.areaid == 109) 
+						DoShenk(); 
+					break;
 			case 75 : 
 					if(!busy && rushee.areaid == 1)
 						DoAndy();
@@ -277,49 +322,46 @@ function WhatToDO()
 						NTC_SendMsgToScript("loader.ntj", "end"); 
 					break;
 		}
-	}return;
+	}
+	return;
 }
 
 function chat(msg, type)
 {	
 	if(Rushee == null){
 		Rushee = NTR_RetrieveRusheeName();
-	}
-	
+	}	
 	if(type == 0){
 		var _split = msg.split(":");
 		if(_split.length >= 1 && _split[1] != undefined){
-			var _sender = _split[0].substring(3, _split[0].length - 3);
 			var _msg = _split[1].substring(1);
-			if(_sender == Rushee || _sender == RusheeLeech || _sender == me.name){
-				switch(_msg){
-					case "I Need An Adult!" :
-						if(!NTC_InTown() && !_busy){
-							_busy = true;
-							Print(COLOR_3 + "RHPWatch Activated!");
-							NTR_CoverRushee();
-							_busy = false;
+			switch(_msg){
+				case "I Need An Adult!" :
+					if(!NTC_InTown() && !_busy){
+						_busy = true;
+						Print(COLOR_3 + "RHPWatch Activated!");
+						NTR_CoverRushee();
+						_busy = false;
+					}
+					break;
+				
+				case "I died I need a sec" :
+					if(NTC_InTown() && !_busy){
+						_busy = true;
+						Print(COLOR_3 + "Waiting..");
+						for(i = 0; i < 20; i++){
+							Delay(500);
 						}
-						break;
+						_busy = false;
+					}
+					break;
 					
-					case "I died I need a sec" :
-						if(NTC_InTown() && !_busy){
-							_busy = true;
-							Print(COLOR_3 + "Waiting..");
-							for(i = 0; i < 20; i++){
-								Delay(500);
-							}
-							_busy = false;
-						}
-						break;
-						
-					case "portal me" :
-						NTM_MakeTP();
-						break;
-					case "mh" :
-						me.revealautomap = true;
-						break;
-				}
+				case "portal me" :
+					NTM_MakeTP();
+					break;
+				case "mh" :
+					me.revealautomap = true;
+					break;
 			}
 		}
 	}
@@ -1260,13 +1302,17 @@ function DoMeph()
 		} while(_unit.GetNext());
 	}
 
-	if(!NTM_MoveTo(me.areaid, 17583, 8068)) {
+	if(!NTM_MoveTo(me.areaid, 17585, 8069)) {
 		NTC_SendMsgToScript("loader.ntj", "NTM_MoveTo()");
 		return;
 	}
 
 	NTM_MakeTP();
 
+	if(!NTM_MoveTo(me.areaid, 17575, 8069)) {
+		NTC_SendMsgToScript("loader.ntj", "NTM_MoveTo()");
+		return;
+	}
 	Say("Mephisto up!");
 
 	while (!NTC_IsQuesterIn()) {

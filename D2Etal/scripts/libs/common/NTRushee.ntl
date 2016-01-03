@@ -222,10 +222,10 @@ function NTR_Death(area)
 		case 8 :
 			while(_player.GetNext()){
 				if(_player.name = _rusher.name){					
-					while(me.areaid == _rusher.areaid){
+					while(me.areaid == _rusher.areaid && !NTC_InTown()){
 						NTC_Delay(200);
 					}
-					if(me.areaid == 8 && me.areaid !== _rusher.areaid){
+					if(me.areaid == 8 && me.areaid !== _rusher.areaid && !NTC_InTown()){
 						NTC_Delay(100);
 						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
 						NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
@@ -245,10 +245,10 @@ function NTR_Death(area)
 		case 37 :
 			while(_player.GetNext()){
 				if(_player.name = _rusher.name){					
-					while(me.areaid == _rusher.areaid){
+					while(me.areaid == _rusher.areaid && !NTC_InTown()){
 						NTC_Delay(200);
 					}
-					if(me.areaid == 37 && me.areaid !== _rusher.areaid){
+					if(me.areaid == 37 && me.areaid !== _rusher.areaid && !NTC_InTown()){
 						NTC_Delay(100);
 						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
 						NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
@@ -267,10 +267,10 @@ function NTR_Death(area)
 		case 49 : 
 			while(_player.GetNext()){
 				if(_player.name = _rusher.name){					
-					while(me.areaid == _rusher.areaid){
+					while(me.areaid == _rusher.areaid && !NTC_InTown()){
 						NTC_Delay(200);
 					}
-					if(me.areaid == 49 && me.areaid !== _rusher.areaid){
+					if(me.areaid == 49 && me.areaid !== _rusher.areaid && !NTC_InTown()){
 						NTC_Delay(100);
 						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
 						NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
@@ -291,10 +291,10 @@ function NTR_Death(area)
 		case 74 :
 			while(_player.GetNext()){
 				if(_player.name = _rusher.name){					
-					while(me.areaid == _rusher.areaid){
+					while(me.areaid == _rusher.areaid && !NTC_InTown()){
 						NTC_Delay(200);
 					}
-					if(me.areaid == 74 && me.areaid !== _rusher.areaid){
+					if(me.areaid == 74 && me.areaid !== _rusher.areaid && !NTC_InTown()){
 						Say("I died I need a sec");
 						NTC_Delay(100);
 						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
@@ -314,10 +314,10 @@ function NTR_Death(area)
 		case 83 : 
 			while(_player.GetNext()){
 				if(_player.name = _rusher.name){					
-					while(me.areaid == _rusher.areaid){
+					while(me.areaid == _rusher.areaid && !NTC_InTown()){
 						NTC_Delay(200);
 					}
-					if(me.areaid == 83 && me.areaid !== _rusher.areaid){
+					if(me.areaid == 83 && me.areaid !== _rusher.areaid && !NTC_InTown()){
 						Say("I died I need a sec");
 						NTC_Delay(100);
 						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
@@ -337,10 +337,10 @@ function NTR_Death(area)
 		case 94 :
 			while(_player.GetNext()){
 				if(_player.name = _rusher.name){					
-					while(me.areaid == _rusher.areaid){
+					while(me.areaid == _rusher.areaid && !NTC_InTown()){
 						NTC_Delay(200);
 					}
-					if(me.areaid == 94 && me.areaid !== _rusher.areaid){
+					if(me.areaid == 94 && me.areaid !== _rusher.areaid && !NTC_InTown()){
 						Say("I died I need a sec");
 						NTC_Delay(100);
 						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
@@ -362,10 +362,10 @@ function NTR_Death(area)
 		case 102 : 
 			while(_player.GetNext()){
 				if(_player.name = _rusher.name){					
-					while(me.areaid == _rusher.areaid){
+					while(me.areaid == _rusher.areaid && !NTC_InTown()){
 						NTC_Delay(200);
 					}
-					if(me.areaid == 102 && me.areaid !== _rusher.areaid){
+					if(me.areaid == 102 && me.areaid !== _rusher.areaid && !NTC_InTown()){
 						Say("I died I need a sec");
 						NTC_Delay(200);
 						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
@@ -383,9 +383,11 @@ function NTR_Death(area)
 						if(me.areaid == 102){
 							NTC_Delay(200);
 							NTM_MoveTo(me.areaid, 17590, 8068);
-							NTC_Delay(1500);
-							if(NTM_TakeUnit(NTC_UNIT_OBJECT, 342)){
-								NTC_Delay(1500);
+							NTC_Delay(200);
+							if(!NTM_TakeUnit(NTC_UNIT_OBJECT, 342)){
+								if(me.hp < 1 && !NTC_InTown()){
+									NTR_Death();
+								}
 							}
 						}
 					}
@@ -395,10 +397,10 @@ function NTR_Death(area)
 		case 105 : 
 			while(_player.GetNext()){
 				if(_player.name = _rusher.name){					
-					while(me.areaid == _rusher.areaid){
+					while(me.areaid == _rusher.areaid && !NTC_InTown()){
 						NTC_Delay(200);
 					}
-					if(me.areaid == 105 && me.areaid !== _rusher.areaid){
+					if(me.areaid == 105 && me.areaid !== _rusher.areaid && !NTC_InTown()){
 						NTC_Delay(100);
 						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
 						NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
@@ -417,10 +419,10 @@ function NTR_Death(area)
 		case 108 : 
 			while(_player.GetNext()){
 				if(_player.name = _rusher.name){					
-					while(me.areaid == _rusher.areaid){
+					while(me.areaid == _rusher.areaid && !NTC_InTown()){
 						NTC_Delay(200);
 					}
-					if(me.areaid == 108 && me.areaid !== _rusher.areaid){
+					if(me.areaid == 108 && me.areaid !== _rusher.areaid && !NTC_InTown()){
 						NTC_Delay(100);
 						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
 						NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
@@ -439,10 +441,10 @@ function NTR_Death(area)
 		case 110 : 
 			while(_player.GetNext()){
 				if(_player.name = _rusher.name){					
-					while(me.areaid == _rusher.areaid){
+					while(me.areaid == _rusher.areaid && !NTC_InTown()){
 						NTC_Delay(200);
 					}
-					if(me.areaid == 110 && me.areaid !== _rusher.areaid){
+					if(me.areaid == 110 && me.areaid !== _rusher.areaid && !NTC_InTown()){
 						NTC_Delay(100);
 						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
 						NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
@@ -460,10 +462,10 @@ function NTR_Death(area)
 		default :
 			while(_player.GetNext()){
 				if(_player.name = _rusher.name){					
-					while(me.areaid == _rusher.areaid){
+					while(me.areaid == _rusher.areaid && !NTC_InTown()){
 						NTC_Delay(200);
 					}
-					if(me.areaid !== _rusher.areaid){
+					if(me.areaid !== _rusher.areaid && !NTC_InTown()){
 						Say("I died I need a sec");
 						NTC_Delay(100);
 						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
@@ -916,6 +918,9 @@ function NTR_CheckQuest()
 	if(cube.length > 0 && ammy.length > 0 && staff.length > 0 || horadricstaff.length > 0){
 		NT_File("logs/questlog/QuestStatus.txt", 1, "false");			
 	}
+	if(cube.length < 1 && ammy.length > 0 && staff.length > 0){
+		NT_File("logs/questlog/QuestStatus.txt", 1, "CTS");			
+	}
 	else if(horadricstaff.length > 0 && me.GetQuest(13, 0) && me.GetQuest(13, 2)){
 		NT_File("logs/questlog/QuestStatus.txt", 1, "summoner");			
 	}
@@ -948,7 +953,7 @@ function NTR_CheckQuestItem()
 		NT_File("logs/questlog/QuestItem.txt", 1, "horadricstaff");
 		NTR_CubeStaff();
 	}
-	else if(staff.length > 0 && cube.length > 0 && ammy.length < 1){		
+	else if(cube.length > 0 && ammy.length < 1 && staff.length > 0){		
 		return NT_File("logs/questlog/QuestItem.txt", 1, "both");
 	}
 	else if(cube.length > 0 && ammy.length > 0 && staff.length < 1){		
@@ -957,8 +962,11 @@ function NTR_CheckQuestItem()
 	else if(cube.length > 0 && ammy.length < 1 && staff.length < 1){		
 		return NT_File("logs/questlog/QuestItem.txt", 1, "cube");
 	}
-	else if(cube.length < 1){		
+	else if(cube.length < 1 && ammy.length < 1 && staff.length < 1){		
 		return NT_File("logs/questlog/QuestItem.txt", 1, "none");
+	}
+	else if(cube.length < 1 && ammy.length > 0 && staff.length > 0){		
+		return NT_File("logs/questlog/QuestItem.txt", 1, "JC");
 	}
 	else
 		return false;

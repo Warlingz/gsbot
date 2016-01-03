@@ -30,7 +30,7 @@ function NTMain()
 	}
 	
 	while(NTC_InMyParty(NTConfig_Leader)){
-		if(me.hp < 1){
+		if(me.hp < 1 && !NTC_InTown()){
 			NTR_Death();
 		}		
 		if(NTC_InTown() && me.hp < me.hpmax){
@@ -193,7 +193,7 @@ var i;
 						}			
 						if(NTC_InTown()){							
 							NTC_PingDelay(500);
-							if(!NTR_GoCain())
+							if(!CheckCubeStaff())
 								NTR_GoCain();
 						}			
 						break;
@@ -212,7 +212,7 @@ var i;
 						}
 						if(NTC_InTown()){							
 							NTC_PingDelay(1000);
-							if(!NTR_GoCain())
+							if(!CheckCubeStaff())
 								NTR_GoCain();
 						}
 						break;
@@ -232,7 +232,8 @@ var i;
 						}
 						if(NTC_InTown()){
 							Delay(200);
-							NTR_CubeStaff();
+							if(!CheckCubeStaff())
+								NTR_GoCain();
 						}
 						break;
 
@@ -399,8 +400,11 @@ var i;
 								if(!NTM_TakeUnit(NTC_UNIT_OBJECT, 342)){
 									NTM_MoveTo(me.areaid, 17590, 8068);
 									NTC_Delay(200);
-									if(!NTM_TakeUnit(NTC_UNIT_OBJECT, 342))
-										ExitGame();
+									if(!NTM_TakeUnit(NTC_UNIT_OBJECT, 342)){
+										if(me.hp < 1 && !NTC_InTown()){
+											NTR_Death();
+										}
+									}
 								}
 							}
 						}
@@ -633,7 +637,18 @@ var i;
 		 }
     }
 }
-
+function CheckCubeStaff()
+{
+	var cube = me.GetItems(549);
+	var staff = me.GetItems(92);
+	var ammy = me.GetItems(521);
+	var _result = false;
+	if(cube.length > 0 && ammy.length > 0 && staff.length > 0){
+		NTR_CubeStaff();
+		_result = true;
+	}
+	return _result;
+}
 function Testing(quest)
 {				
 	for(var i = 0 ; i < 13 ; i++){

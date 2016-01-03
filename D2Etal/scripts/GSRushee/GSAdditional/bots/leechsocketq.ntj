@@ -22,7 +22,7 @@ function NTMain()
 		NTC_Delay(500);
 	}
 	while(NTC_InMyParty(NTConfig_Leader)){
-		if(me.hp < 1){
+		if(me.hp < 1 && !NTC_InTown()){
 			NTR_Death();
 		}		
 		if(NTC_InTown() && me.hp < me.hpmax){
@@ -205,8 +205,11 @@ var i;
 								if(!NTM_TakeUnit(NTC_UNIT_OBJECT, 342)){
 									NTM_MoveTo(me.areaid, 17590, 8068);
 									NTC_Delay(200, 1000);
-									if(!NTM_TakeUnit(NTC_UNIT_OBJECT, 342))
-										ExitGame();
+									if(!NTM_TakeUnit(NTC_UNIT_OBJECT, 342)){
+										if(me.hp < 1 && !NTC_InTown()){
+											NTR_Death();
+										}
+									}
 								}
 							}
 						}
