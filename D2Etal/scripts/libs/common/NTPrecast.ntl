@@ -185,8 +185,8 @@ function NTP_DoPrecast(refresh, castbo)
 				NTC_CastSkill(155, NTC_HAND_RIGHT); // Battle Command
 				NTC_CastSkill(149, NTC_HAND_RIGHT); // Battle Orders
 			}
-			
-			NTC_CastSkill(138, NTC_HAND_RIGHT); // Shout
+			if(!me.GetState(26))
+				NTC_CastSkill(138, NTC_HAND_RIGHT); // Shout
 				
 			if(BarbSwitch)
 				NTC_SwapWeapons();

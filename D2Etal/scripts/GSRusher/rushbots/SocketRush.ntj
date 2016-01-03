@@ -35,7 +35,6 @@ function NTMain()
 	NTTMGR_TownManager();
 	
 	GS_Loading();
-	
 	while(me.ingame){
 		Rush();
 		Delay(200);
@@ -147,6 +146,7 @@ function SetSkills()
 		Print(COLOR_3 + "Skills Set");
 	}return;
 }
+
 var WaitforLeecher = true;
 function GS_Loading()
 {	
@@ -168,6 +168,7 @@ function GS_Loading()
 	}	
 	WhatToDO();
 }
+
 var qitem, qstatus;
 function WhatToDO()
 {	
@@ -290,7 +291,7 @@ function chat(msg, type)
 		if(_split.length >= 1 && _split[1] != undefined){
 			var _sender = _split[0].substring(3, _split[0].length - 3);
 			var _msg = _split[1].substring(1);
-			if(_sender == Rushee || _sender == RusheeLeech){
+			if(_sender == Rushee || _sender == RusheeLeech || _sender == me.name){
 				switch(_msg){
 					case "I Need An Adult!" :
 						if(!NTC_InTown() && !_busy){
@@ -314,6 +315,9 @@ function chat(msg, type)
 						
 					case "portal me" :
 						NTM_MakeTP();
+						break;
+					case "mh" :
+						me.revealautomap = true;
 						break;
 				}
 			}
@@ -426,6 +430,7 @@ function Rush(area){
 		}
 	}return;
 }
+
 function DoAndy()
 {
 	Print(COLOR_3 + "Starting Andy");
@@ -1015,6 +1020,7 @@ function DoDuriel()
 	andy = true;
 	
 }
+
 function WaitforLeech(area, range, seconds){
 	
 	var count = 0;
@@ -1055,6 +1061,7 @@ function WaitforLeech(area, range, seconds){
 		break;
 	}
 }
+
 function WaitforRushee(range, seconds)
 {	
 	rushee = GetRushee(Rushee);
@@ -1075,6 +1082,7 @@ function WaitforRushee(range, seconds)
 		}
 	}
 }
+
 function DoTrav()
 {
 	Print(COLOR_3 + "Starting Travincal");
@@ -1191,6 +1199,7 @@ function NT_FindDurance()
 		}
 	}
 }
+
 function DoMeph()
 {	
 	Print(COLOR_3 + "Starting Mephisto");

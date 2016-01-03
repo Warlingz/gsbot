@@ -120,7 +120,6 @@ var i;
             if(_sender == NTConfig_Leader){
                 switch(_msg){				
 				// ACT 1 Case's---------------------------------------------
-					case "test" : Testing(13); break;
 					case "Den up!" :
 						NTC_Delay(200);
 						if(me.areaid == 1){
@@ -318,7 +317,14 @@ var i;
 							}
 						}
 						ara = me.areaid;
-						NTR_PlaceStaff();
+						if(!NTR_PlaceStaff()){
+							var rusheepos = NTR_RetrieveRusheePos();
+							NTC_Delay(200);		
+							var pos = (parseInt(rusheepos) + 1);
+							NTC_Delay(200);		
+							NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_1 + "Rush [ " + COLOR_1 + pos + COLOR_1 + " ] Failed at Duriel Entrance".split("\n")[0] + ";" + COLOR_1 + "------------------------------\n" + COLOR_1 + "Rush : [ " + pos + " ]\n" + "Failed!" + "\n" + C_WHITE + "My Last Area : " + ara + "\n" + C_RED + "Couldn't Submit the Horadric Staff" + "\n" + "Probably didn't pick the Ammy or Staff" + "\n" + C_BROWN + "Rushee Name : " + me.charname + "\n" + COLOR_1 + "---------------------------------");	
+							NTC_SendMsgToScript("Manager.ntj", "SCRIPT_END");							
+						}
 						NTC_PingDelay(500);
 						NTR_TakePortal();
 						break;
@@ -389,11 +395,13 @@ var i;
 							NTC_Delay(100);
 							NTM_MoveTo(me.areaid, 17590, 8068);
 							NTC_Delay(1500);
-							if(!NTM_TakeUnit(NTC_UNIT_OBJECT, 342)){
-								NTM_MoveTo(me.areaid, 17590, 8068);
-								NTC_Delay(200);
-								if(!NTM_TakeUnit(NTC_UNIT_OBJECT, 342))
-									ExitGame();
+							if(me.mode != 17 && me.mode != 0){
+								if(!NTM_TakeUnit(NTC_UNIT_OBJECT, 342)){
+									NTM_MoveTo(me.areaid, 17590, 8068);
+									NTC_Delay(200);
+									if(!NTM_TakeUnit(NTC_UNIT_OBJECT, 342))
+										ExitGame();
+								}
 							}
 						}
 						break;
@@ -507,7 +515,7 @@ var i;
 						if(me.areaid > 108){							
 							var _area = GetArea();
 							NTC_Delay(150);				
-							NTR_IncrementRusheePos(); // For automated rusher bot
+							NTR_IncrementRusheePos();
 							rushComplete = true;
 							var _account = NT_File("logs/namelog/" + me.account + "-SocketAccount.txt", 0);
 							var _password = NT_File("logs/namelog/" + me.account + "-SocketPW.txt", 0);

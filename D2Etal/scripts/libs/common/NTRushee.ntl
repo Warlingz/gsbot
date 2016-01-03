@@ -15,9 +15,9 @@ function NTR_CoverRushee(area)
 	
 	while(_player.GetNext()){
 		if(_player.name !== me.name && _player.areaid === area){
-			TelePlayer();
+			if(!TelePlayer())
+				break;
 		}
-		break;
 	}
 	function TelePlayer(){	
 	
@@ -208,7 +208,6 @@ function NTR_Heal(area)
 				NTR_CheckLocation();
 				break;
 		}
-	return false;
 	}
 }
 function NTR_Death(area)
@@ -497,7 +496,6 @@ function NTR_GoAkara()
 		NTR_TalkNPC("akara");
 		NTR_CheckLocation();
 	}
-	return false;
 }
 function NTR_GoEast(type)
 {
@@ -571,10 +569,8 @@ function NTR_GoEast(type)
 
 function NTR_TalkNPC(who)
 {
-	var _npc;	
-	
-	if(!NTTM_TownMove(who)){ return false; }
-	
+	var _npc;			
+	if(!NTTM_TownMove(who)){ return false; }	
 	switch(who)
 	{
 		case "atma" : _npc = NTC_FindUnit(NTC_UNIT_NPC, 176, 5); break;
@@ -592,8 +588,7 @@ function NTR_TalkNPC(who)
 	if(_npc){
 		if(NTT_VisitNpc(_npc)){
 			for(var i = 0; i < 5 ; i++){
-				if((i % 5) == 0)
-					NTC_CancelMenus();
+				NTC_CancelMenus();
 				NTC_Delay(100);
 			}
 		}
@@ -607,11 +602,12 @@ function NTR_GoCain()
 {
 	if(me.mode != 17 && NTC_InTown()){
 		Print(C_DARK_GREEN + "Talking to Cain");
-		NTR_TalkNPC("cain");
+		if(!NTR_TalkNPC("cain")){
+			return false;
+		}
 		NTR_CheckLocation();
 		return true;
 	}
-	return false;
 }
 
 function NTR_TalktoJeryhn()
@@ -627,6 +623,7 @@ function NTR_TalktoJeryhn()
 			if(NTT_VisitNpc(_npc)){				
 				NTC_CancelMenus();
 			}
+			return true;
 		}				
 	}
 	return false;
@@ -649,18 +646,23 @@ function NTR_GoDrognan()
 	NTC_Delay(100);
 	if(me.areaid == 40){
 		Print(C_DARK_GREEN + "Talking to Drognan");
-		NTR_TalkNPC("drognan");
+		if(!NTR_TalkNPC("drognan")){
+			return false;
+		}
+		NTR_CheckLocation();
  	}
-	NTR_CheckLocation();
-	return;
+	return true;
 }
 function NTR_GoAlkor()
 {
 	if(me.areaid == 75) {
 		Print(C_DARK_GREEN + "Talking to Alkor");
-		NTR_TalkNPC("alkor");
+		if(!NTR_TalkNPC("alkor")){
+			return false;
+		}
+		NTR_CheckLocation();
 	}
-	return;
+	return true;
 }
 function NTR_TalkTyraelSpirit()
 {
@@ -671,12 +673,12 @@ function NTR_TalkTyraelSpirit()
 			NTM_MoveTo(_npc.areaid, _npc.x, _npc.y);
 			NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _npc);
 			for(var i = 0 ;i < 4 ; i+=1){
+				NTC_CancelMenus();
+				NTC_Delay(100);
 				if((i % 4) == 0){
-					NTC_CancelMenus();
 					NTC_Delay(100);
 					NTC_CancelOut(0);
 				}
-				NTC_Delay(100);
 			}
 		}				
 	}
@@ -696,7 +698,6 @@ function NTR_GoTyraelSpirit()
 	
 	for(var i = 0 ; i < px.length ; i += 1){
 		NTM_WalkTo(px[i], py[i]);
-		//NTM_MoveTo(me.areaid, px[i], py[i]);
 	}
 	
 	_npc = NTC_FindUnit(NTC_UNIT_NPC, GetLocaleString(1013), 5);
@@ -940,15 +941,12 @@ function NTR_CheckQuestItem()
 	
 	NTR_CheckQuest();
 	
-	if(horadricstaff.length > 0 && cube.length > 0 && staff.length < 1 && ammy.length < 1){
+	if(horadricstaff.length > 0 && cube.length > 0){
 		return NT_File("logs/questlog/QuestItem.txt", 1, "horadricstaff");
 	}
 	else if(cube.length > 0 && ammy.length > 0 && staff.length > 0){
 		NT_File("logs/questlog/QuestItem.txt", 1, "horadricstaff");
 		NTR_CubeStaff();
-	}
-	else if(staff.length < 1 && cube.length > 0 && ammy.length < 1){		
-		return NT_File("logs/questlog/QuestItem.txt", 1, "cube");
 	}
 	else if(staff.length > 0 && cube.length > 0 && ammy.length < 1){		
 		return NT_File("logs/questlog/QuestItem.txt", 1, "both");
@@ -1045,33 +1043,6 @@ function NTR_PickItems() {
 	NTSI_SnagIt();
 }
 
-function NTR_GetCube()
-{
-	var _item = NTC_FindUnit(NTC_UNIT_ITEM, 549);
-	var _cube = "Horadric Cube";
-	var _haveCube = me.GetItems(549);
-	
-	if(!_item){return false;}
-	if(_item){
-		NTM_MoveTo(_item.areaid,_item.x,_item.y);
-		for(var i = 0 ; i < 10 && _haveCube.length < 1; i++){
-			if(_haveCube.length < 1){
-				_item = NTC_FindUnit(NTC_UNIT_ITEM, 549);
-				Print(COLOR_5 + "Looking for " + _cube + "...");
-				if (NTC_ClearCursor())
-					NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _item);
-				NTC_Delay(500);
-			}
-			if (_haveCube.length > 0){
-				Print(COLOR_8 + "Picked up the " + _cube + "!");
-				NTC_PingDelay(200);
-				break;
-			}
-		}		
-	}
-	return false;
-}
-
 function NTR_GetStaff()
 {
 	var _staff = NTC_FindUnit(NTC_UNIT_ITEM, GetLocaleString(2698));
@@ -1134,8 +1105,7 @@ function NTR_PlaceStaff()
 	var _horadricstaff = me.GetItems(91);
 	if(_horadricstaff.length == 0){			
 		Print("Don't have: " + COLOR_17 + "Horadric Staff");
-		NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Don't have Horadric Staff");
-		return;
+		return false;
 	}	
 	for(var b = 0; b < 1; b++){
         if(_horadricstaff && _horadricstaff.length > 0 && _horadricstaff[0].itemloc == 0){  
@@ -1209,35 +1179,25 @@ function NTR_MoveStaff()
 	var cube = me.GetItems(549);
 
 	for(i = 0 ; i < _horadricstaff.length ; i++){
-		if(_horadricstaff[i].itemloc == 3){
-			Print(COLOR_1 + "Staff in cube");
-			
-			Print(COLOR_8 + "Moving Staff out of cube!");
-			
-			NTC_Delay(1000);
-			
-			SetUIState(0x01, true);  		
-			
-			NTCU_OpenCubeInt(cube[0]);
-			
-			NTC_Delay(300);
-			
-			NTR_MoveStaffToInventoryInt(_horadricstaff[0]);
-			
-			NTCU_CloseCubeInt(cube[0]);
-			
-			me.Cancel(1);
-			
-			if(_horadricstaff.length > 0 && _horadricstaff[0].itemloc == 0)
-			Print(COLOR_5 + "Staff in inventory!");
-			return true;
+		if(_horadricstaff[i].itemloc == 3){			
+			NTC_Delay(1000);			
+			SetUIState(0x01, true);  					
+			NTCU_OpenCubeInt(cube[0]);			
+			NTC_Delay(300);			
+			NTR_MoveStaffToInventoryInt(_horadricstaff[0]);			
+			NTCU_CloseCubeInt(cube[0]);			
+			me.Cancel(1);			
+			if(_horadricstaff.length > 0 && _horadricstaff[0].itemloc == 0){
+				Print(COLOR_5 + "Staff in inventory!");
+				return true;
+			}
+			else 
+				return false;
 		}
-		else if(_horadricstaff.length < 0 && _horadricstaff[0].itemloc != 0){
+		else if(_horadricstaff.length < 0){
 			Print(COLOR_5 + "Staff Not in inventory!");
 			return false;
 		}
-		else
-			return true;
 	}
 }
 function NTR_MakeStaff()
@@ -1300,29 +1260,29 @@ function NTR_ReadScroll()
 		return false;
 	}	
 	else if(!returnCheck){
-	SetUIState(0x01, true);
-	if(_readbook.length > 0 && _readbook[0]){
-		for(i = 0; i < 5; i++){
-			me.ClickItem(1, _readbook[0]);	
-			Delay(500);	
-			if(me.itemoncursor)
-				break;
+		SetUIState(0x01, true);
+		if(_readbook.length > 0 && _readbook[0]){
+			for(i = 0; i < 5; i++){
+				me.ClickItem(1, _readbook[0]);	
+				Delay(500);	
+				if(me.itemoncursor)
+					break;
+			}
 		}
-	}
-	if(i < 5){
-		for(i = 0; i < 5; i++){
-			me.ClickItem(1, 0, 0, 0);	
-			Delay(500);	
-			if(!me.itemoncursor)
-				break;
+		if(i < 5){
+			for(i = 0; i < 5; i++){
+				me.ClickItem(1, 0, 0, 0);	
+				Delay(500);	
+				if(!me.itemoncursor)
+					break;
+			}
 		}
-	}
-	me.Cancel(1);
-	Print(COLOR_8 + "My resistance has increased!");
-	if(_readbook.length > 0)
-		return true;
-	else
-		return false;
+		me.Cancel(1);
+		Print(COLOR_8 + "My resistance has increased!");
+		if(_readbook.length > 0)
+			return true;
+		else
+			return false;
 	}
 }
 function NTR_OpenAltar()
@@ -1394,7 +1354,6 @@ function NTR_GetTome()
 }
 function NTR_GoHarrogath()
 {
-	Print(COLOR_5 + "Using Harrogath Portal");
 	var _gath = NTM_TakeUnit(NTC_UNIT_OBJECT, GetLocaleString(22646));
 	if(me.areaid == 103){
 		if(!_gath){return false;}
@@ -1403,12 +1362,16 @@ function NTR_GoHarrogath()
          	NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _gath); 			
 		}
 	}
-	return false;
+	if(me.areaid == 0 || me.areaid == 109)
+		return true;
+	else
+		return false;
 }
 function NTR_GetHammer()
 {
-		var _hammer = NTC_FindUnit(NTC_UNIT_ITEM, 90);
-	if (_hammer)		
+	var _hammer = NTC_FindUnit(NTC_UNIT_ITEM, 90);
+	if(!_hammer){ return false; }
+	if (_hammer){
 		for (i = 0; i < 20; i++){
 			if ((i % 5) == 0){
 				if (_hammer.mode == 3 || _hammer.mode == 5){
@@ -1422,10 +1385,10 @@ function NTR_GetHammer()
 			if (_hammer.mode != 3 && _hammer.mode != 5){
 				Print(COLOR_8 + "Picked up Hellforge Hammer!");
 				NTC_Delay(200);
-				break;
+				return true;
 			}
 		}
-	return false;
+	}
 }
 function NTR_GoForge()
 {
@@ -1441,32 +1404,30 @@ function NTR_GoForge()
 		NTM_MoveTo(_forge.areaid, _forge.x+2, _forge.y-1);			
 		NTA_ClearPosition(40);		
 		NTC_Delay(150);		
-		NTR_Hammer();		
-		NTM_MakeTP();
-		Say("Hammer up!");		
-		while(!NTC_IsQuesterIn()) {
-			NTC_TPGuard(10);
-		}								
-		while(!NTC_IsQuesterOut()) {
-			NTC_TPGuard(10);
-		}				
-		NTM_MoveTo(_forge.areaid, _forge.x+5, _forge.y);			
-		NTM_MakeTP();			
-		NTC_Delay(6500);		
-		Say("Hellforge up!");		
-		while(!NTC_IsQuesterIn()) {
-			NTC_TPGuard(20);
-		}		
-		while(!NTC_IsQuesterOut()) {
-			NTC_TPGuard(20);
-		}						
-		NTM_MoveTo(_forge.areaid, _forge.x+5, _forge.y);	
-		NTC_Delay(550);				
-		NTSI_PickItems();		
-		NTC_SendMsgToScript("loader.ntj", "end");		
-		return;
+		if(NTR_Hammer()){
+			NTM_MakeTP();
+			Say("Hammer up!");		
+			while(!NTC_IsQuesterIn()) {
+				NTC_TPGuard(10);
+			}								
+			while(!NTC_IsQuesterOut()) {
+				NTC_TPGuard(10);
+			}				
+			NTM_MoveTo(_forge.areaid, _forge.x+5, _forge.y);			
+			NTM_MakeTP();			
+			NTC_Delay(6500);		
+			Say("Hellforge up!");		
+			while(!NTC_IsQuesterIn()) {
+				NTC_TPGuard(20);
+			}		
+			while(!NTC_IsQuesterOut()) {
+				NTC_TPGuard(20);
+			}						
+			NTM_MoveTo(_forge.areaid, _forge.x+5, _forge.y);	
+			NTC_Delay(550);				
+			NTSI_PickItems();
+		}
 	}
-return;
 }
 function NTR_SmashNdatShit()
 {
@@ -1488,9 +1449,9 @@ function NTR_SmashNdatShit()
 				NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _forge);  
 			}
 			NTC_Delay(2500);
+			return true;
 		}
 	}
-	return false;
 }
 function NTR_SSCheck()
 {
@@ -1500,13 +1461,11 @@ function NTR_SSCheck()
 		if(_soulStone[0].itemloc == 0){
 			Print(COLOR_5 + "Soulstone in Inventory");
 		}
-		return true;
 	}
 	else if(_soulStone.length < 1){
 		Print(COLOR_1 + "Soulstone Missing!");
 		NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_11 + "Soulstone Missing");		
 		NTR_GoCain();
-		return false;
 	}
 }
 function NTR_Hammer()
@@ -1514,13 +1473,12 @@ function NTR_Hammer()
 	var _hammer = NTC_FindUnit(NTC_UNIT_ITEM, GetLocaleString(2194));
 	if(_hammer){
 		NTM_MoveTo(me.areaid, _hammer.x, _hammer.y);
+		return true;
 	}
 	if(!_hammer){
 		Say("No Hammer here dude");
-		NTC_SendMsgToScript("loader.ntj", "end");
+		return false;
 	}
-	NTC_Delay(100);	
-	return false;
 }
 function NTR_ClearSpot(delay)
 {
@@ -1556,13 +1514,13 @@ function NTR_CheckLocation()
 {
 	if(NTC_InTown()){
 		if(!NTTM_TownMove("portalspot")){
-			return;
+			return false;
 		}
+	
+		NTC_CancelMenus();
+		NTC_Delay(100);	
+		return true;
 	}
-	NTC_CancelMenus();
-	NTC_Delay(100);	
-		
-	return false;
 }
 function NTR_TakePortal()
 {
@@ -1592,8 +1550,6 @@ function NTR_TakePortal()
 		}
 	} 
 	while(_portal.GetNext());
-	
-	return false;
 }
 
 function NTR_ClearLevel(pickitem, safelevel) {
@@ -1956,13 +1912,13 @@ function NTR_ZeroRusheePos() {
 
 function NTR_MoveOut(target, range) {
 	if(!NTR_FindPosition(target.x + range, target.y + range, 5, 5))
-		if(!NTR_FindPosition(target.x - range, target.y - range, 5, 5))
+		NTR_FindPosition(target.x - range, target.y - range, 5, 5);
 	if(!NTR_FindPosition(target.x - range, target.y + range, 5, 5))
 		if(!NTR_FindPosition(target.x + range, target.y - range, 5, 5))
-	if(!NTR_FindPosition(target.x - range, target.y - range, 5, 5))
-		if(!NTR_FindPosition(target.x + range, target.y + range, 5, 5))
-	if(!NTR_FindPosition(target.x + range, target.y - range, 5, 5))
-		NTR_FindPosition(target.x - range, target.y + range, 5, 5);
+			NTR_FindPosition(target.x + range, target.y + range, 5, 5);
+	if(!NTR_FindPosition(target.x + range, target.y + range, 5, 5))
+		if(!NTR_FindPosition(target.x + range, target.y - range, 5, 5))
+			NTR_FindPosition(target.x - range, target.y + range, 5, 5);
 }
 
 function NTR_FindPosition(x, y, blocksize, range){
