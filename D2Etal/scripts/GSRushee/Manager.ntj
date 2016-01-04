@@ -1,6 +1,6 @@
 var CurScriptIndex = 0;
 var LastScript = false;
-var Rev = "GSRushee v2.0   ";
+var Rev = "GSRushee v2.12  ";
 
 var InitLife;
 var Corpses = 0;
@@ -54,7 +54,7 @@ function NTMain()
 		RegisterEvent(EVENT_SCRIPTMSG, NT_ScriptMsgEvents);
 
 		Load("GSRushee/bots/" + NTConfig_Script[CurScriptIndex]);
-		SetStatusText(Rev + " "+ NTConfig_Script[CurScriptIndex]);
+		SetStatusText(Rev + " " + NTConfig_Script[CurScriptIndex]);
 
 		Include("libs/common/NTSnagit.ntl");
 		NTSI_ClearIgnoredItems();

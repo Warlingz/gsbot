@@ -513,6 +513,8 @@ function NTR_GoEast(type)
 				Print(C_DARK_GREEN + "Heading East");
 				NTTM_TownMove("warriv");
 				_npc = NTC_FindUnit(NTC_UNIT_NPC, 155, 5);
+				if(!_npc)
+					return false;
 				if(_npc){
 					NTT_VisitNpc(_npc); NTC_CancelMenus();
 					if(NTT_DoInteract(_npc)){
@@ -526,6 +528,7 @@ function NTR_GoEast(type)
 			}
 			if(me.areaid == 40){						
 				NTR_TalktoJeryhn()
+				return true;
 			}
 		break;
 		case 1 :		
@@ -533,6 +536,8 @@ function NTR_GoEast(type)
 				Print(C_DARK_GREEN + "Heading East");
 				NTTM_TownMove("warriv");
 				_npc = NTC_FindUnit(NTC_UNIT_NPC, 155, 5);
+				if(!_npc)
+					return false;
 				if(_npc){
 					NTT_VisitNpc(_npc); NTC_CancelMenus();					
 					if(NTT_DoInteract(_npc)){
@@ -542,14 +547,17 @@ function NTR_GoEast(type)
 							NTC_Delay(200);
 						}
 					}
+					return true;
 				}
 			}
 		break;
 		case 2 :		
 			if(me.areaid == 40){
 				Print(C_DARK_GREEN + "Heading to A3");
-				NTTM_TownMove("meshif");   
-				_npc = NTC_FindUnit(NTC_UNIT_NPC, 210, 5);      
+				NTTM_TownMove("meshif");
+				_npc = NTC_FindUnit(NTC_UNIT_NPC, 210, 5);   
+				if(!_npc)
+					return false;   
 				if(_npc){
 					if(NTT_VisitNpc(_npc)){				
 						NTC_CancelMenus();		
@@ -705,12 +713,10 @@ function NTR_GoTyraelSpirit()
 	_npc = NTC_FindUnit(NTC_UNIT_NPC, GetLocaleString(1013), 5);
 	if(_npc){
 		if(GetDistance(me, _npc) > 2)
-			NTM_MoveTo(_npc.areaid, _npc.x, _npc.y-3);
-			NTM_MakeTP(true);
-			Say("Leeches Talk to Tyrael!");
-			return true;
-	}
-	return false;
+			NTM_WalkTo(_npc.x, _npc.y-3);
+	}	
+	NTM_MakeTP(true);
+	Say("Leeches Talk to Tyrael!");
 }
 function NTR_TalkTyrael()
 {

@@ -106,7 +106,6 @@ function Questing(area)
 	return false;
 }
 
-
 // Leader Commands ---------------------------------------------
 
 function chat(msg, type)
@@ -141,7 +140,9 @@ var i;
 						if(me.areaid == 37 && me.mode != 17){
 							ara = me.areaid;
 							NTC_Delay(200);
-							NTR_TakePortal();
+							if(!NTR_TakePortal())
+								if(me.hp < 1 && !NTC_InTown())
+									NTR_Death();
 							NTC_Delay(200);
 						}
 						if(me.areaid == 1)
@@ -157,7 +158,9 @@ var i;
 					case "Radament dead!" :
 						if(me.areaid == 49 && me.mode != 17){
 							ara = me.areaid;
-							NTR_TakePortal();
+							if(!NTR_TakePortal())
+								if(me.hp < 1 && !NTC_InTown())
+									NTR_Death();
 						}
 						break;
 						
@@ -189,12 +192,14 @@ var i;
 							ara = me.areaid;
 							NTR_PickItems();
 							NTC_PingDelay(500);
-							NTR_TakePortal();
+							if(!NTR_TakePortal())
+								if(me.hp < 1 && !NTC_InTown())
+									NTR_Death();
 						}			
 						if(NTC_InTown()){							
 							NTC_PingDelay(500);
 							if(!CheckCubeStaff())
-								NTR_GoCain();
+								return;
 						}			
 						break;
 
@@ -208,12 +213,14 @@ var i;
 							NTR_OpenAmmy();
 							NTC_PingDelay(500);
 							NTR_GetAmmy();
-							NTR_TakePortal();
+							if(!NTR_TakePortal())
+								if(me.hp < 1 && !NTC_InTown())
+									NTR_Death();
 						}
 						if(NTC_InTown()){							
 							NTC_PingDelay(1000);
 							if(!CheckCubeStaff())
-								NTR_GoCain();
+								return;
 						}
 						break;
 
@@ -227,13 +234,15 @@ var i;
 							NTR_GetStaff();
 							havestaff = true;				
 							NTC_Delay(250);
-							NTR_TakePortal();				
+							if(!NTR_TakePortal())
+								if(me.hp < 1 && !NTC_InTown())
+									NTR_Death();			
 							NTC_Delay(250);
 						}
 						if(NTC_InTown()){
 							Delay(200);
 							if(!CheckCubeStaff())
-								NTR_GoCain();
+								return;
 						}
 						break;
 
@@ -258,7 +267,9 @@ var i;
 						if(me.areaid == 74 && me.mode != 17){
 							ara = me.areaid;
 							NTC_PingDelay(200);
-							NTR_TakePortal();
+							if(!NTR_TakePortal())
+								if(me.hp < 1 && !NTC_InTown())
+									NTR_Death();
 							NTC_PingDelay(200);
 						}
 						if(me.areaid == 40){
@@ -341,7 +352,9 @@ var i;
 							NTC_PingDelay(300);
 							NTR_GetTome();
 							NTC_PingDelay(300);
-							NTR_TakePortal();
+							if(!NTR_TakePortal())
+								if(me.hp < 1 && !NTC_InTown())
+									NTR_Death();
 						}
 						if(me.areaid == 75){
 							NTC_PingDelay(300);
@@ -361,7 +374,9 @@ var i;
 						if(me.mode != 17){
 							ara = me.areaid;
 							NTC_Delay(100);
-							NTR_TakePortal();
+							if(!NTR_TakePortal())
+								if(me.hp < 1 && !NTC_InTown())
+									NTR_Death();
 							NTC_PingDelay(500);
 							if(NTC_InTown())
 								if(!NTR_GoCain())
@@ -461,7 +476,9 @@ var i;
 						NTC_Delay(100);
 						if(me.areaid == 105 && me.mode != 17){
 							NTC_PingDelay(500);
-							NTR_TakePortal();
+							if(!NTR_TakePortal())
+								if(me.hp < 1 && !NTC_InTown())
+									NTR_Death();
 							NTC_PingDelay(500);
 							NTR_TalkTyrael();
 						}
@@ -637,6 +654,7 @@ var i;
 		 }
     }
 }
+
 function CheckCubeStaff()
 {
 	var cube = me.GetItems(549);
@@ -648,10 +666,4 @@ function CheckCubeStaff()
 		_result = true;
 	}
 	return _result;
-}
-function Testing(quest)
-{				
-	for(var i = 0 ; i < 13 ; i++){
-		Print(C_WHITE + i + " = " + me.GetQuest(quest ,i));
-	}
 }

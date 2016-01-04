@@ -1,4 +1,4 @@
-var Rev = "GSRusher v1.0";
+var Rev = "GSRusher v1.12";
 var _actCheck = false;
 var firstCheck = true;
 var _leech = false;
@@ -19,7 +19,7 @@ function NTMain() {
 		RegisterEvent(EVENT_KEYDOWN, NT_KeyEvents);
 		RegisterEvent(EVENT_SCRIPTMSG, NT_ScriptMsgEvents);
 		Load("GSRusher/rushbots/" + NTConfig_RushScript[_count] + ".ntj");
-		SetStatusText(Rev + " " + NTConfig_RushScript[_count]);
+		SetStatusText(Rev + " " + NTConfig_RushScript[_count] + ".ntj");
 		
 		while (!finished) {
 			Delay(1000);
@@ -45,14 +45,14 @@ function NT_KeyEvents(keycode) {
 					_script.Stop();
 					NTC_Delay(300);
 					ClickMap(NTC_CLICK_LUP, NTC_SHIFT_NONE, null);
-					SetStatusText(COLOR_1 + Rev + "    Paused   " + NTConfig_RushScript[_count]);
+					SetStatusText(COLOR_1 + Rev + "    Paused   " + NTConfig_RushScript[_count] + ".ntj");
 					_paused = true;
 				}
 			}
 		} else {
 			_paused = false;
 			Load("GSRusher/rushbots/" + NTConfig_RushScript[_count] + ".ntj");
-			SetStatusText(Rev + " " + NTConfig_RushScript[_count]);
+			SetStatusText(Rev + " " + NTConfig_RushScript[_count] + ".ntj");
 		}
 		break;
 	case Do_PrevScript:
@@ -63,7 +63,7 @@ function NT_KeyEvents(keycode) {
 				_script.Stop();
 				NTC_Delay(300);
 				ClickMap(NTC_CLICK_LUP, NTC_SHIFT_NONE, null);
-				SetStatusText(COLOR_1 + Rev + " Stopped " + NTConfig_RushScript[_count]);
+				SetStatusText(COLOR_1 + Rev + " Stopped " + NTConfig_RushScript[_count] + ".ntj");
 				break;
 			}
 		} else {
@@ -72,7 +72,7 @@ function NT_KeyEvents(keycode) {
 			} else {
 				Print(COLOR_9 + "No where to go back to from here!");
 			}
-			SetStatusText(COLOR_4 + Rev + " Back to " + NTConfig_RushScript[_count]);
+			SetStatusText(COLOR_4 + Rev + " Back to " + NTConfig_RushScript[_count] + ".ntj");
 		}
 		break;
 	case Do_NextScript:
@@ -83,7 +83,7 @@ function NT_KeyEvents(keycode) {
 				_script.Stop();
 				NTC_Delay(300);
 				ClickMap(NTC_CLICK_LUP, NTC_SHIFT_NONE, null);
-				SetStatusText(COLOR_1 + Rev + " Stopped " + NTConfig_RushScript[_count]);
+				SetStatusText(COLOR_1 + Rev + " Stopped " + NTConfig_RushScript[_count] + ".ntj");
 			}
 		} else {
 			if(_count < NTConfig_RushScript.length - 1) {
@@ -91,7 +91,7 @@ function NT_KeyEvents(keycode) {
 			} else {
 				Print(COLOR_9 + "No where to go forward to from here!");
 			}
-			SetStatusText(COLOR_2 + Rev + " Skip to " + NTConfig_RushScript[_count]);
+			SetStatusText(COLOR_2 + Rev + " Skip to " + NTConfig_RushScript[_count] + ".ntj");
 		}
 		break;
 	case Do_DropItems:
@@ -147,7 +147,7 @@ function NT_ScriptMsgEvents(msg) {
 			_count++;
 			NTTM_CheckAct();
 			Load("GSRusher/rushbots/" + NTConfig_RushScript[_count] + ".ntj");
-			SetStatusText(Rev + " " + NTConfig_RushScript[_count]);
+			SetStatusText(Rev + " " + NTConfig_RushScript[_count] + ".ntj");
 			NTC_LogCurScript(NTConfig_RushScript[_count]);
 		} else {
 			_script = NTC_FindScript(NTConfig_RushScript[_count] + ".ntj");
@@ -168,7 +168,7 @@ function NT_ScriptMsgEvents(msg) {
 			_count++;
 			NTTM_CheckAct();
 			Load("GSRusher/rushbots/" + NTConfig_RushScript[_count] + ".ntj");
-			SetStatusText(Rev + " " + NTConfig_RushScript[_count]);
+			SetStatusText(Rev + " " + NTConfig_RushScript[_count] + ".ntj");
 			NTC_LogCurScript(NTConfig_RushScript[_count]);
 		} else {
 			_script = NTC_FindScript(NTConfig_RushScript[_count] + ".ntj");
