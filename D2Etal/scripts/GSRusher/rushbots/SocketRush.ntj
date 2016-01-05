@@ -17,17 +17,17 @@ function NTMain()
 	
 	NT_LoadConfig();
 	NTSI_LoadNIPFiles("NTBot/item_configs");
-
+	
+	SetBelt();
+	
 	NT_File("logs/loc/readyforgame.txt", 1, 1);
 	NTA_Initialize();
 	RegisterEvent(EVENT_GAMEMSG, chat);
 	
 	if(!NTTM_CheckAct()) {
-		NTC_SendMsgToScript("loader.ntj", "NTTM_CheckAct()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_CheckAct()");
 		return;
 	}	
-	
-	SetBelt();
 	
 	Delay(200);
 	
@@ -35,7 +35,7 @@ function NTMain()
 	
 	if(!NTTM_TownMove("waypoint"))
 	{
-		NTC_SendMsgToScript("loader.ntj", "NTTM_TownMove()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
 		return;
 	}
 	
@@ -322,11 +322,11 @@ function WhatToDO()
 					else if(rushee.areaid == 109){						
 						if(!NTTM_TownMove("waypoint"))
 						{
-							NTC_SendMsgToScript("loader.ntj", "NTTM_TownMove()");
+							NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
 							return;
 						}
 						if (!NTM_TakeWaypoint(109)) {
-							NTC_SendMsgToScript("loader.ntj", "NTM_TakeWaypoint()");
+							NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 							return;
 						}
 					}
@@ -349,7 +349,7 @@ function WhatToDO()
 					else if(!busy && !shenk && rushee.areaid == 109) 
 						DoShenk(); 
 					else if(!busy && shenk) 
-						NTC_SendMsgToScript("loader.ntj", "end"); 
+						NTC_SendMsgToScript("NTRushGame.ntj", "end"); 
 					break;
 		}
 	}
@@ -398,11 +398,11 @@ function chat(msg, type)
 	else if(type == 4) {
 		if(msg.indexOf("weaken") != -1 && (msg.indexOf(Rushee) != -1 || msg.indexOf(RusheeLeech) != -1)){
 			Delay(600);
-			NTC_SendMsgToScript("loader.ntj", "end");
+			NTC_SendMsgToScript("NTRushGame.ntj", "end");
 		}
 		else if(msg.indexOf("timeout") != -1 && (msg.indexOf(Rushee) != -1 || msg.indexOf(RusheeLeech) != -1)){
 			Delay(600);
-			NTC_SendMsgToScript("loader.ntj", "end");
+			NTC_SendMsgToScript("NTRushGame.ntj", "end");
 		}
     }
 
@@ -470,11 +470,11 @@ function Rush(area){
 					else if(rushee.areaid == 109){						
 						if(!NTTM_TownMove("waypoint"))
 						{
-							NTC_SendMsgToScript("loader.ntj", "NTTM_TownMove()");
+							NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
 							return;
 						}
 						if (!NTM_TakeWaypoint(109)) {
-							NTC_SendMsgToScript("loader.ntj", "NTM_TakeWaypoint()");
+							NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 							return;
 						}
 					}
@@ -497,7 +497,7 @@ function Rush(area){
 					else if(!busy && !shenk && rushee.areaid == 109) 
 						DoShenk(); 
 					else if(!busy && shenk) 
-						NTC_SendMsgToScript("loader.ntj", "end"); 
+						NTC_SendMsgToScript("NTRushGame.ntj", "end"); 
 					break;
 		}
 	}return;
@@ -511,16 +511,16 @@ function DoAndy()
 	var i, _clearpos,
 		_tileid = [18, 18];
 	if(!NTTM_CheckAct()) {
-		NTC_SendMsgToScript("loader.ntj", "NTTM_CheckAct()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_CheckAct()");
 		return;
 	}
 	if(!NTTM_TownMove("waypoint"))
 	{
-		NTC_SendMsgToScript("loader.ntj", "NTTM_TownMove()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
 		return;
 	}
 	if (!NTM_TakeWaypoint(35)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_TakeWaypoint()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 		return;
 	}
 
@@ -528,12 +528,12 @@ function DoAndy()
 
 	for (i = 0; i < 2; i++) {
 		if (!NTM_MoveToStair(me.areaid, 36 + i)) {
-			NTC_SendMsgToScript("loader.ntj", "NTM_MoveToStair()");
+			NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveToStair()");
 			return;
 		}
 
 		if (!NTM_TakeStair(36 + i)) {
-			NTC_SendMsgToScript("loader.ntj", "NTM_TakeStair()");
+			NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeStair()");
 			return;
 		}
 	}
@@ -544,7 +544,7 @@ function DoAndy()
 
 	for (i = 0; i < _clearpos.length; i += 2) {
 		if (!NTM_MoveTo(me.areaid, _clearpos[i], _clearpos[i + 1])) {
-			NTC_SendMsgToScript("loader.ntj", "NTM_MoveTo()");
+			NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveTo()");
 			return;
 		}
 		NTA_ClearPosition(20);
@@ -565,7 +565,7 @@ function DoAndy()
 	//NTP_DoPrecast(false);
 
 	if (!NTM_MoveTo(me.areaid, 22532, 9553)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveTo()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveTo()");
 		return;
 	}
 
@@ -580,7 +580,7 @@ function DoAndy()
 	NTR_GoRushee();
 
 	if (!NTM_MoveTo(me.areaid, 22595, 9617)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveTo()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveTo()");
 		return;
 	}
 	andy = true;
@@ -588,7 +588,7 @@ function DoAndy()
 	NTM_UsePortal("BluePortal", 1, me.charname);
 
 	if (!NTTM_TownMove("waypoint")) {
-		NTC_SendMsgToScript("loader.ntj", "NTTM_TownMove()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
 		return;
 	}
 	NTC_Delay(4000);
@@ -598,7 +598,7 @@ function DoAndy()
 	}
 
 	if (!NTM_TakeWaypoint(40)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_TakeWaypoint()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 		return;
 	}
 
@@ -614,35 +614,35 @@ function DoCube()
 
 	if(me.diff == 0) {
 		if(!NTTM_CheckAct()) {
-			NTC_SendMsgToScript("loader.ntj", "NTTM_CheckAct()");
+			NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_CheckAct()");
 			return;
 		}
 		if(!NTTM_TownMove("waypoint")) {
-			NTC_SendMsgToScript("loader.ntj", "NTTM_TownMove()");
+			NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
 			return;
 		}
 
 		if(!NTM_TakeWaypoint(57)) {
-			NTC_SendMsgToScript("loader.ntj", "NTM_TakeWaypoint()");
+			NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 			return;
 		}
 
 		NTP_DoPrecast(false);		
 
 		if(!NTM_MoveToStair(me.areaid, 60)) {
-			NTC_SendMsgToScript("loader.ntj", "NTM_MoveToStair()");
+			NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveToStair()");
 			return;
 		}
 
 		if(!NTM_TakeStair(60)) {
-			NTC_SendMsgToScript("loader.ntj", "NTM_TakeStair()");
+			NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeStair()");
 			return;
 		}
 
 		//NTP_DoPrecast(false);
 
 		if(!NTM_MoveToPresetUnit(me.areaid, NTC_UNIT_OBJECT, 354, -5, -5)) {
-			NTC_SendMsgToScript("loader.ntj", "NTM_MoveToPresetUnit()");
+			NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveToPresetUnit()");
 			return;
 		}
 
@@ -709,7 +709,7 @@ function DoAmmy()
 	busy = true;
 	NTC_PingDelay(2000);
 	if(!NTTM_CheckAct()) {
-		NTC_SendMsgToScript("loader.ntj", "NTTM_CheckAct()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_CheckAct()");
 		return;
 	}
 	
@@ -717,35 +717,35 @@ function DoAmmy()
 			
 	if(!NTTM_TownMove("waypoint"))
 	{
-		NTC_SendMsgToScript("loader.ntj", "NTTM_TownMove()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
 		return;
 	}
 
 	if(!NTM_TakeWaypoint(44))
 	{
-		NTC_SendMsgToScript("loader.ntj", "NTM_TakeWaypoint()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 		return;
 	}
 		
 	NTP_DoPrecast(false);
 			
 	if(!NTM_MoveToStair(45, 58)) { 
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveToStair()"); 
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveToStair()"); 
 		return; 
 	} 
 
 	if(!NTM_TakeStair(58)) { 
-		NTC_SendMsgToScript("loader.ntj", "NTM_TakeStair()"); 
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeStair()"); 
 		return; 
 	}
 			
 	if(!NTM_MoveToStair(me.areaid, 61)) { 
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveToStair()"); 
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveToStair()"); 
 		return; 
 	} 
 
 	if(!NTM_TakeStair(61)) { 
-		NTC_SendMsgToScript("loader.ntj", "NTM_TakeStair()"); 
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeStair()"); 
 		return; 
 	}
 
@@ -757,7 +757,7 @@ function DoAmmy()
 		NT_FieldID();
 	} 
 	if(!NTM_MoveToPresetUnit(me.areaid, NTC_UNIT_OBJECT, 149, +6, -8)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveToPresetUnit()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveToPresetUnit()");
 		return;
 	}
 		
@@ -768,7 +768,7 @@ function DoAmmy()
 	NTC_PingDelay(100);
 	
 	if(!NTM_MoveToPresetUnit(me.areaid, NTC_UNIT_OBJECT, 149, +15, -5)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveToPresetUnit()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveToPresetUnit()");
 		return;
 	}
 		
@@ -798,7 +798,7 @@ function DoStaff()
 	busy = true;
 	Say("Talk to Drognan!");
 	if(!NTTM_CheckAct()) {
-		NTC_SendMsgToScript("loader.ntj", "NTTM_CheckAct()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_CheckAct()");
 		return;
 	}
 	var _Staff;
@@ -806,24 +806,24 @@ function DoStaff()
 	NTTMGR_TownManager();
 
 	if(!NTTM_TownMove("waypoint")) {
-		NTC_SendMsgToScript("loader.ntj", "NTTM_TownMove()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
 		return;
 	}
 
 	if(!NTM_TakeWaypoint(43)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_TakeWaypoint()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 		return;
 	}
 	NTP_DoPrecast(false);
 
 	for(i=0; i<3; i++) {		
 		if(!NTM_MoveToStair(me.areaid, 62+i)) { 
-			NTC_SendMsgToScript("loader.ntj", "NTM_MoveToStair()"); 
+			NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveToStair()"); 
 			return; 
 		}
 
 		if(!NTM_TakeStair(62+i))  { 
-			NTC_SendMsgToScript("loader.ntj", "NTM_TakeStair()"); 
+			NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeStair()"); 
 			return; 
 		} 
 	}
@@ -831,12 +831,12 @@ function DoStaff()
 	NTA_ClearPosition(10);
 
 	if(!NTM_MoveToPresetUnit(me.areaid, NTC_UNIT_OBJECT, 356, -5, -5)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveToPresetUnit()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveToPresetUnit()");
 		return;
 	}
 
 	if(NTM_MoveToPresetUnit(me.areaid, 356)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveToPresetUnit()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveToPresetUnit()");
 		return;
 	}
 
@@ -891,19 +891,19 @@ function DoSummoner()
 	Delay(3000);
 	var _unit, _journalx, _journaly ;
 	if(!NTTM_CheckAct()) {
-		NTC_SendMsgToScript("loader.ntj", "NTTM_CheckAct()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_CheckAct()");
 		return;
 	}
 
 	NTTMGR_TownManager();
 
 	if(!NTTM_TownMove("waypoint")) {
-		NTC_SendMsgToScript("loader.ntj", "NTTM_TownMove()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
 		return;
 	}
 
 	if(!NTM_TakeWaypoint(74)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_TakeWaypoint()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 		return;
 	}
 
@@ -951,7 +951,7 @@ function DoSummoner()
 	} 
 	
 	if(!NTM_MoveToPresetUnit(me.areaid, 2, 357, 0, 0, true)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveToPresetUnit()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveToPresetUnit()");
 		return;
 	}
 
@@ -968,7 +968,7 @@ function DoSummoner()
 	}
 
 	if(!NTM_TakeWaypoint(40)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_TakeWaypoint()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 		return;
 	}
 	busy = false;
@@ -982,19 +982,19 @@ function DoDuriel()
 	busy = true;
 	var _tombs, _tileid, _harem;
 	if(!NTTM_CheckAct()) {
-		NTC_SendMsgToScript("loader.ntj", "NTTM_CheckAct()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_CheckAct()");
 		return;
 	}
 
 	NTTMGR_TownManager();
 
 	if(!NTTM_TownMove("waypoint")) {
-		NTC_SendMsgToScript("loader.ntj", "NTTM_TownMove()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
 		return;
 	}
 
 	if(!NTM_TakeWaypoint(46)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_TakeWaypoint()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 		return;
 	}
 
@@ -1003,29 +1003,29 @@ function DoDuriel()
 	_tombs = GetRoom();
 
 	if(!_tombs) {
-		NTC_SendMsgToScript("loader.ntj", "GetRoom()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "GetRoom()");
 		return;
 	}
 
 	if(!NTM_MoveToPresetUnit(me.areaid, NTC_UNIT_TILE, _tombs.correcttomb-28)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveToPresetUnit()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveToPresetUnit()");
 		return;
 	}
 
 	_tileunit = NTC_FindUnit(NTC_UNIT_TILE, _tombs.correcttomb-28);
 
 	if(!_tileunit) {
-		NTC_SendMsgToScript("loader.ntj", "NTC_FindUnit()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTC_FindUnit()");
 		return;
 	}
 
 	if(!NTM_TakeStair(_tileunit.subareaid)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_TakeStair()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeStair()");
 		return;
 	}
 
 	if(!NTM_MoveToPresetUnit(me.areaid, NTC_UNIT_OBJECT, 152, -2, 2)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveToPresetUnit()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveToPresetUnit()");
 		return;
 	}
 
@@ -1066,7 +1066,7 @@ function DoDuriel()
 		NTP_DoPrecast(false);
 		
 		if(!NTM_TakeUnit(NTC_UNIT_OBJECT, 100)) {
-			NTC_SendMsgToScript("loader.ntj", "NTM_TakeUnit()");
+			NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeUnit()");
 			return;
 		}
 	}
@@ -1077,7 +1077,7 @@ function DoDuriel()
 	NTR_GoTyraelSpirit();
 	
 	if(!NTTM_TownMove("waypoint")) {
-		NTC_SendMsgToScript("loader.ntj", "NTTM_TownMove()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
 		return;
 	}
 
@@ -1086,7 +1086,7 @@ function DoDuriel()
 	}
 
 	if(!NTM_TakeWaypoint(75)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_TakeWaypoint()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 		return;
 	}
 
@@ -1164,7 +1164,7 @@ function DoTrav()
 	Print(COLOR_3 + "Starting Travincal");
 	if(me.areaid != 75){		
 		if(!NTM_TakeWaypoint(75)) {
-			NTC_SendMsgToScript("loader.ntj", "NTM_TakeWaypoint()");
+			NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 			return;
 		}
 	}
@@ -1180,26 +1180,26 @@ function DoTrav()
 	NT_FindDurance();
 
 	if(!NTTM_CheckAct()) {
-		NTC_SendMsgToScript("loader.ntj", "NTTM_CheckAct()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_CheckAct()");
 		return;
 	}
 
 	NTTMGR_TownManager();
 
 	if(!NTTM_TownMove("waypoint")) {
-		NTC_SendMsgToScript("loader.ntj", "NTTM_TownMove()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
 		return;
 	}
 
 	if(!NTM_TakeWaypoint(83)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_TakeWaypoint()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 		return;
 	}
 
 	_waypoint = NTC_FindUnit(NTC_UNIT_OBJECT, GetLocaleString(22526));
 
 	if(!_waypoint) {
-		NTC_SendMsgToScript("loader.ntj", "NTC_FindUnit()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTC_FindUnit()");
 		return;
 	}
 
@@ -1212,7 +1212,7 @@ function DoTrav()
 	NT_FindDurance();
 
 	if(!NTM_MoveTo(me.areaid, _todurx-2, _todury-35)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveTo()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveTo()");
 		return;
 	}
 
@@ -1236,7 +1236,7 @@ function DoTrav()
 	NTR_ClearSpot(200);
 	
 	if(!NTM_MoveTo(me.areaid, 5780+_deltax, 1555+_deltay)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveTo()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveTo()");
 		return;
 	}
 
@@ -1285,41 +1285,41 @@ function DoMeph()
 	var _chest, _councils, _unit;
 	
 	if(!NTTM_CheckAct()) {
-		NTC_SendMsgToScript("loader.ntj", "NTTM_CheckAct()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_CheckAct()");
 		return;
 	}
 
 	NTTMGR_TownManager();
 
 	if(!NTTM_TownMove("waypoint")) {
-		NTC_SendMsgToScript("loader.ntj", "NTTM_TownMove()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
 		return;
 	}
 
 	if(!NTM_TakeWaypoint(101)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_TakeWaypoint()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 		return;
 	}
 
 	NTP_DoPrecast(false);
 
 	if(!NTM_MoveToStair(me.areaid, 102)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveToStair()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveToStair()");
 		return;
 	}
 
 	if(!NTM_TakeStair(102)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_TakeStair()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeStair()");
 		return;
 	}
 
 	if(!NTM_MoveTo(me.areaid, 17583, 8068)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveTo()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveTo()");
 		return;
 	}
 	if(DoKillCouncils) {	
 		if(!NTM_MoveTo(me.areaid, 17617, 8068)) {
-			NTC_SendMsgToScript("loader.ntj", "NTM_MoveTo()");
+			NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveTo()");
 			return;
 		}
 		_unit = GetUnit(NTC_UNIT_MONSTER);
@@ -1337,14 +1337,14 @@ function DoMeph()
 	}
 
 	if(!NTM_MoveTo(me.areaid, 17589, 8068)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveTo()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveTo()");
 		return;
 	}
 
 	NTM_MakeTP();
 
 	if(!NTM_MoveTo(me.areaid, 17572, 8060)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveTo()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveTo()");
 		return;
 	}
 	Delay(200);
@@ -1355,7 +1355,7 @@ function DoMeph()
 	}
 
 	if(!NTM_MoveTo(me.areaid, 17556, 8069)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveTo()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveTo()");
 		return;
 	}
 
@@ -1374,7 +1374,7 @@ function DoMeph()
 		NTM_MakeTP(true);
 
 	if(!NTTM_TownMove("waypoint")) {
-		NTC_SendMsgToScript("loader.ntj", "NTTM_TownMove()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
 		return;
 	}
 	var count = 0;
@@ -1388,7 +1388,7 @@ function DoMeph()
 	}
 	else{
 		if(!NTM_TakeWaypoint(103)) {
-			NTC_SendMsgToScript("loader.ntj", "NTM_TakeWaypoint()");
+			NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 			return;
 		}
 		
@@ -1410,33 +1410,33 @@ function DoDiablo()
 	NTConfig_DancingSorc = false;	
 
 	if(!NTTM_CheckAct()){
-		NTC_SendMsgToScript("loader.ntj", "NTTM_CheckAct()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_CheckAct()");
 		return;
 	}
 
 	NTTMGR_TownManager();
 	
 	if(!NTTM_TownMove("waypoint")){
-		NTC_SendMsgToScript("loader.ntj", "NTTM_TownMove()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
 		return;
 	}
 
 	if(!NTM_TakeWaypoint(107)){
-		NTC_SendMsgToScript("loader.ntj", "NTM_TakeWaypoint()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 		return;
 	}
 
 	NTP_DoPrecast(false);
 
 	if (!NTM_MoveTo(108, 7790, 5544)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveTo()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveTo()");
 		return;
 	}
 
 	NTM_MoveTo(108, 7792, 5291);
 
 	if (!NT_OpenSealsInt()) {
-		NTC_SendMsgToScript("loader.ntj", "NT_OpenSealsInt()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NT_OpenSealsInt()");
 		return;
 	}
 
@@ -1463,7 +1463,7 @@ function DoDiablo()
 	
 	if (!NTA_KillMonster(243)) {
 		if (!NT_OpenSealsInt()) {
-			NTC_SendMsgToScript("loader.ntj", "NT_OpenSealsInt()");
+			NTC_SendMsgToScript("NTRushGame.ntj", "NT_OpenSealsInt()");
 			return;
 		}
 		NTM_MoveTo(108, 7792, 5291); //safe spot
@@ -1492,7 +1492,7 @@ function DoDiablo()
 	
 	if(!NTTM_TownMove("waypoint"))
 	{
-		NTC_SendMsgToScript("loader.ntj", "NTTM_TownMove()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
 		return;
 	}
 
@@ -1502,7 +1502,7 @@ function DoDiablo()
 
 	if(!NTM_TakeWaypoint(109))
 	{
-		NTC_SendMsgToScript("loader.ntj", "NTM_TakeWaypoint()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 		return;
 	}
 	
@@ -1517,7 +1517,7 @@ function DoShenk()
 	
 	busy = true;
 	if(!NTTM_CheckAct()) {
-		NTC_SendMsgToScript("loader.ntj", "NTTM_CheckAct()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_CheckAct()");
 		return;
 	}
 
@@ -1528,19 +1528,19 @@ function DoShenk()
 	}
 	
 	if(!NTTM_TownMove("waypoint")) {
-		NTC_SendMsgToScript("loader.ntj", "NTTM_TownMove()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
 		return;
 	}
 
 	if(!NTM_TakeWaypoint(111)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_TakeWaypoint()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 		return;
 	}
 
 	NTP_DoPrecast(false);	
 
 	if(!NTM_MoveTo(110, 3855, 5125)) {
-		NTC_SendMsgToScript("loader.ntj", "NTM_MoveTo()");
+		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveTo()");
 		return;
 	}
 
@@ -1573,7 +1573,8 @@ function DoShenk()
 	NTR_GoRushee();
 	
 	NTM_UsePortal("BluePortal", 109, me.charname);
-
+	Delay(500);
+	Say("Rush Over!"); // Message to let the rushees know that the game is over
 	busy = false;
 	shenk = true;
 	andy = true;

@@ -1089,8 +1089,9 @@ function NTR_CubeStaff()
 	
 	if(me.areaid == 40 && staff.length > 0 && ammy.length > 0 && cube.length > 0){
 		Print(COLOR_5 + "Cubing Staff!");
-		NTR_MakeStaff();
-		NTR_GoCain();
+		if(NTR_MakeStaff())
+			if(NTR_GoCain())
+				return true;
 	}
 	else
 		return false;
@@ -1253,10 +1254,7 @@ function NTR_MakeStaff()
 		me.Cancel(1);
 		Print(COLOR_8 + "Staff made!");
 		NTR_MoveStaff();
-		if(_horadricstaff.length > 0)
-			return true;
-		else
-			return false;		
+		return true;		
 	}
 }
 function NTR_ReadScroll()

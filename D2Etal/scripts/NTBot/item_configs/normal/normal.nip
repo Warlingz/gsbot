@@ -153,11 +153,11 @@
 //[Name] == PerfectTopaz
 
 // ##### Potions #######################
-//[Name] == GreaterHealingPotion
+[Name] == GreaterHealingPotion
 [Name] == SuperHealingPotion
-//[Name] == GreaterManaPotion
+[Name] == GreaterManaPotion
 [Name] == SuperManaPotion
-//[Name] == RejuvenationPotion
+[Name] == RejuvenationPotion
 [Name] == FullRejuvenationPotion
 
 // ##### Gold ##########################

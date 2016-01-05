@@ -1,10 +1,11 @@
-var Rev = "GSRusher v1.0";
+var Rev = "GSRusher v1.13";
 var CurScriptIndex = 0;
 var LastScript = false;
 
 var InitLife;
 var Corpses = 0;
 var done = false;
+var _paused = false;
 
 function D2NTStatus(where, time, message) { return SendCopyData('D2NT Manager', null, where << 16 | time, message); }
 function NTMain() {
@@ -47,10 +48,8 @@ function NTMain() {
 		NTU_DeathLog(Corpses, InitLife);
 	}
 
-	if (!done) {
+	if (!LastScript) {
 		NTT_ClearInventory();
-		NTT_ClearBelt();
-
 		if (!NTT_LookForEnigma()) {
 			if (GetUIState(0x01)) {
 				SetUIState(0x01, false);
@@ -60,100 +59,137 @@ function NTMain() {
 		}
 
 		Load("GSRusher/rush_tools/NTRushTools.ntj");
+				
+		RegisterEvent(EVENT_GAMEMSG, NT_GameMsgEvents);
+		RegisterEvent(EVENT_KEYDOWN, NT_KeyEvents);
+		RegisterEvent(EVENT_SCRIPTMSG, NT_ScriptMsgEvents);
 
-		RegisterEvent(EVENT_GAMEMSG, GameMsgEvents);
-		RegisterEvent(EVENT_SCRIPTMSG, ScriptMsgEvents);
+		Load("GSRusher/rushbots/" + NTConfig_RushScript[CurScriptIndex] + ".ntj");
+		SetStatusText(Rev + " " + NTConfig_RushScript[CurScriptIndex] + ".ntj");
 
 		Include("libs/common/NTSnagit.ntl");
 		NTSI_ClearIgnoredItems();
-		Load("GSRusher/rush_tools/loader.ntj");
-		while (!done) {
+
+		NTC_LogCurScript(NTConfig_RushScript[CurScriptIndex] + ".ntj");//jinay item log
+		
+		while (!LastScript) {
 			Delay(1000);
 		}
 	}
-
-	//NTE_ComputeStats(false);
-	ExitGame();
-}
-
-function GameMsgEvents(msg, type) {
-	var date, logfile, script;
-
-	if (type == 1 && msg.toLowerCase().indexOf("error") != -1) {
-		date = new Date().toLocaleFormat("<%a, %b %d, %H:%M>");
-		logfile = FileOpen("logs/" + me.charname + "_errorlog.txt", 2);
-		if (!logfile) {
-			logfile = FileOpen("logs/" + me.charname + "_errorlog.txt", 1);
-		}
-
-		logfile.WriteLine(date + " - " + msg);
-		logfile.Close();
-	} else if (type == 0 && msg.indexOf(me.charname) != -1 && msg.indexOf("restart") != -1) {
-		script = NTC_FindScript("loader.ntj");
-		if (script.running) {
-			script.Stop();
-		}
-		NTTM_CheckAct();
-		Load("GSRusher/rush_tools/loader.ntj");
+	if(LastScript){		
+		NT_File("logs/loc/rushbot-gamestatus.txt", 1, "rushover"); // Let the bot know that he needs to switch char.
+		NT_File("logs/loc/rushleech-gamestatus.txt", 1, "rushover");
+		Delay(1500);
+		ExitGame();
 	}
 }
+
+function NT_GameMsgEvents(msg, type)
+{
+	var _holdPauseCheck = "";
+	var _area = GetArea();
+	switch(type){
+		case 1:
+			if(msg.toLowerCase().indexOf("d2nt") != -1 || msg.toLowerCase().indexOf("error") != -1 || msg.toLowerCase().indexOf("fail") != -1) {
+				var date = new Date().toLocaleFormat("<%a, %b %d, %H:%M>");
+				var logfile = FileOpen("logs/errorlog/"+me.charname+"-errorlog.txt", 2);
+				if(!logfile)
+					var logfile = FileOpen("logs/errorlog/"+me.charname+"-errorlog.txt", 1);
+
+				logfile.WriteLine(date + " - " + msg);
+				logfile.Close();
+			}
+			else if(msg.toLowerCase().indexOf("skipped") != -1 ) {
+				var date = new Date().toLocaleFormat("<%a, %b %d, %H:%M>");
+				var logfile = FileOpen("logs/skiplog/"+me.charname+"-skiplog.txt", 2);
+				if(!logfile)
+					var logfile = FileOpen("logs/skiplog/"+me.charname+"-skiplog.txt", 1);
+
+				logfile.WriteLine(date + " - " + msg + " ( " + _area.name + " ) ");
+				logfile.Close();
+			}
+			break;
+		
+		default: break;
+	}
+}
+
 
 function NT_KeyEvents(keycode)
 {
 	var _script;
 	switch(keycode) {
-		case Do_PauseBot:
-		_script = NTC_FindScript(NTConfig_Script[CurScriptIndex]);
-			if(_script) {
-				if(_script.running) {
+	case Do_PauseBot:
+		if (!_paused) {
+			_script = NTC_FindScript(NTConfig_RushScript[CurScriptIndex] + ".ntj");
+			if (_script) {
+				if (_script.running) {
 					_script.Stop();
-					NT_ClearMessages();
 					NTC_Delay(300);
 					ClickMap(NTC_CLICK_LUP, NTC_SHIFT_NONE, null);
-					SetStatusText(COLOR_1 + Rev + "    Paused " + NTConfig_Script[CurScriptIndex]);
-				}
-				else {
-					Load("GSRusher/rush_configs/" + NTConfig_Script[CurScriptIndex]);
-					SetStatusText(Rev + " " + NTConfig_Script[CurScriptIndex]);
+					SetStatusText(COLOR_1 + Rev + "    Paused   " + NTConfig_RushScript[CurScriptIndex] + ".ntj");
+					_paused = true;
 				}
 			}
-			break;
-		case Do_PrevScript:
-			_script = NTC_FindScript(NTConfig_Script[CurScriptIndex]);
+		} else {
+			_paused = false;
+			Load("GSRusher/rushbots/" + NTConfig_RushScript[CurScriptIndex] + ".ntj");
+			SetStatusText(Rev + " " + NTConfig_RushScript[CurScriptIndex] + ".ntj");
+		}
+		break;
+	case Do_PrevScript:
+		if (!_paused) {
+			_script = NTC_FindScript(NTConfig_RushScript[CurScriptIndex] + ".ntj");
 
 			if(_script.running) {
 				_script.Stop();
-				NT_ClearMessages();
 				NTC_Delay(300);
 				ClickMap(NTC_CLICK_LUP, NTC_SHIFT_NONE, null);
-				SetStatusText(COLOR_11 + Rev + " Stopped " + NTConfig_Script[CurScriptIndex]);
+				SetStatusText(COLOR_1 + Rev + "  Paused  " + NTConfig_RushScript[CurScriptIndex] + ".ntj");
+				_paused = true;
 				break;
 			}
-			else {
-				for(i=0; i<NTConfig_Script.length-1; i++) {
-					if(CurScriptIndex < NTConfig_Script.length-1)
-						CurScriptIndex++;
-					else
-						CurScriptIndex = 0;
-				}
-				SetStatusText(COLOR_14 + Rev + " Back to " + NTConfig_Script[CurScriptIndex]);
-			}
-			break;
-		case Do_NextScript:
-			_script = NTC_FindScript(NTConfig_Script[CurScriptIndex]);
+		} else {
+			_script = NTC_FindScript(NTConfig_RushScript[CurScriptIndex] + ".ntj");
 
-			if(_script.running) {
+			if (_script.running) {
 				_script.Stop();
-				NT_ClearMessages();
-				SetStatusText(COLOR_11 + Rev + " Stopped " + NTConfig_Script[CurScriptIndex]);
+				NTC_Delay(300);
+				ClickMap(NTC_CLICK_LUP, NTC_SHIFT_NONE, null);
+				_paused = true;
 			}
-			else if(++CurScriptIndex < NTConfig_Script.length)
-				SetStatusText(COLOR_14 + Rev + " Skipped to " + NTConfig_Script[CurScriptIndex]);
-			else if(++CurScriptIndex >= NTConfig_Script.length) {
-				CurScriptIndex = 0;
-				SetStatusText(COLOR_2 + Rev + " Skipped to " + NTConfig_Script[CurScriptIndex]);
+			if(CurScriptIndex > 0) {
+				CurScriptIndex--;
 			}
-			break;
+			SetStatusText(COLOR_9 + Rev + " Back to " + NTConfig_RushScript[CurScriptIndex] + ".ntj");
+		}
+		break;
+	case Do_NextScript:
+		if (!_paused) {
+			_script = NTC_FindScript(NTConfig_RushScript[CurScriptIndex] + ".ntj");
+
+			if (_script.running) {
+				_script.Stop();
+				NTC_Delay(300);
+				ClickMap(NTC_CLICK_LUP, NTC_SHIFT_NONE, null);
+				SetStatusText(COLOR_1 + Rev + "  Paused  " + NTConfig_RushScript[CurScriptIndex] + ".ntj");
+				_paused = true;
+			}
+		} else {
+			_script = NTC_FindScript(NTConfig_RushScript[CurScriptIndex] + ".ntj");
+
+			if (_script.running) {
+				_script.Stop();
+				NTC_Delay(300);
+				ClickMap(NTC_CLICK_LUP, NTC_SHIFT_NONE, null);
+				_paused = true;
+			}
+			if(CurScriptIndex < NTConfig_RushScript.length - 1) {
+				CurScriptIndex++;
+			}
+			SetStatusText(COLOR_0 + Rev + " Skip to " + NTConfig_RushScript[CurScriptIndex] + ".ntj");
+		}
+		break;
 		case Do_DropItems:
 			NTU_DropItems();
 			break;
@@ -198,21 +234,51 @@ function NT_KeyEvents(keycode)
 	}
 }
 
-function ScriptMsgEvents(msg) {
-	var script;
+function NT_ScriptMsgEvents(msg)
+{
+	var _area;
 
-	switch (msg) {
-	case "end":
-		script = NTC_FindScript("loader.ntj");
-		if (script.running) {
-			script.Stop();
-		}
-		done = true;
+	switch(msg)
+	{
+	case "QuitGame":
+		NTC_StopScript(NTConfig_RushScript[CurScriptIndex] + ".ntj");
+		NTC_CancelMenus();
+		LastScript = true;
 		break;
-	case "mule":
-	case "clone":
-	case "pause":
-		NTC_SendMsgToScript("loader.ntj", "pause");
+	case "HOSTILE":
+		NTC_SendMsgToScript(NTConfig_RushScript[CurScriptIndex] + ".ntj", "pause");
+		break;
+	case "end":
+		if(++CurScriptIndex < NTConfig_RushScript.length)
+		{
+			NTTM_CheckAct();
+			Load("GSRusher/rushbots/" + NTConfig_RushScript[CurScriptIndex] + ".ntj");
+			SetStatusText(Rev + "   " + NTConfig_RushScript[CurScriptIndex] + ".ntj");
+			NTC_LogCurScript(NTConfig_RushScript[CurScriptIndex] + ".ntj");
+		}
+		else{
+			LastScript = true;
+		}
+		break;
+	default:
+		Print(COLOR_1 + NTConfig_RushScript[CurScriptIndex] + " : " + msg + " failed");
+
+		_area = GetArea();
+
+		if(_area)
+			NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_1 + NTConfig_RushScript[CurScriptIndex] + ".ntj" + " : " + msg + " failed (" + _area.name + ")");
+		else
+			NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_1 + NTConfig_RushScript[CurScriptIndex] + ".ntj" + " : " + msg + " failed (unknown area)");
+
+		if(++CurScriptIndex < NTConfig_RushScript.length)
+		{
+			NTTM_CheckAct();
+			Load("GSRusher/rushbots/" + NTConfig_RushScript[CurScriptIndex] + ".ntj");
+			SetStatusText(Rev + "  "  + NTConfig_RushScript[CurScriptIndex] + ".ntj");
+			NTC_LogCurScript(NTConfig_RushScript[CurScriptIndex] + ".ntj");
+		}
+		else
+			LastScript = true;
 		break;
 	}
 }
