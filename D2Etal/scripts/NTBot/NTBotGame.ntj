@@ -1,6 +1,6 @@
 var CurScriptIndex = 0;
 var LastScript = false;
-var Rev = "BE-97.13";
+var Rev = "BE-97.14";
 
 var SoJNotify = false;
 var CloneDiabloString = GetLocaleString(11005);
@@ -108,7 +108,7 @@ function NTMain()
 		RegisterEvent(EVENT_SCRIPTMSG, NT_ScriptMsgEvents);
 
 		Load("NTBot/bots/" + NTConfig_Script[CurScriptIndex]);
-		SetStatusText(Rev + " "+ NTConfig_Script[CurScriptIndex]);
+		SetStatusText(Rev + " " + NTConfig_Script[CurScriptIndex]);
 
 		Include("libs/common/NTSnagit.ntl");
 		NTSI_ClearIgnoredItems();

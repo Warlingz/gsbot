@@ -156,8 +156,8 @@ function NT_LoadConfig()
 	// 		To use rejuvenations only, put "rv" in all columns.
 	//----------------------------------------------------------------------------------------------
 	NTConfig_BeltColType[0] = "hp";
-	NTConfig_BeltColType[1] = "hp";
-	NTConfig_BeltColType[2] = "mp";
+	NTConfig_BeltColType[1] = "mp";
+	NTConfig_BeltColType[2] = "rv";
 	NTConfig_BeltColType[3] = "rv";
 
 	//-----------------------------------------------------------------------------------

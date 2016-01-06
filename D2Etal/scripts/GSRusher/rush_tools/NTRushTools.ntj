@@ -16,7 +16,8 @@ function NTMain(){
 
 	NT_LoadConfig();
 
-
+	SetBelt();
+	
 	_LifeMax = me.hpmax;
 	_ManaMax = me.mpmax;
 
@@ -184,6 +185,40 @@ function NTMain(){
 		}
 		NTC_Delay(200);
 	}
+}
+
+function SetBelt()
+{	
+	var _c1, _c2, _c3, _c4, b1, b2, b3, b4;
+	var i;
+	var _result;
+	var _items;
+	do{
+		_items = me.GetItems();
+		if(!_items){
+			_result = false;
+			break;
+		}
+		_result = true;
+		for(i = 0 ; i < _items.length ; i++){
+			if(_items[i].mode == 2 && _items[i].x < 4){
+				switch(_items[i].itemtype){
+					case 76:
+						NTConfig_BeltColType[_items[i].x] = "hp";
+						break;
+					case 77:
+						NTConfig_BeltColType[_items[i].x] = "mp";
+						break;
+					case 78:
+						NTConfig_BeltColType[_items[i].x] = "rv";
+						break;
+					default:
+						break;
+				}
+			}
+		}
+	} while(!_result);
+	return _result;
 }
 
 // Internal function

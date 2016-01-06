@@ -563,15 +563,20 @@ function NTR_GoEast(type)
 						NTC_CancelMenus();		
 						if(NTT_DoInteract(_npc)){
 							for(var i = 0 ; i < 4 ; i++){
-								if((i % 4) == 0)
-								me.SelectNPCMenu(0x0D38);
 								NTC_Delay(100);
-							}return true;
+								if((i % 4) == 0)
+									me.SelectNPCMenu(0x0D38);
+							}
+							Delay(500);
+							if(me.areaid == 40)
+								Delay(500);
+							if(me.areaid != 40)
+								return true;
+							else
+								return false;
 						}
 					}
 				}
-				else
-					return false;
 			}
 		break;
 	}
@@ -618,6 +623,30 @@ function NTR_GoCain()
 		NTR_CheckLocation();
 		return true;
 	}
+}
+function NTR_ReturnToTyrael(type)
+{
+	switch(type){
+		case 0:
+			if(!NTTM_TownMove("portalspot")){ return false; }
+			if(NTM_UsePortal("BluePortal", 73)){ 						
+				NTR_TalkTyraelSpirit();
+				NTC_PingDelay(200);
+				NTR_TakePortal();
+				NTC_PingDelay(200);
+				while(!NTC_InTown()){
+					NTC_PingDelay(200);
+					if(NTR_TakePortal())
+						break;
+				}
+			}
+		break;
+		case 1:
+			if(!NTTM_TownMove("portalspot")){ return false; }
+			NTC_Delay(500, 1000);
+		break;
+	}
+	return true;
 }
 
 function NTR_TalktoJeryhn()

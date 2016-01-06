@@ -47,6 +47,7 @@ function NTMain()
 	}
 	
 }
+
 function SetBelt()
 {	
 	var _c1, _c2, _c3, _c4, b1, b2, b3, b4;
@@ -115,7 +116,7 @@ function SetBelt()
 
 function SetSkills()
 {
-	if(NTConfig_AttackSkill[0] == 0 || NTConfig_AttackSkill[3] == 0){	
+	if(NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0){	
 		switch(me.classid)
 		{
 		case NTC_CHAR_CLASS_AMAZON:
@@ -1167,17 +1168,10 @@ function DoTrav()
 			NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 			return;
 		}
-	}
-	if(WaitforLeecher){
-		WaitforLeech(75, 25, 25);
-	}
-	WaitforRushee(25, 25);
-	
+	}	
 	busy = true;
 	var i,_pretp, _waypoint, _deltax, _deltay,
 		_attackpos = [5800, 1554, 5799, 1534, 5799, 1526, 5797, 1514, 5795, 1490, 5787, 1491, 5797, 1514, 5781, 1514];
-
-	NT_FindDurance();
 
 	if(!NTTM_CheckAct()) {
 		NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_CheckAct()");
@@ -1191,6 +1185,11 @@ function DoTrav()
 		return;
 	}
 
+	if(WaitforLeecher){
+		WaitforLeech(75, 25, 25);
+	}
+	WaitforRushee(25, 25);
+	
 	if(!NTM_TakeWaypoint(83)) {
 		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
 		return;

@@ -12,7 +12,9 @@ function NTMain(){
 	NT_LoadConfig();		
 	
 	Print(C_ORANGE + "goodstuffs " + C_BROWN + "DClone Killer" + C_ORANGE + " Activated");
-		
+	
+	NTTM_CheckAct();	
+	
 	NTTMGR_TownManager();
 	
 	NTTM_TownMove("waypoint");

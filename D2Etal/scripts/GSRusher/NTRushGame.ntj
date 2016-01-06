@@ -1,4 +1,4 @@
-var Rev = "GSRusher v1.13";
+var Rev = "GSRusher v1.14";
 var CurScriptIndex = 0;
 var LastScript = false;
 
@@ -161,10 +161,10 @@ function NT_KeyEvents(keycode)
 			if(CurScriptIndex > 0) {
 				CurScriptIndex--;
 			}
-			SetStatusText(COLOR_9 + Rev + " Back to " + NTConfig_RushScript[CurScriptIndex] + ".ntj");
+			SetStatusText(COLOR_14 + Rev + " Back to " + NTConfig_RushScript[CurScriptIndex] + ".ntj");
 		}
 		break;
-	case Do_NextScript:
+	case Do_NextScript:			
 		if (!_paused) {
 			_script = NTC_FindScript(NTConfig_RushScript[CurScriptIndex] + ".ntj");
 
@@ -187,7 +187,7 @@ function NT_KeyEvents(keycode)
 			if(CurScriptIndex < NTConfig_RushScript.length - 1) {
 				CurScriptIndex++;
 			}
-			SetStatusText(COLOR_0 + Rev + " Skip to " + NTConfig_RushScript[CurScriptIndex] + ".ntj");
+			SetStatusText(COLOR_2 + Rev + " Skip to " + NTConfig_RushScript[CurScriptIndex] + ".ntj");
 		}
 		break;
 		case Do_DropItems:

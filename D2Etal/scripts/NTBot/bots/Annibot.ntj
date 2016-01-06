@@ -11,6 +11,7 @@ function NTMain()
 	NTSI_LoadNIPFiles("NTBot/item_configs");
 	NTA_Initialize();	
 	
+	NTTM_CheckAct(1);	
 	if(me.diff == 0) {
 		Delay(1000);
 		dropAnni();

@@ -302,7 +302,7 @@ function NTC_IncludeConfig(filepath, createCharConfigsOverride)
 				}
 			}
 		break;
-		case "NTAnni/charconfigs": 
+		case "NTAnni/char_configs": 
 			{
 				_configname = _fullconfigname;
 				_configfile = FileOpen(filepath + "/" + _fullconfigname, 0);
@@ -310,7 +310,7 @@ function NTC_IncludeConfig(filepath, createCharConfigsOverride)
 					_configfile.Close();
 				else{
 					_configname = _shortconfigname;
-					if(filepath == "NTAnni/charconfigs") {
+					if(filepath == "NTAnni/char_configs") {
 						Print(COLOR_14 + filepath);
 					}
 				}
@@ -1333,18 +1333,14 @@ function NTC_GetLocation(index)
 }
 
 function NTC_CancelMenus() { // more koreans
-	while (GetUIState(0x01) || GetUIState(0x08) || GetUIState(0x0C) || GetUIState(0x0F) || GetUIState(0x14) ||
-		GetUIState(0x17) || GetUIState(0x19) ||   GetUIState(0x1A) || GetUIState(0x24)){
-
-		for (var i = 0; i < 40; i++){
-			if ((i % 20) == 0){
-				me.Cancel(1);
-			}
+	if(GetUIState(0x01) || GetUIState(0x08) || GetUIState(0x0C) || GetUIState(0x0F) || GetUIState(0x14) || GetUIState(0x17) || GetUIState(0x19) ||   GetUIState(0x1A) || GetUIState(0x24)){
+		for (var i = 0; i < 10; i++){
+			//if ((i % 5) == 0){
+				NTC_CancelOut(100);
+			//}
 			Delay(100);
-			if (!GetUIState(0x01) && !GetUIState(0x08) && !GetUIState(0x0C) && !GetUIState(0x0F) && !GetUIState(0x14) &&
-					!GetUIState(0x17) && !GetUIState(0x19) &&  !GetUIState(0x1A) && !GetUIState(0x24)){
-
-				NTC_PingDelay(300);
+			if (!GetUIState(0x01) && !GetUIState(0x08) && !GetUIState(0x0C) && !GetUIState(0x0F) && !GetUIState(0x14) && !GetUIState(0x17) && !GetUIState(0x19) &&  !GetUIState(0x1A) && !GetUIState(0x24)){
+				NTC_PingDelay(100);
 				break;
 			}
 		}

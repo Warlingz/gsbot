@@ -15,9 +15,6 @@ var endtime = null;
 function D2NTStatus(where, time, message) { return SendCopyData('D2NT Manager', null, where << 16 | time, message); }
 function NTMain()
 {
-	if (!Load("NTAnni/tools/NTLogHandler.ntj")) {
-		NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_1 + "Error: Logger failed to initialize");
-	}
 	Delay(1000);
 
 	InitLife = me.hp;
@@ -29,7 +26,6 @@ function NTMain()
 
 	NT_LoadConfig();
 	NTE_InitializeStats();
-	//Print(NTConfig_FreeSpace);
 
 	if (NTConfig_MinIngameTime > 0) {
 		endtime = GetTickCount() + 1000 * 60 * NTConfig_MinIngameTime;

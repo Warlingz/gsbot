@@ -157,8 +157,20 @@ var i;
 								NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_1 + "Rush [ " + COLOR_1 + pos + COLOR_1 + " ] Failed at Jeryhn".split("\n")[0] + ";" + COLOR_1 + "------------------------------\n" + COLOR_1 + "Rush : [ " + pos + " ]\n" + "Failed!" + "\n" + C_WHITE + "My Last Area : " + ara + "\n" + C_RED + "Couldn't Talk to Jeryhn to leave Act 2" + "\n" + "Something odd happend.." + "\n" + C_BROWN + "Leecher Name : " + me.charname + "\n" + COLOR_1 + "---------------------------------");	
 								NTC_SendMsgToScript("NTLeechGame.ntj", "SCRIPT_END");
 							}
-							if(!NTR_GoEast(2))
-								NTR_GoEast(2);
+							if(!NTR_GoEast(2)){
+								if(NTR_ReturnToTyrael(1)){									
+									if(NTR_TalkJer()){
+										if(!NTR_GoEast(2)){ 
+											var rusheepos = NTR_RetrieveRusheePos();
+											NTC_Delay(200);		
+											var pos = (parseInt(rusheepos) + 1);
+											NTC_Delay(200);		
+											NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_1 + "Rush [ " + COLOR_1 + pos + COLOR_1 + " ] Failed at Jeryhn".split("\n")[0] + ";" + COLOR_1 + "------------------------------\n" + COLOR_1 + "Rush : [ " + pos + " ]\n" + "Failed!" + "\n" + C_WHITE + "My Last Area : " + ara + "\n" + C_RED + "Couldn't Leave Act 2" + "\n" + "Something odd happend.." + "\n" + C_BROWN + "Leecher Name : " + me.charname + "\n" + COLOR_1 + "---------------------------------");	
+											NTC_SendMsgToScript("NTLeechGame.ntj", "SCRIPT_END"); 
+										}
+									}
+								}
+							}
 						}
 						break;
 
