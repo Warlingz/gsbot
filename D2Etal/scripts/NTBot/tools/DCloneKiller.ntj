@@ -13,10 +13,8 @@ function NTMain(){
 	
 	Print(C_ORANGE + "goodstuffs " + C_BROWN + "DClone Killer" + C_ORANGE + " Activated");
 	DetectAreaid = me.areaid;
-	
-	var DCloneHere = NTC_FindUnit(NTC_UNIT_MONSTER, 333, 5);
-	
-	if(!DCloneHere){
+		
+	if(!GS_KillDClone()){
 		NTTM_CheckAct();
 		Delay(500);
 		NTTMGR_TownManager();
@@ -29,8 +27,7 @@ function NTMain(){
 				if(!NTM_MoveToPresetUnit(3, NTC_UNIT_MONSTER, 734, 10, -10)){
 					return;
 				}
-				var dClone = NTC_FindUnit(NTC_UNIT_MONSTER, 333, 5);
-				if(!dClone){
+				if(!GS_KillDClone()){
 					GS_SearchForClone();
 				}
 				break;
@@ -40,8 +37,7 @@ function NTMain(){
 				if(!NTM_MoveToPresetUnit(4, NTC_UNIT_MONSTER, 737, 10, -10)){
 					return;
 				}
-				var dClone = NTC_FindUnit(NTC_UNIT_MONSTER, 333, 5);
-				if(!dClone){
+				if(!GS_KillDClone()){
 					GS_SearchForClone();
 				}
 				break;
@@ -51,8 +47,7 @@ function NTMain(){
 				if(!NTM_MoveToPresetUnit(33, NTC_UNIT_MONSTER, 743, 10, -10)){
 					return;
 				}
-				var dClone = NTC_FindUnit(NTC_UNIT_MONSTER, 333, 5);
-				if(!dClone){
+				if(!GS_KillDClone()){
 					GS_SearchForClone();
 				}
 				break;
@@ -62,8 +57,7 @@ function NTMain(){
 				if(!NTM_MoveToPresetUnit(43, NTC_UNIT_MONSTER, 747, 10, -10)){
 					return;
 				}
-				var dClone = NTC_FindUnit(NTC_UNIT_MONSTER, 333, 5);
-				if(!dClone){
+				if(!GS_KillDClone()){
 					GS_SearchForClone();
 				}
 				break;
@@ -72,8 +66,7 @@ function NTMain(){
 				NTP_DoPrecast(true, true);
 				var _portal = NTM_TakeUnit(NTC_UNIT_OBJECT, 298);			
 				if(_portal){
-					var dClone = NTC_FindUnit(NTC_UNIT_MONSTER, 333, 5);
-					if(!dClone){
+					if(!GS_KillDClone()){
 						GS_SearchForClone();
 					}
 				}
@@ -84,7 +77,20 @@ function NTMain(){
 	}
 	else if(DCloneHere){
 		NTM_MoveTo(me.areaid, DCloneHere.x, DCloneHere.y);
+		if(!GS_KillDClone()){
+			GS_SearchForClone();
+		}
 	}
+	GS_ScriptRev();
+	
+	if(CurScriptIndex == "" || CurScriptIndex == " ")
+		CurScriptIndex = 0;
+	Load("NTBot/bots/" + NTConfig_Script[CurScriptIndex]);
+	SetStatusText(Rev + " " + NTConfig_Script[CurScriptIndex]);
+}
+function GS_KillDClone()
+{
+	var _result = false;
 	if(NTConfig_DCloneHandler > 0)		
 		_picker = NT_File("logs/AnniLog/AnniPicker.txt", 0);
 	
@@ -115,15 +121,10 @@ function NTMain(){
 							if(!NTM_UsePortal("BluePortal", 109, me.charname))
 								NTTM_CheckAct();
 		}
-	}
-	GS_ScriptRev();
-	
-	if(CurScriptIndex == "" || CurScriptIndex == " ")
-		CurScriptIndex = 0;
-	Load("NTBot/bots/" + NTConfig_Script[CurScriptIndex]);
-	SetStatusText(Rev + " " + NTConfig_Script[CurScriptIndex]);
+		_result = true;
+	}	
+	return _result;
 }
-
 function GS_FindPicker() {
 	var count = 0;
 	var _unit;
@@ -158,16 +159,27 @@ function GS_FindPicker() {
 }
 function GS_WaitFor(name)
 {
+	var paused = true;
+	var count = 0;
 	var unit = GetPlayerUnit();
 	do{
-		if(unit.name == name){
-			while(unit.areaid != me.areaid){
-				Delay(1000);
-				if(unit.areaid == me.areaid)
-					break;
+		do{
+			if(unit.name == name){
+				while(unit.areaid != me.areaid){
+					count++;
+					Delay(1000);
+					if(unit.areaid == me.areaid){
+						paused = false;
+						break;
+					}
+					if(count > 139){
+						paused = false;
+						break;
+					}
+				}
 			}
-		}
-	}while(unit.GetNext())
+		}while(unit.GetNext());
+	}while(paused && count < 140);
 }
 function GS_ScriptRev() {
 	var grabLine;
@@ -256,8 +268,11 @@ function GS_SearchForClone()
 		}
 		
 	}
-	dClone = NTC_FindUnit(NTC_UNIT_MONSTER, 333, 5);	
-	if(dClone){
-		NTM_MoveTo(me.areaid, dClone.x, dClone.y);
+	if(!GS_KillDClone()){		
+		GS_ScriptRev();		
+		if(CurScriptIndex == "" || CurScriptIndex == " ")
+			CurScriptIndex = 0;
+		Load("NTBot/bots/" + NTConfig_Script[CurScriptIndex]);
+		SetStatusText(Rev + " " + NTConfig_Script[CurScriptIndex]);
 	}
 }

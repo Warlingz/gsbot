@@ -24,7 +24,7 @@ function NTMain()
 		Delay(1500);
 		NTC_SendMsgToScript("NTBotGame.ntj", "SCRIPT_END");	
 	}
-	else if(me.diff == 2){		
+	else if(me.diff == 2){	
 		GS_GetDCloneLocation();
 	}
 	
@@ -32,19 +32,31 @@ function NTMain()
 
 function GS_GetDCloneLocation()
 {	
-	DKiller = NT_File("logs/AnniLog/AnniOwnerName.txt", 0);
+	DKiller = NT_File("logs/AnniLog/AnniOwnerName.txt", 0);	
 	var player = GetPlayerUnit();
 	while(player.GetNext()){
 		if(player.name == DKiller){
-			Delay(500);
-			if(!NTTM_TownMove("waypoint"))
-			{
-				NTC_SendMsgToScript("NTBotGame.ntj", "NTTM_TownMove()");
-				return;
+			if(GS_GetPlayerAct(player) == null){
+				Print(COLOR_14 + "Getting Area ID this will just take a few seconds.");				
+				while(GS_GetPlayerAct(player) == null)
+				{
+					Delay(200);
+					GS_GetPlayerAct(player);
+					if(GS_GetPlayerAct(player) != null){
+						Print(COLOR_14 + GS_GetPlayerAct(player));
+						break;
+					}
+				}
 			}
-			if(me.areaid != GS_GetPlayerAct(player))
+			if(me.areaid != GS_GetPlayerAct(player)){
+				if(!NTTM_TownMove("waypoint"))
+				{
+					NTC_SendMsgToScript("NTBotGame.ntj", "NTTM_TownMove()");
+					return;
+				}
 				NTM_TakeWaypoint(GS_GetPlayerAct(player));
-			Delay(500);
+			}
+			Delay(200);
 			NT_File("logs/AnniLog/AnniOwner.txt", 1, 0);
 			if(!NTTM_TownMove("portalspot"))
 			{

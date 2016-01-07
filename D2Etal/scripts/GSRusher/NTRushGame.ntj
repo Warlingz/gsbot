@@ -1,4 +1,4 @@
-var Rev = "GSRusher v1.15";
+var Rev = "GSRusher v1.16";
 var CurScriptIndex = 0;
 var LastScript = false;
 
