@@ -75,12 +75,7 @@ function NTMain(){
 				break;
 		}
 	}
-	else if(DCloneHere){
-		NTM_MoveTo(me.areaid, DCloneHere.x, DCloneHere.y);
-		if(!GS_KillDClone()){
-			GS_SearchForClone();
-		}
-	}
+	
 	GS_ScriptRev();
 	
 	if(CurScriptIndex == "" || CurScriptIndex == " ")
@@ -91,8 +86,6 @@ function NTMain(){
 function GS_KillDClone()
 {
 	var _result = false;
-	if(NTConfig_DCloneHandler > 0)		
-		_picker = NT_File("logs/AnniLog/AnniPicker.txt", 0);
 	
 	if(NTA_KillMonster(333)){
 		if(NTConfig_DCloneHandler == 0){
@@ -102,6 +95,7 @@ function GS_KillDClone()
 			NTM_MakeTP(true);	
 		}
 		else if(NTConfig_DCloneHandler > 0){
+			_picker = NT_File("logs/AnniLog/AnniPicker.txt", 0);
 			NTM_MakeTP();	
 			NTA_ClearPosition(30);
 			Delay(100);
