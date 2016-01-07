@@ -1,6 +1,6 @@
 var CurScriptIndex = 0;
 var LastScript = false;
-var Rev = "BE-97.14";
+var Rev = "BE-97.15";
 
 var SoJNotify = false;
 var CloneDiabloString = GetLocaleString(11005);
@@ -255,15 +255,19 @@ function NT_GameMsgEvents(msg, type)
 			break;
 		case 4:
             if(msg.indexOf(CloneDiabloString) != -1) {
+				NT_File("logs/AnniLog/AnniIP.txt", 1, "[IP:" + me.gameserverip.split(".")[3] + "]"); 
                 CloneDiabloNotify = true;
                 SoJNotify = false;
                 NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_4 + CloneDiabloString);				
 				var dClone = NT_File("logs/mylogs/Diablo.txt", 0);
 				if(!dClone) NT_File("logs/mylogs/Diablo.txt", 1, 0);
                 NT_LogDclone();//log event to file
-
-				if(NTConfig_ExitonDclone){ExitGame();}
 				
+				if(NTConfig_DCloneHandler > -1){
+					NTConfig_CheckCloneDiablo = true; 
+					NTConfig_ExitonDclone = false;
+				}
+				if(NTConfig_ExitonDclone){ExitGame();}
                 if(NTConfig_CheckCloneDiablo){
                     me.maxgametime = 0;
                     SetStatusText(COLOR_1 + CloneDiabloString);
@@ -281,9 +285,10 @@ function NT_GameMsgEvents(msg, type)
                     NTTM_CheckAct();
 					
 					if(NTConfig_DCloneHandler > -1){
-						NT_File("logs/AnniLog/utility.txt", 1, Rev + "/" + CurScriptIndex);
+						NT_File("logs/AnniLog/" + me.account + "-utility.txt", 1, Rev + "/" + CurScriptIndex);
 						NTC_Delay(200);
 						Load("NTBot/tools/DcloneKiller.ntj");
+						CloneDiabloNotify = false;
 					}
                 }
             }
@@ -292,6 +297,7 @@ function NT_GameMsgEvents(msg, type)
 					NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_4 + "Not waiting for DClone - not in a hell game");
 				}
 				if(me.diff == 2) {
+					NT_File("logs/AnniLog/SojSales.txt", 1, msg);
 					SoJNotify = true;
 					SoJElapsedTime = 0;             
 					NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_4 + msg);

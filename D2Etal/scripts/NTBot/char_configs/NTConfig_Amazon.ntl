@@ -622,9 +622,10 @@ function NT_LoadConfig()
 	//------------------------------------------------------------------------------
 	// General configuration
 	//------------------------------------------------------------------------------
-	NTConfig_PublicMode = false;						// Enables "Public" features (Partying, Tp'ing etc). (Cannot be true while NTConfig_PartyOnlyLeader is.)
-	NTConfig_CheckCloneDiablo = true;					// Set to true if you want to wait in game after "Diablo Walks the Earth" msg.
-	NTConfig_DCloneHandler = -1;						// -1 = Disable, 0 = Kill Diablo Clone, 1 = Kill Diablo Clone and Call for Annipicker(one must be running)
+	NTConfig_PublicMode = false;					// Enables "Public" features (Partying, Tp'ing etc). (Cannot be true while NTConfig_PartyOnlyLeader is.)
+	NTConfig_CheckCloneDiablo = true;				// Set to true if you want to wait in game after "Diablo Walks the Earth" msg.
+	NTConfig_DCloneHandler = -1;					// -1 = Disable, 0 = Kill Diablo Clone, 1 = Kill Diablo Clone and Call for Annipicker(one must be running)
+	NTConfig_SpawnArea = 0;		// Where to Spawn D Clone, 0 = ColdPlains(Bishibosh), 1 = Stonyfield(Rakanishu), 2 = Cathedral(BoneAsh) 3 = FarOasis(Beetleburst), 4 = Palace(Fire Eye)
 	NTConfig_SoJWaitTime = 5;							// Time in minutes to wait for the next SoJ sale. Set to 0 to disable SoJ notifier.
 	NTConfig_ExitonDclone = false;						// Exit game on Diablo Walks
 	NTConfig_FastPickit = false;						// This is a new option that causes far less crashes(maybe none).  Is independent of snag delay

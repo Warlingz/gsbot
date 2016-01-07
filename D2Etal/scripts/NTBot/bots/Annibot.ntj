@@ -1,5 +1,5 @@
 //Written by goodstuff 8/03/15
-
+var DKiller = "";
 
 function NTMain()
 {	
@@ -11,8 +11,10 @@ function NTMain()
 	NTSI_LoadNIPFiles("NTBot/item_configs");
 	NTA_Initialize();	
 	
-	NTTM_CheckAct(1);	
+	Delay(1000);
+	
 	if(me.diff == 0) {
+		NTTM_CheckAct(1);
 		Delay(1000);
 		dropAnni();
 		Delay(1500);
@@ -22,30 +24,65 @@ function NTMain()
 		Delay(1500);
 		NTC_SendMsgToScript("NTBotGame.ntj", "SCRIPT_END");	
 	}
-	else if(me.diff == 2){
-		NT_File("logs/AnniLog/AnniOwner.txt", 1, 0);
-		if(!NTTM_TownMove("portalspot"))
-		{
-			NTC_SendMsgToScript("NTBotGame.ntj", "NTTM_TownMove()");
-			return;
-		}
-		for(var i = 0; i < 500 && NTC_InTown() ; i++){
-			if(!NTM_UsePortal("BluePortal", 4)){
-				NTC_Delay(500);
-			}
-		}
-		if(me.areaid == 4){
-			Delay(1000);
-			NTSI_PickItems();
-			if(haveAnni()){
-				NT_File("logs/AnniLog/Annilog.txt", 1, "anni");
-				NT_File("logs/AnniLog/Anni.txt", 1, "yes");
-			}
-			Delay(2000);
-			NTC_SendMsgToScript("NTBotGame.ntj", "SCRIPT_END");	
-		}
+	else if(me.diff == 2){		
+		GS_GetDCloneLocation();
 	}
 	
+}
+
+function GS_GetDCloneLocation()
+{	
+	DKiller = NT_File("logs/AnniLog/AnniOwnerName.txt", 0);
+	var player = GetPlayerUnit();
+	while(player.GetNext()){
+		if(player.name == DKiller){
+			Delay(500);
+			if(!NTTM_TownMove("waypoint"))
+			{
+				NTC_SendMsgToScript("NTBotGame.ntj", "NTTM_TownMove()");
+				return;
+			}
+			if(me.areaid != GS_GetPlayerAct(player))
+				NTM_TakeWaypoint(GS_GetPlayerAct(player));
+			Delay(500);
+			NT_File("logs/AnniLog/AnniOwner.txt", 1, 0);
+			if(!NTTM_TownMove("portalspot"))
+			{
+				NTC_SendMsgToScript("NTBotGame.ntj", "NTTM_TownMove()");
+				return;
+			}
+			for(var i = 0; i < 20 && NTC_InTown() ; i++){
+				if(!NTM_UsePortal("BluePortal", player.areaid)){
+					NTC_Delay(500);
+				}
+			}
+			if(me.areaid == player.areaid){
+				Delay(1000);
+				NTSI_PickItems();
+				if(haveAnni()){
+					NT_File("logs/AnniLog/Annilog.txt", 1, "anni");
+					NT_File("logs/AnniLog/Anni.txt", 1, "yes");
+				}
+				Delay(2000);
+				NTC_SendMsgToScript("NTBotGame.ntj", "SCRIPT_END");	
+			}
+		}
+		Delay(100);
+	}
+}
+
+function GS_GetPlayerAct(unit)
+{
+	if(unit.areaid > 0 && unit.areaid < 40)
+		return 1;
+	if(unit.areaid > 39 && unit.areaid < 75)
+		return 40;
+	if(unit.areaid > 74 && unit.areaid < 103)
+		return 75;
+	if(unit.areaid > 102 && unit.areaid < 109)
+		return 103;
+	if(unit.areaid > 108 && unit.areaid < 133)
+		return 109;
 }
 
 function haveAnni() {	

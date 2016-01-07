@@ -4,7 +4,7 @@
 var _picker = "";
 var Rev = "";
 var CurScriptIndex = 0;
-
+var DetectAreaid;
 function NTMain(){
 	Include("libs/common/NTCommon.ntl");
 	NTC_IncludeLibs();
@@ -12,20 +12,78 @@ function NTMain(){
 	NT_LoadConfig();		
 	
 	Print(C_ORANGE + "goodstuffs " + C_BROWN + "DClone Killer" + C_ORANGE + " Activated");
+	DetectAreaid = me.areaid;
 	
-	NTTM_CheckAct();	
+	var DCloneHere = NTC_FindUnit(NTC_UNIT_MONSTER, 333, 5);
 	
-	NTTMGR_TownManager();
-	
-	NTTM_TownMove("waypoint");
-	NTM_TakeWaypoint(4);
-	NTP_DoPrecast(true, true);
-	
-	if(!NTM_MoveToPresetUnit(me.areaid, NTC_UNIT_MONSTER, 737, 10, -10)){
-		Print(C_ORANGE + "Moving TO DCLONE");
-		if(!NTM_MoveToPresetUnit(me.areaid, NTC_UNIT_MONSTER, 333, 10, -10)){
-			return;
+	if(!DCloneHere){
+		NTTM_CheckAct();
+		Delay(500);
+		NTTMGR_TownManager();
+		NTTM_TownMove("waypoint");
+		
+		switch(NTConfig_SpawnArea){
+			case 0 ://cold plains Bishibosh
+				NTM_TakeWaypoint(3);
+				NTP_DoPrecast(true, true);			
+				if(!NTM_MoveToPresetUnit(3, NTC_UNIT_MONSTER, 734, 10, -10)){
+					return;
+				}
+				var dClone = NTC_FindUnit(NTC_UNIT_MONSTER, 333, 5);
+				if(!dClone){
+					GS_SearchForClone();
+				}
+				break;
+			case 1 ://stony field Rakanishu
+				NTM_TakeWaypoint(4);
+				NTP_DoPrecast(true, true);			
+				if(!NTM_MoveToPresetUnit(4, NTC_UNIT_MONSTER, 737, 10, -10)){
+					return;
+				}
+				var dClone = NTC_FindUnit(NTC_UNIT_MONSTER, 333, 5);
+				if(!dClone){
+					GS_SearchForClone();
+				}
+				break;
+			case 2 ://cathedral Bone Ash
+				NTM_TakeWaypoint(32);
+				NTP_DoPrecast(true, true);
+				if(!NTM_MoveToPresetUnit(33, NTC_UNIT_MONSTER, 743, 10, -10)){
+					return;
+				}
+				var dClone = NTC_FindUnit(NTC_UNIT_MONSTER, 333, 5);
+				if(!dClone){
+					GS_SearchForClone();
+				}
+				break;
+			case 3 ://far oasis Beetleburst
+				NTM_TakeWaypoint(43);
+				NTP_DoPrecast(true, true);			
+				if(!NTM_MoveToPresetUnit(43, NTC_UNIT_MONSTER, 747, 10, -10)){
+					return;
+				}
+				var dClone = NTC_FindUnit(NTC_UNIT_MONSTER, 333, 5);
+				if(!dClone){
+					GS_SearchForClone();
+				}
+				break;
+			case 4 ://palace cellar Fire Eye
+				NTM_TakeWaypoint(74);
+				NTP_DoPrecast(true, true);
+				var _portal = NTM_TakeUnit(NTC_UNIT_OBJECT, 298);			
+				if(_portal){
+					var dClone = NTC_FindUnit(NTC_UNIT_MONSTER, 333, 5);
+					if(!dClone){
+						GS_SearchForClone();
+					}
+				}
+				break;
+			default :
+				break;
 		}
+	}
+	else if(DCloneHere){
+		NTM_MoveTo(me.areaid, DCloneHere.x, DCloneHere.y);
 	}
 	if(NTConfig_DCloneHandler > 0)		
 		_picker = NT_File("logs/AnniLog/AnniPicker.txt", 0);
@@ -44,17 +102,23 @@ function NTMain(){
 			NT_File("logs/AnniLog/AnniOwner.txt", 1, me.gamename + "/" + me.gamepassword);
 			Delay(100);
 			NT_File("logs/AnniLog/Annilog.txt", 1, "anniup");
+			Delay(100);
+			NT_File("logs/AnniLog/AnniOwnerName.txt", 1, me.charname);
 			GS_FindPicker();
 			NTA_ClearPosition(30);
-			NTSI_PickItems(); 
-			Delay(5000);
-			NTM_UsePortal("BluePortal", 1, me.charname);
+			NTSI_PickItems();
+			GS_WaitFor(_picker);
+			if(!NTM_UsePortal("BluePortal", 1, me.charname))
+				if(!NTM_UsePortal("BluePortal", 40, me.charname))
+					if(!NTM_UsePortal("BluePortal", 75, me.charname))
+						if(!NTM_UsePortal("BluePortal", 103, me.charname))
+							if(!NTM_UsePortal("BluePortal", 109, me.charname))
+								NTTM_CheckAct();
 		}
 	}
-	
 	GS_ScriptRev();
 	
-	if(CurScriptIndex == "undefined")
+	if(CurScriptIndex == "" || CurScriptIndex == " ")
 		CurScriptIndex = 0;
 	Load("NTBot/bots/" + NTConfig_Script[CurScriptIndex]);
 	SetStatusText(Rev + " " + NTConfig_Script[CurScriptIndex]);
@@ -82,6 +146,7 @@ function GS_FindPicker() {
 		if(count == 10 || count == 20 || count == 30 || count == 50 || count == 70 || count == 100 || count == 130 || count == 160 || count == 200 || count == 220 || count == 240 || count == 260 || count == 280 || count == 300){			
 			NT_File("logs/AnniLog/AnniOwner.txt", 1, me.gamename + "/" + me.gamepassword);	
 			NT_File("logs/AnniLog/Annilog.txt", 1, "anniup");
+			NT_File("logs/AnniLog/AnniOwnerName.txt", 1, me.charname);
 		}
 	} while ((!found) && (count < 300));	
 	
@@ -91,12 +156,24 @@ function GS_FindPicker() {
 	}
 	
 }
-
+function GS_WaitFor(name)
+{
+	var unit = GetPlayerUnit();
+	do{
+		if(unit.name == name){
+			while(unit.areaid != me.areaid){
+				Delay(1000);
+				if(unit.areaid == me.areaid)
+					break;
+			}
+		}
+	}while(unit.GetNext())
+}
 function GS_ScriptRev() {
 	var grabLine;
-	var grabInfo = FileOpen("logs/AnniLog/utility.txt", 0);
+	var grabInfo = FileOpen("logs/AnniLog/" + me.account + "-utility.txt", 0);
 	if(!grabInfo){
-		var grabInfo = FileOpen("logs/AnniLog/utility.txt", 1);
+		var grabInfo = FileOpen("logs/AnniLog/" + me.account + "-utility.txt", 1);
 	}
 	if(grabInfo){ 
 		grabLine = grabInfo.ReadLine();
@@ -105,4 +182,82 @@ function GS_ScriptRev() {
 		grabInfo.Close();	
 	}
 	return;
+}
+function GS_SearchForClone()
+{
+	if(DetectAreaid == 83 || DetectAreaid == 102 || DetectAreaid == 110 || DetectAreaid == 111 || DetectAreaid == 112)
+		Print(C_ORANGE + "Searching for DClone");
+	var dClone;
+	NTTM_CheckAct();
+	NTTM_TownMove("waypoint");
+	if(DetectAreaid == 83)
+	{		
+		var _waypoint;
+		var _deltax, _deltay;
+		NTM_TakeWaypoint(83);
+		NTP_DoPrecast(true, true);
+		_waypoint = NTC_FindUnit(NTC_UNIT_OBJECT, GetLocaleString(22526), 5);
+		if(!_waypoint){
+			NTC_SendMsgToScript("NTBotGame.ntj", "NTC_FindUnit()");
+			return;
+		}
+		_deltax = _waypoint.x - 5699;
+		_deltay = _waypoint.y - 1584;
+		if(!NTM_MoveTo(me.areaid, 5800+_deltax, 1515+_deltay)){
+			NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
+			return;
+		}
+		
+	}
+	else if(DetectAreaid == 102)
+	{		
+		NTM_TakeWaypoint(101);
+		NTP_DoPrecast(true, true);
+		if(!NTM_MoveToStair(me.areaid, 102)){
+			NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveToStair()");
+			return;
+		}
+		if(!NTM_TakeStair(102)){
+			NTC_SendMsgToScript("NTBotGame.ntj", "NTM_TakeStair()");
+			return;
+		}
+		if(!NTM_MoveTo(me.areaid, 17564, 8069)){
+			NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
+			return;
+		}	
+	}
+	else if(DetectAreaid >= 109 && DetectAreaid <= 132){		
+		if(DetectAreaid == 110){
+			NTM_TakeWaypoint(111);
+			NTP_DoPrecast(true, true);
+			if(!NTM_MoveTo(110, me.x+79, me.y+16)){
+				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
+				return;
+			}
+			if(!NTM_MoveToPresetUnit(me.areaid, NTC_UNIT_MONSTER, 776, -5, 5)) {
+				return;
+			}
+		}
+		else if(DetectAreaid == 111){
+			NTM_TakeWaypoint(111);
+			NTP_DoPrecast(true, true);			
+			if(!NTM_MoveTo(me.areaid, 3750, 5090)){
+				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
+				return;
+			}
+		}
+		else if(DetectAreaid == 112){
+			NTM_TakeWaypoint(112);
+			NTP_DoPrecast(true, true);			
+			if(!NTM_MoveToStair(me.areaid, 113)){
+				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveToStair()");
+				return;
+			}
+		}
+		
+	}
+	dClone = NTC_FindUnit(NTC_UNIT_MONSTER, 333, 5);	
+	if(dClone){
+		NTM_MoveTo(me.areaid, dClone.x, dClone.y);
+	}
 }

@@ -545,3 +545,4 @@ var Enchanter_BlackList = [];
 
 //DCloneKiller.ntj
 var NTConfig_DCloneHandler;
+var NTConfig_SpawnArea;

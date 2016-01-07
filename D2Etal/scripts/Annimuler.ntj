@@ -1,22 +1,24 @@
 //goodstuffs anni muler
 
-//use only one
+//use only one per pc
 
 //Prefix char/acc names
 var accPrefix = "";			//Set to your Preference eg accPrefix = "ETAL_" all account names will have ETAL_ infront of it eg ETAL_Ods9FG8df
 var namePrefix = "";		//Set to your Preference eg namePrefix = "ETAL_" all character names will have ETAL_ infront of it eg ETAL_Ods9FG8df
 var allPasswords = "";		//Set if you want the accounts to be created with a preset password, else leave blank for random 5 character generated password
-var accNumbered = false; 	//Instead of having random text after accPrefix, set to true for numbered eg. "anni0 - anni999" with "anni" being the accPrefix
+var accNumbered = true; 	//Instead of having random text after accPrefix, set to true for numbered eg. "anni0 - anni999" with "anni" being the accPrefix
 
 //Class to create
 var classCreation = 0; // 0:Amazon, 1:Sorceress, 2:Necromancer, 3:Paladin, 4:Barbarian, 5:Druid, 6:Assassin
-var classRandom = false; //if true it will create random classes, disregards classCreation above
+var classRandom = true; //if true it will create random classes, disregards classCreation above
 var makeLadderChar = true;
 
 //Register Accounts
 var registerAccount = 0; // 0 - disable, 1 - enable
 var registerEmail = ""; // email address to register to
 
+
+//No need to edit below
 
 ///////////////////////////////////////////////////
 //        characters in your game setting:	
@@ -69,7 +71,7 @@ var gameMinLength		= 180000;	// time in milliseconds, minimum game length, 180 s
 
 var unableToConnectRetry		= 3;		// time in minutes to retry connecting on connection fail (real value is +/- 1 min)
 var realmDownRetry				= 3;		// time in minutes to retry connecting on a realm down (default is 300 minutes)
-var disconnectedRetry			= 2;		// time in minutes to retry on a disconnection (usually ip ban related)
+var disconnectedRetry			= 1;		// time in minutes to retry on a disconnection (usually ip ban related)
 var cdkeyInUseRetry				= 2;		// time in minutes to retry on a cdkey in use error message (set to 0 to stop)
 var connectingToBnetTimeout		= 20000;	// time in milliseconds to wait for a login to time out and click cancel and retry
 var characterScreenTimeout		= 1000;	// time in milliseconds to wait for character screen to appear
@@ -133,6 +135,7 @@ Include("libs/common/NTColorConverter.ntl");
 Include("libs/common/NTLogger.ntl");
 var mypos = 0;
 var controlData = new controlInfo();
+var checkcount = 0;
 
 function NTMain()
 {
@@ -263,12 +266,20 @@ function locationAction(location)
 		//LogPrintSimple(me.account + "MyAccountTest.txt", me.account + " / " + me.charname) // this is to check for 2nd account login
 		
 		var anni = NT_File("logs/AnniLog/Anni.txt", 0);
-		if(GetTickCount() > nextGameMake && (anni == "no" || !anni)){			
-			sendEventToOOG(D2NT_MGR_PRINT_STATUS, "Waiting...", 0);
+		
+		if(checkcount > 900 && (anni == "no" || !anni)){
+			checkcount = 0;
+			Delay(200);
+			controlData.click(controlData.controls.lobby.button.quit);	
+		}
+		if(anni == "no" || !anni){			
+			sendEventToOOG(D2NT_MGR_PRINT_STATUS, "Waiting" + "(" + checkcount + ")", 0);
+			checkcount++;
 			Delay(1000);
 		}
 		else if(GetTickCount() > nextGameMake && anni == "yes")
 		{
+			checkcount = 0;
 			lastGameFailed = false;
 
 			switch(lastGameStatus)

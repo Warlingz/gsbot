@@ -1,12 +1,24 @@
 //goodstuffs anni picker
 
-// No need to edit anything
+//use only one per pc
+
+////////////////////////////////////////////////////////////////////////////////
+// Lobby chat settings :
+////////////////////////////////////////////////////////////////////////////////
+
+var joinChannelInChat    = "set a channel";		// Name of the channel you want to join (leave blank if you want to stay in the default channel)
+
+// =============================================================================
+// UseCDKeyChangeTrick :
+// if true, the follow bot will say his gamename/gamepwd (set in the OOG) in chat before each game
+//          in order to increment his number of runs (to switch CDKeys after xx runs)
+// if false, the follow bot will never change his CDKey
+// =============================================================================
+
+var UseCDKeyChangeTrick = false;
 
 
-
-
-
-
+// No need to edit below
 
 
 
@@ -54,15 +66,6 @@ var ftjDelay = 180;					// time to idle before trying if leecher failed to join.
 var gamepassword = "";
 
 // =============================================================================
-// UseCDKeyChangeTrick :
-// if true, the follow bot will say his gamename/gamepwd (set in the OOG) in chat before each game
-//          in order to increment his number of runs (to switch CDKeys after xx runs)
-// if false, the follow bot will never change his CDKey
-// =============================================================================
-
-var UseCDKeyChangeTrick = false;
-
-// =============================================================================
 // Debug : set to true if you are experiencing problems with your JoinBot
 // it will log in your OOG the lobby chat actions
 // =============================================================================
@@ -72,13 +75,10 @@ var Debug = false;
 ////////////////////////////////////////////////////////////////////////////////
 // Lobby chat settings :
 ////////////////////////////////////////////////////////////////////////////////
-
 var joinChatAfterGame    = true;	// Set to true to join the chat after each game (needed for JoinBot)
 var firstJoinMessage     = "";		// Message said when you first enter the chat
 var chatMessageAfterGame = "";		// Message said after each game
 var joinRandomChannel    = false; 	// if this is true, will join a random channel, otherwise it will use the channel below..
-var joinChannelInChat    = "set channel";		// Name of the channel you want to join (leave blank if you want to stay in the default channel)
-
 ////////////////////////////////////////////////////////////////////////////////
 // Delays:
 ////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +89,7 @@ var gameMinLength    		  = 420000; // Milliseconds
 // Realm Delays
 var unableToConnectRetry      = 3;		// Minutes
 var realmDownRetry            = 3;	// Minutes
-var disconnectedRetry         = 2;		// Minutes
+var disconnectedRetry         = 1;		// Minutes
 var cdkeyInUseRetry           = 2;		// Minutes
 
 if(fastJoin) { 
@@ -188,7 +188,7 @@ var _gamepassword = "";
 var _leaderOfflineTick = -LeaderOfflineDelay;
 var _leaderInChatTick = -LeaderInChatDelay;
 var _GameIsFullTick = -GameIsFullDelay;
-
+var checkcount = 0;
 function NTMain()
 {
     Delay(1000);
@@ -259,7 +259,7 @@ function locationAction(location)
     switch(location.id)
     {
     case 3: // Lobby Chat
-        sendEventToOOG(D2NT_MGR_PRINT_STATUS, location.name, 0);
+        //sendEventToOOG(D2NT_MGR_PRINT_STATUS, location.name, 0);
 		//ftjcheck
 		if (ftjcount >= 10 && lastGameStatus == 1) {
 			sendEventToOOG(D2NT_MGR_PRINT_LOG, COLOR_1 + "FTJ detected...........Idling", 0);
@@ -310,16 +310,24 @@ function locationAction(location)
 			if(myname != me.charname){
 				NT_File("logs/AnniLog/AnniPicker.txt", 1, me.charname);
 			}
-			if(anni == "none" &&  _xfer != "xfer"){	
-				sendEventToOOG(D2NT_MGR_PRINT_STATUS, "Waiting...", 0);
+			if(checkcount > 900 && ((anni == "none" &&  _xfer != "xfer") || (!anni && !_xfer))){
+				checkcount = 0;
+				Delay(200);
+				controlData.click(controlData.controls.lobby.button.quit);	
+			}
+			if((anni == "none" &&  _xfer != "xfer") || (!anni && !_xfer)){	
+				sendEventToOOG(D2NT_MGR_PRINT_STATUS, "Waiting" + "(" + checkcount + ")", 0);
+				checkcount++;
 				Delay(1000);
 			}
 			else if(anni == "anniup" && (haveanni == "no" || !haveanni)){			
 				sendEventToOOG(D2NT_MGR_PRINT_STATUS, "Picking Anni", 0);
+				checkcount = 0;
 				GS_AnniGame();
 			}
 			else if(_xfer == "xfer" && haveanni == "yes"){	
 				sendEventToOOG(D2NT_MGR_PRINT_STATUS, "Xfering Anni", 0);
+				checkcount = 0;
 				NT_RetrievenextGame();
 			}
 		} 
