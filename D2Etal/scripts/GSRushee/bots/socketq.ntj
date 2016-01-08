@@ -3,7 +3,7 @@
 
 // Do Not Edit Below
 
-var rushComplete = false, havestaff = false, nospam = false, ara, _ladder;
+var rushComplete = false, nospam = false, ara, _ladder;
 function NTMain()
 {
 	Include("libs/common/NTCommon.ntl");

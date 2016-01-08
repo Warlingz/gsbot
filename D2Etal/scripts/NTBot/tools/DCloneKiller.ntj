@@ -193,111 +193,119 @@ function GS_ScriptRev() {
 }
 function GS_SearchForClone()
 {
-	if(DetectAreaid == 83 || DetectAreaid == 102 || DetectAreaid == 110 || DetectAreaid == 111 || DetectAreaid == 112)
+	if(DetectAreaid == 83 || DetectAreaid == 102 || DetectAreaid == 110 || DetectAreaid == 111 || DetectAreaid == 112){
 		Print(C_ORANGE + "Searching for DClone");
-	var dClone;
-	NTTM_CheckAct();
-	NTTM_TownMove("waypoint");
-	if(DetectAreaid == 83)
-	{		
-		var _waypoint;
-		var _deltax, _deltay;
-		NTM_TakeWaypoint(83);
-		NTP_DoPrecast(true, true);
-		_waypoint = NTC_FindUnit(NTC_UNIT_OBJECT, GetLocaleString(22526), 5);
-		if(!_waypoint){
-			NTC_SendMsgToScript("NTBotGame.ntj", "NTC_FindUnit()");
-			return;
-		}
-		_deltax = _waypoint.x - 5699;
-		_deltay = _waypoint.y - 1584;
-		if(!NTM_MoveTo(me.areaid, 5800+_deltax, 1515+_deltay)){
-			NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
-			return;
-		}
-		
-	}
-	else if(DetectAreaid == 102)
-	{		
-		NTM_TakeWaypoint(101);
-		NTP_DoPrecast(true, true);
-		if(!NTM_MoveToStair(me.areaid, 102)){
-			NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveToStair()");
-			return;
-		}
-		if(!NTM_TakeStair(102)){
-			NTC_SendMsgToScript("NTBotGame.ntj", "NTM_TakeStair()");
-			return;
-		}
-		if(!NTM_MoveTo(me.areaid, 17564, 8069)){
-			NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
-			return;
-		}	
-	}
-	else if(DetectAreaid >= 109 && DetectAreaid <= 132){		
-		if(DetectAreaid == 110){
-			NTM_TakeWaypoint(111);
+		var dClone;
+		NTTM_CheckAct();
+		NTTM_TownMove("waypoint");
+		if(DetectAreaid == 83)
+		{		
+			var _waypoint;
+			var _deltax, _deltay;
+			NTM_TakeWaypoint(83);
 			NTP_DoPrecast(true, true);
-			if(!NTM_MoveTo(110, me.x+79, me.y+16)){
+			_waypoint = NTC_FindUnit(NTC_UNIT_OBJECT, GetLocaleString(22526), 5);
+			if(!_waypoint){
+				NTC_SendMsgToScript("NTBotGame.ntj", "NTC_FindUnit()");
+				return;
+			}
+			_deltax = _waypoint.x - 5699;
+			_deltay = _waypoint.y - 1584;
+			if(!NTM_MoveTo(me.areaid, 5800+_deltax, 1515+_deltay)){
 				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
 				return;
 			}
-			if(!NTM_MoveToPresetUnit(me.areaid, NTC_UNIT_MONSTER, 776, -5, 5)) {
-				return;
-			}
+			
 		}
-		else if(DetectAreaid == 111){
-			NTM_TakeWaypoint(111);
-			NTP_DoPrecast(true, true);			
-			if(!NTM_MoveTo(me.areaid, 3750, 5090)){
-				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
-				return;
-			}
-		}
-		else if(DetectAreaid == 112){
-			NTM_TakeWaypoint(112);
-			NTP_DoPrecast(true, true);			
-			if(!NTM_MoveToStair(me.areaid, 113)){
+		else if(DetectAreaid == 102)
+		{		
+			NTM_TakeWaypoint(101);
+			NTP_DoPrecast(true, true);
+			if(!NTM_MoveToStair(me.areaid, 102)){
 				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveToStair()");
 				return;
 			}
+			if(!NTM_TakeStair(102)){
+				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_TakeStair()");
+				return;
+			}
+			if(!NTM_MoveTo(me.areaid, 17564, 8069)){
+				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
+				return;
+			}	
 		}
-		
-	}
-	if(!GS_KillDClone()){		
-		Print(COLOR_8 + "No Luck..");
+		else if(DetectAreaid >= 109 && DetectAreaid <= 132){		
+			if(DetectAreaid == 110){
+				NTM_TakeWaypoint(111);
+				NTP_DoPrecast(true, true);
+				if(!NTM_MoveTo(110, me.x+79, me.y+16)){
+					NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
+					return;
+				}
+				if(!NTM_MoveToPresetUnit(me.areaid, NTC_UNIT_MONSTER, 776, -5, 5)) {
+					return;
+				}
+			}
+			else if(DetectAreaid == 111){
+				NTM_TakeWaypoint(111);
+				NTP_DoPrecast(true, true);			
+				if(!NTM_MoveTo(me.areaid, 3750, 5090)){
+					NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
+					return;
+				}
+			}
+			else if(DetectAreaid == 112){
+				NTM_TakeWaypoint(112);
+				NTP_DoPrecast(true, true);			
+				if(!NTM_MoveToStair(me.areaid, 113)){
+					NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveToStair()");
+					return;
+				}
+			}
+			
+		}
+		if(!GS_KillDClone()){		
+			Print(COLOR_8 + "No Luck..");
+		}
 	}
 }
 
-var m_data = [];
-var mobs = [];
-var m_sdata = "";
 var m_vdata = "";
 function GS_GetNearByMonsters() {
+	var _monster;
+	var _counter = [];
+	var mobs = [];
+	var m_sdata = "";
+	var moblist = [];
+	
 	_monster = NTC_FindUnit(NTC_UNIT_MONSTER);
 	if(_monster){
 		do {
 			switch(_monster.classid) {
-				case 333:
-					AddMonster(_monster.name);
+				case 333 : AddMonster(COLOR_1 + _monster.name + COLOR_9);
 					break;
 				default: AddMonster(_monster.name);
 					break;
 			}
 		} while(_monster.GetNext())
+	}	
+	for(var i = 0 ; i < mobs.length ; i++){
+		moblist.push(mobs[i] + " (" +_counter[i] + ")\n");
 	}
-	for(var i = 0 ; i < mobs.length ; i+= 1){
-		m_data.push(mobs[i] + "\n");
-	}
-	m_sdata = m_data.toString();
-	m_vdata = m_sdata.replace(",", "");
-	for(var i = 0; i < mobs.length ; i+= 1)
+	m_sdata = moblist.toString();	
+	m_vdata = m_sdata.replace(",", "");	
+	for(var i = 0; i < mobs.length ; i++){
 		m_vdata = m_vdata.replace(",", "");
-}
-function AddMonster(unit) {
-	var m_List = mobs.indexOf(unit);
-	if(m_List == -1) {
-		mobs.push(unit);
+	}
+	function AddMonster(unit) {
+		var m_List = mobs.indexOf(unit);
+		if(m_List == -1 && unit != "an evil force") {
+			mobs.push(unit);
+			_counter.push(1);
+		}
+		else{			
+			_counter[m_List]++;
+		}
 	}
 }
 function GS_GetAreaInfo()
@@ -307,8 +315,8 @@ function GS_GetAreaInfo()
 	GS_GetNearByMonsters();	
 	NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_5 + "DClone Detected : My Area[ " + COLOR_3 + _area.name + COLOR_5 + " ] ".split("\n")[0] + ";" + 
 		COLOR_1 + "------------------------------\n" + 
-		COLOR_2 + "Area : [" + _area.name + "]\n" +
-		COLOR_4 + "Nearby Monsters :\n" +
-		COLOR_14 + m_vdata +
+		COLOR_2 + "Area : " + _area.name + "\n" +
+		COLOR_4 + "[Nearby Monsters]" + "\n" +
+		COLOR_9 + m_vdata +
 		COLOR_1 + "---------------------------------");
 }
