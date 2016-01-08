@@ -936,7 +936,7 @@ function DoSummoner()
 
 	NTM_MakeTP();
 	NTC_Delay(500);
-	NTA_ClearPosition(10);
+	NTA_ClearPosition(15);
 	Delay(1500);
 
 	Say("Summoner up!");
@@ -945,13 +945,13 @@ function DoSummoner()
 		NTC_TPGuard(5);
 	}	
 	
-	NTR_ClearSpot(250);
+	NTR_ClearSpot(150);
 	
 	if(NTConfig_IdInField){
 		NT_FieldID();
 	} 
 	
-	if(!NTM_MoveToPresetUnit(me.areaid, 2, 357, 0, 0, true)) {
+	if(!NTM_MoveToPresetUnit(me.areaid, 2, 357, 1, 1)) {
 		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveToPresetUnit()");
 		return;
 	}
@@ -1186,9 +1186,9 @@ function DoTrav()
 	}
 
 	if(WaitforLeecher){
-		WaitforLeech(75, 25, 25);
+		WaitforLeech(75, 30, 35);
 	}
-	WaitforRushee(25, 25);
+	WaitforRushee(30, 35);
 	
 	if(!NTM_TakeWaypoint(83)) {
 		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
@@ -1218,10 +1218,9 @@ function DoTrav()
 	_pretp = [_todurx-2, _todury-35, me.x-30, me.y, me.x+60, me.y, me.x-30, me.y, _todurx-2, _todury-35];
 
 	for(i = 0 ; i < _pretp.length ; i += 2) {
-		if(NTM_MoveTo(me.areaid, _pretp[i], _pretp[i+1])){
-			NTA_ClearPosition(20);
-			NTC_PingDelay(200);
-		}
+		NTM_MoveTo(me.areaid, _pretp[i], _pretp[i+1]);
+		NTA_ClearPosition(20);
+		NTC_PingDelay(200);		
 	}
 
 	NTM_MakeTP();
@@ -1234,7 +1233,7 @@ function DoTrav()
 		
 	NTR_ClearSpot(200);
 	
-	if(!NTM_MoveTo(me.areaid, 5780+_deltax, 1555+_deltay)) {
+	if(!NTM_MoveTo(me.areaid, 5800+_deltax, 1515+_deltay)) {
 		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveTo()");
 		return;
 	}
@@ -1244,7 +1243,6 @@ function DoTrav()
 		NTA_ClearPosition(25,false);
 		NTC_PingDelay(200);
 	}
-	_pretp1 = [_todurx-2, _todury-35, me.x-30, me.y, me.x+60, me.y, me.x-30, me.y, _todurx-2, _todury-35];
 
 	NTR_GoRushee();
 

@@ -212,7 +212,7 @@ var i;
 							ara = me.areaid;
 							NTR_OpenAmmy();
 							NTC_PingDelay(500);
-							NTR_GetAmmy();
+							NTR_PickItems();
 							if(!NTR_TakePortal())
 								if(me.hp < 1 && !NTC_InTown())
 									NTR_Death();
@@ -231,8 +231,7 @@ var i;
 						}
 						if(me.areaid == 64){
 							ara = me.areaid;
-							NTR_GetStaff();
-							havestaff = true;				
+							NTR_PickItems();
 							NTC_Delay(250);
 							if(!NTR_TakePortal())
 								if(me.hp < 1 && !NTC_InTown())
@@ -362,7 +361,7 @@ var i;
 							NTC_PingDelay(300);
 							NTR_OpenAltar();
 							NTC_PingDelay(300);
-							NTR_GetTome();
+							NTR_PickItems();
 							NTC_PingDelay(300);
 							if(!NTR_TakePortal())
 								if(me.hp < 1 && !NTC_InTown())
@@ -422,7 +421,7 @@ var i;
 							ara = me.areaid;
 							NTC_Delay(100);
 							NTM_MoveTo(me.areaid, 17590, 8068);
-							NTC_Delay(1500);
+							NTC_Delay(500);
 							if(me.mode != 17 && me.mode != 0){
 								if(!NTM_TakeUnit(NTC_UNIT_OBJECT, 342)){
 									NTM_MoveTo(me.areaid, 17590, 8068);
@@ -450,7 +449,7 @@ var i;
 							NTC_PingDelay(200);
 							NTC_SwapWeapons();
 							NTC_PingDelay(500);
-							NTR_GetHammer();
+							NTR_PickItems();
 							NTC_PingDelay(200);
 							NTR_TakePortal();
 							NTC_PingDelay(200);

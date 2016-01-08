@@ -5,6 +5,7 @@ var _picker = "";
 var Rev = "";
 var CurScriptIndex = 0;
 var DetectAreaid;
+var _area;
 function NTMain(){
 	Include("libs/common/NTCommon.ntl");
 	NTC_IncludeLibs();
@@ -12,8 +13,9 @@ function NTMain(){
 	NT_LoadConfig();		
 	
 	Print(C_ORANGE + "goodstuffs " + C_BROWN + "DClone Killer" + C_ORANGE + " Activated");
-	DetectAreaid = me.areaid;
-		
+	
+	GS_GetAreaInfo();
+	
 	if(!GS_KillDClone()){
 		NTTM_CheckAct();
 		Delay(500);
@@ -263,10 +265,50 @@ function GS_SearchForClone()
 		
 	}
 	if(!GS_KillDClone()){		
-		GS_ScriptRev();		
-		if(CurScriptIndex == "" || CurScriptIndex == " ")
-			CurScriptIndex = 0;
-		Load("NTBot/bots/" + NTConfig_Script[CurScriptIndex]);
-		SetStatusText(Rev + " " + NTConfig_Script[CurScriptIndex]);
+		Print(COLOR_8 + "No Luck..");
 	}
+}
+
+var m_data = [];
+var mobs = [];
+var m_sdata = "";
+var m_vdata = "";
+function GS_GetNearByMonsters() {
+	_monster = NTC_FindUnit(NTC_UNIT_MONSTER);
+	if(_monster){
+		do {
+			switch(_monster.classid) {
+				case 333:
+					AddMonster(_monster.name);
+					break;
+				default: AddMonster(_monster.name);
+					break;
+			}
+		} while(_monster.GetNext())
+	}
+	for(var i = 0 ; i < mobs.length ; i+= 1){
+		m_data.push(mobs[i] + "\n");
+	}
+	m_sdata = m_data.toString();
+	m_vdata = m_sdata.replace(",", "");
+	for(var i = 0; i < mobs.length ; i+= 1)
+		m_vdata = m_vdata.replace(",", "");
+}
+function AddMonster(unit) {
+	var m_List = mobs.indexOf(unit);
+	if(m_List == -1) {
+		mobs.push(unit);
+	}
+}
+function GS_GetAreaInfo()
+{	
+	_area = GetArea();
+	DetectAreaid = me.areaid;
+	GS_GetNearByMonsters();	
+	NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_5 + "DClone Detected : My Area[ " + COLOR_3 + _area.name + COLOR_5 + " ] ".split("\n")[0] + ";" + 
+		COLOR_1 + "------------------------------\n" + 
+		COLOR_2 + "Area : [" + _area.name + "]\n" +
+		COLOR_4 + "Nearby Monsters :\n" +
+		COLOR_14 + m_vdata +
+		COLOR_1 + "---------------------------------");
 }

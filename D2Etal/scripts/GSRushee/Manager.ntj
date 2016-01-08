@@ -1,6 +1,6 @@
 var CurScriptIndex = 0;
 var LastScript = false;
-var Rev = "GSRushee v2.17  ";
+var Rev = "GSRushee v2.18  ";
 
 var InitLife;
 var Corpses = 0;
@@ -93,8 +93,6 @@ function NTMain()
 
 function NT_GameMsgEvents(msg, type)
 {
-	_area = GetArea();
-
 	if(type == 1 && (msg.toLowerCase().indexOf("d2nt") != -1 || msg.toLowerCase().indexOf("error") != -1 || msg.toLowerCase().indexOf("fail") != -1))
 	{
 		var date = new Date().toLocaleFormat("<%a, %b %d, %H:%M>");

@@ -148,7 +148,7 @@ var i;
 
 					case "Leeches Talk to Tyrael!" :
 						if(me.areaid == 40){
-							NTC_Delay(4500, 5200);													
+							NTC_Delay(3500, 4000);													
 							if(!NTR_TalkJer()){								
 								var rusheepos = NTR_RetrieveRusheePos();
 								NTC_Delay(200);		
@@ -210,9 +210,9 @@ var i;
 					case "Mephisto is dead!" :
 						if(me.areaid == 102 && me.mode != 17 && me.mode != 0){
 							ara = me.areaid;
-							NTC_Delay(1200, 2000);
+							NTC_Delay(700, 1000);
 							NTM_MoveTo(me.areaid, 17590, 8068);
-							NTC_Delay(200, 1000);
+							NTC_Delay(500, 700);
 							if(me.mode != 0 && me.mode != 17){
 								if(!NTM_TakeUnit(NTC_UNIT_OBJECT, 342)){
 									NTM_MoveTo(me.areaid, 17590, 8068);

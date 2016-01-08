@@ -1333,16 +1333,16 @@ function NTC_GetLocation(index)
 }
 
 function NTC_CancelMenus() { // more koreans
-	while (GetUIState(0x01) || GetUIState(0x08) || GetUIState(0x0C) || GetUIState(0x0F) || GetUIState(0x14) ||
-		GetUIState(0x17) || GetUIState(0x19) ||   GetUIState(0x1A) || GetUIState(0x24)){
+	while ((GetUIState(0x01) || GetUIState(0x08) || GetUIState(0x0C) || GetUIState(0x0F) || GetUIState(0x14) ||
+		GetUIState(0x17) || GetUIState(0x19) || GetUIState(0x1A) || GetUIState(0x24)) && !GetUIState(0x09)){
 
 		for (var i = 0; i < 40; i++){
 			if ((i % 20) == 0){
 				me.Cancel(1);
 			}
 			Delay(100);
-			if (!GetUIState(0x01) && !GetUIState(0x08) && !GetUIState(0x0C) && !GetUIState(0x0F) && !GetUIState(0x14) &&
-					!GetUIState(0x17) && !GetUIState(0x19) &&  !GetUIState(0x1A) && !GetUIState(0x24)){
+			if ((!GetUIState(0x01) && !GetUIState(0x08) && !GetUIState(0x0C) && !GetUIState(0x0F) && !GetUIState(0x14) &&
+					!GetUIState(0x17) && !GetUIState(0x19) && !GetUIState(0x1A) && !GetUIState(0x24)) || GetUIState(0x09)){
 
 				NTC_PingDelay(300);
 				break;
@@ -1350,7 +1350,6 @@ function NTC_CancelMenus() { // more koreans
 		}
 	}
 }
-
 function NTC_StopScriptLeecher(){
 	_script = NTC_FindScript(NTConfig_Script[CurScriptIndex]);
 	if(_script){

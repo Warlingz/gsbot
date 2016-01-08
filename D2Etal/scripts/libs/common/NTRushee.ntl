@@ -773,7 +773,7 @@ function NTR_GoTyrael()
 		_npc = NTC_FindUnit(NTC_UNIT_NPC, GetLocaleString(1013), 5);      
 		if(_npc){
 			if(NTT_VisitNpc(_npc)){
-				for(var i = 0 ; i < 2 ; i++){
+				for(var i = 0 ; i < 5 ; i++){
 					NTC_Delay(200);
 					NTC_CancelMenus();
 				}
@@ -824,32 +824,6 @@ function NTR_TalkMalah()
 	return;
 }
 
-function NTR_GetBook()
-{
-	var _item = NTC_FindUnit(NTC_UNIT_ITEM, 552);
-	var _book = "Book of Skill";
-	var _havebook = me.GetItems(552);
-	
-	if(!_item){ return false; }
-	if(_item){
-		NTM_MoveTo(_item.areaid,_item.x,_item.y);
-		for(var i = 0 ; i < 100 && (_item.mode != 0 && _havebook.length < 1) ; i++){
-			if(_item.mode != 0 && _havebook.length < 1){
-				Print(COLOR_5 + "Looking for " + _book + "...");
-				NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _item);
-				NTC_Delay(300);
-			}
-			else if (_item.mode == 0 || _havebook.length > 0){
-				Print(COLOR_8 + "Picked up " + _book);
-				NTC_PingDelay(200);
-				break;
-			}
-			NTC_Delay(500, 300);
-		}
-		return true;
-	}
-	return;
-}
 function NTR_ReadBook()
 {
 	var i;
@@ -1007,67 +981,6 @@ function NTR_CheckQuestItem()
 		return false;
 }
 
-function NTR_GetAmmy()
-{
-	var _ammy = NTC_FindUnit(NTC_UNIT_ITEM, GetLocaleString(2697));
-	if(!_ammy){return FailSafeAmmy();}
-	if (_ammy){			
-		for (var i = 0; i < 20; i++){
-			if ((i % 5) == 0){
-				if (_ammy.mode == 3 || _ammy.mode == 5){
-					if (NTC_ClearCursor())
-					NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _ammy);
-				}
-			}
-			NTC_PingDelay(100);
-			if (_ammy.mode != 3 && _ammy.mode != 5){
-				Print(COLOR_8 + "Picked up the Ammy");
-				NTC_PingDelay(200);
-				break;
-			}
-		}
-	}
-	return false;
-	function FailSafeAmmy(){
-		var _ammy = NTC_FindUnit(NTC_UNIT_ITEM, GetLocaleString(2697));
-		var _tomb = NTC_FindUnit(NTC_UNIT_OBJECT, GetLocaleString(3317)); 
-		if(!_tomb){
-			return false;
-		}
-		else if(_tomb){  
-			if(GetDistance(me, _tomb) > 2){
-				NTM_MoveTo(_tomb.areaid,_tomb.x+2, _tomb.y);   
-				NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _tomb);  
-				NTC_Delay(500); 
-			}
-		}		
-		//attempts to get the ammy 3 times after that it continues.
-		for(var i = 3; i > 0 && (!_ammy || _ammy.mode != 0 || _ammy.mode != 1 && _ammy.mode != 3 || _ammy.mode != 5) ; i--){
-			NTC_PingDelay(1000);
-			Say("!Ammy bugg " + i + " attempts until skip");
-			NTM_WalkTo(me.x-1, me.y-6);
-			NTR_OpenAmmy();
-			if(i <=1){Say("Nothing i do works!"); break;}
-		}
-		if (_ammy){			
-			for (var i = 0; i < 20; i++){
-				if ((i % 5) == 0){
-					if (_ammy.mode == 3 || _ammy.mode == 5){
-						if (NTC_ClearCursor())
-						NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _ammy);
-					}
-				}
-				NTC_PingDelay(100);
-				if (_ammy.mode != 3 && _ammy.mode != 5){
-					Print(COLOR_8 + "Picked up the Ammy");
-					NTC_PingDelay(200);
-					break;
-				}
-			}
-		}
-	}
-}
-
 function NTR_PickItems() {
 	var i, _mode;
 
@@ -1083,32 +996,24 @@ function NTR_PickItems() {
 		NTC_PingDelay(NTConfig_SnagDelay - (i*NTC_DELAY_FRAME));
 	}
 
-	NTSI_SnagIt();
+	NTR_Pickit();
 }
 
-function NTR_GetStaff()
-{
-	var _staff = NTC_FindUnit(NTC_UNIT_ITEM, GetLocaleString(2698));
-	if(!_staff){return false;}
-	if (_staff){
-		for (i = 0; i < 20; i++){
-			if ((i % 5) == 0){
-				if (_staff.mode == 3 || _staff.mode == 5){
-					Print(COLOR_5 + "Looking for the Staff...");
-					NTC_PingDelay(300);
-					if (NTC_ClearCursor())
-						NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _staff);
-				}
+function NTR_Pickit() {
+	var _item;
+	_item = NTC_FindUnit(NTC_UNIT_ITEM);	
+	do {
+		if(_item.classid == 549 || _item.classid == 521 || _item.classid == 92 || _item.classid == 90 || _item.classid == 552 || _item.classid == 548){
+			if(NTSI_PickUpItemInt(_item)){
+				Print("Picked up "+ NTC_ItemQualityToD2Color[_item.quality] + _item.name.split("\n")[0]);
+				return true;
 			}
-			NTC_PingDelay(200);
-			if (_staff.mode != 3 && _staff.mode != 5){
-				Print(COLOR_8 + "Picked up the Staff");
-				NTC_PingDelay(300);
-				break;
+			else{
+				Print(COLOR_1 + "Trying again..");
+				NTR_Pickit(); 
 			}
 		}
-	}
-	return false;
+	}while(_item.GetNext());
 }
 function NTR_CubeStaff()
 {
@@ -1121,25 +1026,6 @@ function NTR_CubeStaff()
 		if(NTR_MakeStaff())
 			if(NTR_GoCain())
 				return true;
-	}
-	else
-		return false;
-}
-function NTR_CheckItems()
-{
-	var cube = me.GetItems(549);
-	var staff = me.GetItems(92);
-	var ammy = me.GetItems(521);
-	var _horadricstaff = me.GetItems(91);
-	
-	if(staff.length > 0 && ammy.length > 0 && cube.length > 0){
-		Print(COLOR_5 + "Cubing Staff!");
-		NTR_MakeStaff();
-		NTR_GoCain();
-	}
-	else if(_horadricstaff.length > 0){
-		NTR_MoveStaff();
-		NTR_GoCain();
 	}
 	else
 		return false;
@@ -1339,59 +1225,6 @@ function NTR_OpenAltar()
 		}
 	}
 	return false;
-}
-function NTR_GetTome()
-{	
-	var _tome = NTC_FindUnit(NTC_UNIT_ITEM, 548);
-	if(!_tome){return FailSafeTome();}
-	if (_tome){				
-		for (i = 0; i < 20; i++){
-			if ((i % 5) == 0){
-				if (_tome.mode == 3 || _tome.mode == 5){
-					if (NTC_ClearCursor())
-					NTC_PingDelay(100);
-					NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _tome);
-				}
-			}
-			NTC_PingDelay(100);
-			if (_tome.mode != 3 && _tome.mode != 5){
-				Print(COLOR_8 + "Picked up Tome!");
-				NTC_PingDelay(200);
-				break;
-			}
-		}
-	}
-	return false;	
-	function FailSafeTome(){
-		var altarcount = 0;
-		//attempts to get the tome 3 times after that it continues.
-		for(i = 1; i < 6 && (!_tome || _tome.mode != 0 || _tome.mode != 1 && _tome.mode != 3 || _tome.mode != 5) ; i++){
-			NTC_PingDelay(1000);
-			Say("!Attempt # " + i);
-			NTM_WalkTo(me.x-1, me.y-6);			
-			NTR_OpenAltar();
-			GrabTome();
-			i++;
-		}		
-		if( i >= 5 ){
-			Say("!Nothing I do works!");
-		}
-	}
-	function GrabTome(){
-		var _tome = NTC_FindUnit(NTC_UNIT_ITEM, 548);
-		if(!_tome){return false;}
-		while(_tome.mode != 0){
-			Print(COLOR_5 + "Looking for the Tome...");
-			NTC_PingDelay(100);
-			NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _tome);
-		}
-		NTC_PingDelay(100);
-		if(_tome.mode == 0){
-			Print(COLOR_8 + "Picked up the Tome");
-			NTC_PingDelay(200);
-		}
-		return false;
-	}
 }
 function NTR_GoHarrogath()
 {
