@@ -18,7 +18,8 @@ function NTI_CheckLog() {
 		{
 			Print(COLOR_25 + "Creating New Log File for "+me.charname+": " +dateString+"_itemlog123.xml");
 			// Creation of the new file
-			filehandle.WriteLine("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>"); 
+			//filehandle.WriteLine("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>"); //removed encoding for D2 Monitor
+			filehandle.WriteLine("<?xml version=\"1.0\" ?>");  //removed encoding for D2 Monitor
 			filehandle.WriteLine("<?xml-stylesheet href=\"itemlog.xsl\" type=\"text/xsl\"?>");
 			filehandle.WriteLine("<itemlog>");
 			filehandle.WriteLine("</itemlog>");
@@ -41,7 +42,7 @@ function NTI_CheckILog() {
 		{
 			Print(COLOR_25 + "Creating New Log File for "+me.charname+": " + dateString + "_" + me.charname + "_itemlog.xml");
 			// Creation of the new file
-			filehandle.WriteLine("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>"); 
+			filehandle.WriteLine("<?xml version=\"1.0\" ?>");  //removed encoding for D2 Monitor
 			filehandle.WriteLine("<?xml-stylesheet href=\"itemlog.xsl\" type=\"text/xsl\"?>");
 			filehandle.WriteLine("<itemlog>");
 			filehandle.WriteLine("</itemlog>");
@@ -153,7 +154,7 @@ function NTI_WriteILog(item, me, _isEthereal, _mode, gamble, npc, crafted) {
 
 	itemlog.item += <item id={itemid} char={me.charname} time={timestring} quality={item.quality} ethereal={_isEthereal} mode={_mode} name={itemname} ilvl={item.itemlevel} location={loc} type={typeId} typedesc={itemTypeDesc}>{itemdesc}</item>;
 	// Creation of the file output, headers first and then the itemlog content
-	content = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n";
+	content = "<?xml version=\"1.0\"?>\n";//removed encoding for D2 Monitor
 	content += "<?xml-stylesheet href=\"Rendering/itemlog.xsl\" type=\"text/xsl\"?>\n";
 	content += itemlog.toXMLString();
 
@@ -253,7 +254,7 @@ function NTI_WriteLog(item, me, _isEthereal, _mode, gamble, npc, crafted) {
 
 	itemlog.item += <item id={itemid} char={me.charname} time={timestring} quality={item.quality} ethereal={_isEthereal} mode={_mode} name={itemname} ilvl={item.itemlevel} location={loc} type={typeId} typedesc={itemTypeDesc}>{itemdesc}</item>;
 	// Creation of the file output, headers first and then the itemlog content
-	content = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n";
+	content = "<?xml version=\"1.0\"?>\n";//removed encoding for D2 Monitor
 	content += "<?xml-stylesheet href=\"Rendering/itemlog.xsl\" type=\"text/xsl\"?>\n";
 	content += itemlog.toXMLString();
 

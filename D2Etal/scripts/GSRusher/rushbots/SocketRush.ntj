@@ -1463,7 +1463,7 @@ function DoDiablo()
 			NTC_SendMsgToScript("NTRushGame.ntj", "NT_OpenSealsInt()");
 			return;
 		}
-		NTM_MoveTo(108, 7792, 5291); //safe spot
+		NTM_MoveTo(108, 7792, 5291);
 		
 		Print(COLOR_8 + "Waiting for Diablo to spawn..");
 

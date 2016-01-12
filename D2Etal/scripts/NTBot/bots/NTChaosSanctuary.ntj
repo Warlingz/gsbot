@@ -93,8 +93,11 @@ function NTMain() {
 		NTCS_DiaSpam();
 	}
 	if (!NTA_KillMonster(243)) {
-		NTC_SendMsgToScript("NTBotGame.ntj", "NTA_KillMonster()");
-		return;
+		NTM_MoveTo(108, 7795, 5295);
+		if (!NTA_KillMonster(243)) {
+			NTC_SendMsgToScript("NTBotGame.ntj", "NTA_KillMonster()");
+			return;
+		}
 	}
 	NTSI_PickItems();
 	PubSay("Diablo Dead.");

@@ -13,7 +13,6 @@ function NTMain(){
 	NT_LoadConfig();		
 	
 	Print(C_ORANGE + "goodstuffs " + C_BROWN + "DClone Killer" + C_ORANGE + " Activated");
-	
 	GS_GetAreaInfo();
 	
 	if(!GS_KillDClone()){
@@ -30,7 +29,7 @@ function NTMain(){
 					return;
 				}
 				if(!GS_KillDClone()){
-					GS_SearchForClone();
+					GS_SearchForClone(DetectAreaid);
 				}
 				break;
 			case 1 ://stony field Rakanishu
@@ -40,7 +39,7 @@ function NTMain(){
 					return;
 				}
 				if(!GS_KillDClone()){
-					GS_SearchForClone();
+					GS_SearchForClone(DetectAreaid);
 				}
 				break;
 			case 2 ://cathedral Bone Ash
@@ -50,7 +49,7 @@ function NTMain(){
 					return;
 				}
 				if(!GS_KillDClone()){
-					GS_SearchForClone();
+					GS_SearchForClone(DetectAreaid);
 				}
 				break;
 			case 3 ://far oasis Beetleburst
@@ -60,7 +59,7 @@ function NTMain(){
 					return;
 				}
 				if(!GS_KillDClone()){
-					GS_SearchForClone();
+					GS_SearchForClone(DetectAreaid);
 				}
 				break;
 			case 4 ://palace cellar Fire Eye
@@ -69,11 +68,19 @@ function NTMain(){
 				var _portal = NTM_TakeUnit(NTC_UNIT_OBJECT, 298);			
 				if(_portal){
 					if(!GS_KillDClone()){
-						GS_SearchForClone();
+						GS_SearchForClone(DetectAreaid);
 					}
 				}
 				break;
-			default :
+			default : //if for some reason the spawn type was set wrong, we will go to Rakanishu
+				NTM_TakeWaypoint(4); 
+				NTP_DoPrecast(true, true);			
+				if(!NTM_MoveToPresetUnit(4, NTC_UNIT_MONSTER, 737, 10, -10)){
+					return;
+				}
+				if(!GS_KillDClone()){
+					GS_SearchForClone(DetectAreaid);
+				}
 				break;
 		}
 	}
@@ -97,24 +104,23 @@ function GS_KillDClone()
 			NTM_MakeTP(true);	
 		}
 		else if(NTConfig_DCloneHandler > 0){
+			GS_SendInfo(3);
 			_picker = NT_File("logs/AnniLog/AnniPicker.txt", 0);
 			NTM_MakeTP();	
 			NTA_ClearPosition(30);
 			Delay(100);
 			NT_File("logs/AnniLog/AnniOwner.txt", 1, me.gamename + "/" + me.gamepassword);
-			Delay(100);
 			NT_File("logs/AnniLog/Annilog.txt", 1, "anniup");
-			Delay(100);
 			NT_File("logs/AnniLog/AnniOwnerName.txt", 1, me.charname);
 			GS_FindPicker();
 			NTA_ClearPosition(30);
-			NTSI_PickItems();
 			GS_WaitFor(_picker);
-			if(!NTM_UsePortal("BluePortal", 1, me.charname))
-				if(!NTM_UsePortal("BluePortal", 40, me.charname))
-					if(!NTM_UsePortal("BluePortal", 75, me.charname))
-						if(!NTM_UsePortal("BluePortal", 103, me.charname))
-							if(!NTM_UsePortal("BluePortal", 109, me.charname))
+			NTSI_PickItems();
+			if(!NTM_UsePortal("BluePortal", 1))
+				if(!NTM_UsePortal("BluePortal", 40))
+					if(!NTM_UsePortal("BluePortal", 75))
+						if(!NTM_UsePortal("BluePortal", 103))
+							if(!NTM_UsePortal("BluePortal", 109))
 								NTTM_CheckAct();
 		}
 		_result = true;
@@ -191,15 +197,21 @@ function GS_ScriptRev() {
 	}
 	return;
 }
-function GS_SearchForClone()
-{
-	if(DetectAreaid == 83 || DetectAreaid == 102 || DetectAreaid == 110 || DetectAreaid == 111 || DetectAreaid == 112){
-		Print(C_ORANGE + "Searching for DClone");
-		var dClone;
-		NTTM_CheckAct();
-		NTTM_TownMove("waypoint");
-		if(DetectAreaid == 83)
-		{		
+function GS_SearchForClone(areaid)
+{	
+	Print(C_ORANGE + "Searching for DClone");
+	GS_SendInfo(0);
+	var dClone, _result = false;
+	NTTM_CheckAct();
+	NTTM_TownMove("waypoint");
+	switch(areaid)
+	{
+		case 1:
+		case 40:
+		case 75:
+		case 109:
+		break;
+		case 83 :
 			var _waypoint;
 			var _deltax, _deltay;
 			NTM_TakeWaypoint(83);
@@ -215,10 +227,9 @@ function GS_SearchForClone()
 				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
 				return;
 			}
-			
-		}
-		else if(DetectAreaid == 102)
-		{		
+			_result = true;
+		break;
+		case 102 :
 			NTM_TakeWaypoint(101);
 			NTP_DoPrecast(true, true);
 			if(!NTM_MoveToStair(me.areaid, 102)){
@@ -232,42 +243,48 @@ function GS_SearchForClone()
 			if(!NTM_MoveTo(me.areaid, 17564, 8069)){
 				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
 				return;
-			}	
-		}
-		else if(DetectAreaid >= 109 && DetectAreaid <= 132){		
-			if(DetectAreaid == 110){
-				NTM_TakeWaypoint(111);
-				NTP_DoPrecast(true, true);
-				if(!NTM_MoveTo(110, me.x+79, me.y+16)){
-					NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
-					return;
-				}
-				if(!NTM_MoveToPresetUnit(me.areaid, NTC_UNIT_MONSTER, 776, -5, 5)) {
-					return;
-				}
 			}
-			else if(DetectAreaid == 111){
-				NTM_TakeWaypoint(111);
-				NTP_DoPrecast(true, true);			
-				if(!NTM_MoveTo(me.areaid, 3750, 5090)){
-					NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
-					return;
-				}
+			_result = true;
+		break;
+		case 110 :
+			NTM_TakeWaypoint(111);
+			NTP_DoPrecast(true, true);
+			if(!NTM_MoveTo(110, me.x+79, me.y+16)){
+				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
+				return;
 			}
-			else if(DetectAreaid == 112){
-				NTM_TakeWaypoint(112);
-				NTP_DoPrecast(true, true);			
-				if(!NTM_MoveToStair(me.areaid, 113)){
-					NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveToStair()");
-					return;
-				}
+			if(!NTM_MoveToPresetUnit(me.areaid, NTC_UNIT_MONSTER, 776, -5, 5)) {
+				return;
 			}
-			
-		}
-		if(!GS_KillDClone()){		
-			Print(COLOR_8 + "No Luck..");
-		}
+			_result = true;
+		break;
+		case 111 :
+			NTM_TakeWaypoint(111);
+			NTP_DoPrecast(true, true);			
+			if(!NTM_MoveTo(me.areaid, 3750, 5090)){
+				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
+				return;
+			}
+			_result = true;
+		break;
+		case 112 :
+			NTM_TakeWaypoint(112);
+			NTP_DoPrecast(true, true);			
+			if(!NTM_MoveToStair(me.areaid, 113)){
+				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveToStair()");
+				return;
+			}
+			_result = true;
+		break;
+		default :GS_SendInfo(2);
+		break;
 	}
+	if(!GS_KillDClone()){
+		Print(COLOR_8 + "No Luck..");
+		if(_result)
+			GS_SendInfo(1);
+	}
+
 }
 
 var m_vdata = "";
@@ -282,9 +299,9 @@ function GS_GetNearByMonsters() {
 	if(_monster){
 		do {
 			switch(_monster.classid) {
-				case 333 : AddMonster(COLOR_1 + _monster.name + COLOR_9);
+				case 333 : AddMonster(COLOR_1 + _monster.name + COLOR_0);
 					break;
-				default: AddMonster(_monster.name);
+				default: AddMonster(COLOR_4 + _monster.name + COLOR_0);
 					break;
 			}
 		} while(_monster.GetNext())
@@ -299,7 +316,7 @@ function GS_GetNearByMonsters() {
 	}
 	function AddMonster(unit) {
 		var m_List = mobs.indexOf(unit);
-		if(m_List == -1 && unit != "an evil force") {
+		if(m_List == -1 && unit.indexOf("an evil force") == -1){
 			mobs.push(unit);
 			_counter.push(1);
 		}
@@ -313,10 +330,77 @@ function GS_GetAreaInfo()
 	_area = GetArea();
 	DetectAreaid = me.areaid;
 	GS_GetNearByMonsters();	
-	NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_5 + "DClone Detected : My Area[ " + COLOR_3 + _area.name + COLOR_5 + " ] ".split("\n")[0] + ";" + 
-		COLOR_1 + "------------------------------\n" + 
-		COLOR_2 + "Area : " + _area.name + "\n" +
+	NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_5 + "DClone Detected : " + COLOR_3 + "[Moving to SpawnArea]".split("\n")[0] + ";" + 
+		COLOR_4 + "-------------------------------------\n" + 
+		COLOR_4 + "DClone Detected\nMy Area : [" + COLOR_2 +_area.name + COLOR_4 + "]\n" +
+		COLOR_4 + "Detect Area ID : " + COLOR_9 + DetectAreaid + "\n" +
+		COLOR_4 + "Spawn Area : " + COLOR_9 + spawnTypeToString() + "\n" +
 		COLOR_4 + "[Nearby Monsters]" + "\n" +
-		COLOR_9 + m_vdata +
-		COLOR_1 + "---------------------------------");
+		COLOR_4 + m_vdata +
+		COLOR_4 + "---------------------------------------");
+}
+function GS_SendInfo(type)
+{
+	var area = GetArea();
+	m_vdata = "";
+	GS_GetNearByMonsters();
+	switch(type){
+		case 0:
+			NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_8 + "SpawnArea Failed :" + COLOR_5 + " [Searching for DClone] ".split("\n")[0] + ";" + 
+				COLOR_4 + "-------------------------------------\n" + 
+				COLOR_1 + "Failed to Spawn DClone\n" + 
+				COLOR_4 + "Area : " + COLOR_2 + area.name + "\n" +
+				COLOR_4 + "Area ID : " + COLOR_2 + me.areaid + "\n" +
+				COLOR_4 + "Detect Area ID : " + COLOR_9 + DetectAreaid + "\n" +
+				COLOR_4 + "Spawn Area : " + COLOR_9 + spawnTypeToString() + "\n" +
+				COLOR_4 + "[Nearby Monsters]\n" +
+				COLOR_4 + m_vdata +
+				COLOR_4 + "---------------------------------------");
+		break;
+		case 1:
+			NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_1 + "Search For DClone Failed : My Area [" + COLOR_5 + area.name + COLOR_1 + "] ".split("\n")[0] + ";" + 
+				COLOR_4 + "-------------------------------------\n" + 
+				COLOR_1 + "Search For DClone Failed\n" + 
+				COLOR_4 + "Area : " + COLOR_2 + area.name + "\n" +
+				COLOR_4 + "Area ID : " + COLOR_2 + me.areaid + "\n" +
+				COLOR_4 + "Detect Area ID : " + COLOR_9 + DetectAreaid + "\n" +
+				COLOR_4 + "Spawn Area : " + COLOR_9 + spawnTypeToString() + "\n" +
+				COLOR_4 + "[Nearby Monsters]\n" +
+				COLOR_4 + m_vdata +
+				COLOR_4 + "---------------------------------------");
+		break;
+		case 2:
+			NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_1 + "Couldn't Search for DClone : Area[" + COLOR_5 + _area.name + COLOR_1 + "] ".split("\n")[0] + ";" + 
+				COLOR_4 + "-----------------------------------------\n" + 
+				COLOR_1 + "Search For DClone Failed\n" + 
+				COLOR_4 + "Detect Area ID : " + COLOR_9 + DetectAreaid + "\n" +
+				COLOR_9 + "If this Area has A Super Unique Monster\nPost it in goodstuffs thread\nArea Name : [" + COLOR_2 + _area.name + COLOR_9 + "]\n" +
+				COLOR_4 + "-----------------------------------------------");
+		break;
+		case 3:
+			NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_4 + "Slayed Diablo Clone".split("\n")[0] + ";" + 
+				COLOR_4 + "-------------------------------------\n" + 
+				COLOR_4 + "Slayed DClone Successfully\n" +
+				COLOR_4 + "Area : " + COLOR_2 + area.name + "\n" +
+				COLOR_4 + "Area ID : " + COLOR_2 + me.areaid + "\n" +
+				COLOR_4 + "Spawn Area : " + COLOR_9 + spawnTypeToString() + "\n" +
+				COLOR_4 + "[Nearby Monsters]\n" +
+				COLOR_4 + m_vdata +
+				COLOR_4 + "---------------------------------------");
+		break;
+	}
+}
+function spawnTypeToString()
+{
+	var str;
+	switch(NTConfig_SpawnArea)
+	{
+		case 0 : str = "Cold Plains - Bishibosh"; break;
+		case 1 : str = "Stony Field - Rakanishu"; break;
+		case 2 : str = "Cathedral - Bone Ash"; break;
+		case 3 : str = "Far Oasis - Beetleburst"; break;
+		case 4 : str = "Palace Cellar - Fire Eye"; break;
+		default : str = "Stony Field - Rakanishu"; break;
+	}
+	return str;
 }

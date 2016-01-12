@@ -1,6 +1,6 @@
 var CurScriptIndex = 0;
 var LastScript = false;
-var Rev = "GSRusher v1.19";
+var Rev = "GSRusher v1.20";
 
 var InitLife;
 var Corpses = 0;
