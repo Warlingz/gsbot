@@ -15,6 +15,7 @@ Options : Window Control
 
 
 	The "Normal" & "Minimize" options - These will override what Etal Manager has set and will either display or minimize the clients.
+	The Box next to "Minimize" - Process to Exclude from window control, once clicked and clients will be renamed with the process id, this makes it very easy to find which diablo you want to keep from being Controlled.
 
 	There are Two Options for Repostioning Clients, "Reposition Tiled" or "Reposition Top Left".
 

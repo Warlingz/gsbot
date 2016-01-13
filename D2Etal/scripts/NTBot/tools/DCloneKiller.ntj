@@ -97,6 +97,7 @@ function GS_KillDClone()
 	var _result = false;
 	
 	if(NTA_KillMonster(333)){
+		GS_SendInfo(3);
 		if(NTConfig_DCloneHandler == 0){
 			Delay(100);		
 			NTSI_PickItems(); 
@@ -104,7 +105,6 @@ function GS_KillDClone()
 			NTM_MakeTP(true);	
 		}
 		else if(NTConfig_DCloneHandler > 0){
-			GS_SendInfo(3);
 			_picker = NT_File("logs/AnniLog/AnniPicker.txt", 0);
 			NTM_MakeTP();	
 			NTA_ClearPosition(30);
@@ -116,12 +116,7 @@ function GS_KillDClone()
 			NTA_ClearPosition(30);
 			GS_WaitFor(_picker);
 			NTSI_PickItems();
-			if(!NTM_UsePortal("BluePortal", 1))
-				if(!NTM_UsePortal("BluePortal", 40))
-					if(!NTM_UsePortal("BluePortal", 75))
-						if(!NTM_UsePortal("BluePortal", 103))
-							if(!NTM_UsePortal("BluePortal", 109))
-								NTTM_CheckAct();
+			NTTM_CheckAct();
 		}
 		_result = true;
 	}	
