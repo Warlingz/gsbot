@@ -49,7 +49,7 @@ function NTMain()
 			}
 			NTC_Delay(100);
 			NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_3 + "[ " + COLOR_1 + mypos + COLOR_3 + " ] Annis on Account [ " + COLOR_5 + _account + COLOR_3 + " ]".split("\n")[0] + ";" 
-			+ COLOR_1 + "------------------------------\n" + C_ORANGE + "Annis on Account : [ " + mypos + " ]\n" + COLOR_2 + "Anni Picked!" + "\n"+ C_BROWN + "Char Name : " + me.charname + "\n" + C_ORANGE + "Account : " + _account + "\n" + COLOR_1 + "---------------------------------");								
+			+ COLOR_1 + "------------------------------\n" + C_ORANGE + "Annis on Account : [ " + mypos + " ]\n" + COLOR_2 + "Anni Picked!" + "\n"+ C_BROWN + "Char Name : " + me.charname + "\n" + C_ORANGE + "Account : " + _account + "\n" + COLOR_1 + "---------------------------------" + "\n" + annistats);								
 		}
 		NTC_Delay(100);	
 		if(mypos == 8){
@@ -68,14 +68,14 @@ function NTMain()
 				NTC_Delay(100);
 			}
 			NTC_SendLogToOOG(NTC_LOG_COMMON, C_BROWN + "Anni Account Completed [ " + COLOR_5 + _account + C_BROWN + " ]".split("\n")[0] + ";" 
-			+ COLOR_1 + "------------------------------\n" + C_ORANGE + "Annis on Account : [ " + mypos + " ]\n" + COLOR_2 + "Account Full!" + "\n" + C_BROWN + "Char Name : " + me.charname + "\n" + C_ORANGE + "Account : " + _account + "\n" + COLOR_1 + "---------------------------------");						
+			+ COLOR_1 + "------------------------------\n" + C_ORANGE + "Annis on Account : [ " + mypos + " ]\n" + COLOR_2 + "Account Full!" + "\n" + C_BROWN + "Char Name : " + me.charname + "\n" + C_ORANGE + "Account : " + _account + "\n" + COLOR_1 + "---------------------------------" + "\n" + annistats);						
 		}
 	}
 	NTC_Delay(2000);	
 	NTC_SendMsgToScript("NTAnniMuleGame.ntj", "SCRIPT_END");
 	
 }
-
+var annistats = "";
 function haveAnni() {	
 	var _anni = false;
 	var _items = me.GetItems();
@@ -84,6 +84,7 @@ function haveAnni() {
 	for(var i = 0 ; i < _items.length ; i++) {
 		if(_items[i].classid == 603 && _items[i].quality == 7){
 			if(_items[i].itemloc == 0){
+				annistats = _items[i].itemdesc;
 				_anni = true;
 			}
 		}

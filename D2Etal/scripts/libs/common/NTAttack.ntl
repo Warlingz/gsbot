@@ -163,13 +163,13 @@ function NTA_Initialize() {
 				_NTA_SkillRange[i] = 15;
 				break;
 			case 106: //Zeal
-				_NTA_SkillRange[i] = 3;
+				_NTA_SkillRange[i] = 2;
 				break;
 			case 111: //Vengeance
 				_NTA_SkillRange[i] = 2;
 				break;
 			case 112: //Blessed Hammer
-				_NTA_SkillRange[i] = 3;
+				_NTA_SkillRange[i] = 2;
 				break;
 			case 121: // FOH
 				_NTA_SkillRange[i] = 20;

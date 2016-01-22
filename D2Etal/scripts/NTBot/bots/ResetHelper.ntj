@@ -15,7 +15,7 @@ var _UseTelePads = true;		// if true bot(s) will auto use the telepads in Arcane
 var _autoTown = false;			// if You(leader) dies the bot(s) will make a tp and town
 
 //Enchanter Settings -
-var Enchant_Party = true;			// Enchant Party if have Enchant Skill | Default : true
+var Enchant_Party = false;			// Enchant Party if have Enchant Skill | Default : true
 var Enchant_Merc = true;			// Enchant Party Mercs/Summons, Enchant_Party must be true | Default : true
 var printEnchants = true;			// Prints players/mercs being enchanted on screen | Default : true (recommended)
 									// Useful to catch anything being spammed(15+) with Enchant(which would need to be blacklisted below)
@@ -70,7 +70,7 @@ function NTMain()
 	
 	me.maxgametime = 0;	
 	NTConfig_SnagRange = 20; //keep this between 15-25
-	NTConfig_MinGoldToStash = 200;
+	NTConfig_MinGoldToStash = 200; //edit this to your preference
 		
 	RegisterEvent(EVENT_GAMEMSG, chat);
 	
@@ -90,27 +90,27 @@ function NTMain()
 
 function GS_LeaderCheck(leader)
 {
-        _limit = NTConfig_PartyMaxTime;
-       
-        if(!NTC_InMyParty(leader))
-        {              
-                for(i = _limit ; i > 0 ; i--){ 
-                        NTC_Delay(1000);
-                        if(NTC_InMyParty(leader)){
-                                Print(COLOR_10 + "Leader : " + leader);
-                                break;
-                        }
-                        Say("!Waiting " + i + " seconds for " + leader);
-                        if(i <= 1){
-                                Say("!" + leader + " isn't here, Leaving Game!");
-                                NTC_Delay(1000);
-                        }
-                }
-        }
-        else if(NTC_InMyParty(leader)){               
-                Print(C_GREEN + "Leader : " + leader);
-        }
-        return true;
+	var _limit = NTConfig_PartyMaxTime;
+	var _result = false;
+	if(!NTC_InMyParty(leader))
+	{              
+		for(i = _limit ; i > 0 ; i--){ 
+			NTC_Delay(1000);
+			if(NTC_InMyParty(leader)){
+				Print(COLOR_10 + "Leader : " + leader);
+				break;
+			} Say("!Waiting " + i + " seconds for " + leader);
+			if(i <= 1){
+				Say("!" + leader + " isn't here, Leaving Game!");
+				NTC_Delay(1000);
+			}
+		}
+	}
+	else if(NTC_InMyParty(leader)){               
+		Print(C_GREEN + "Leader : " + leader);
+		_result = true;
+	}
+	return _result;
 }
 
 function chat(msg, type)
@@ -164,7 +164,7 @@ function chat(msg, type)
 		NTC_SendMsgToScript("NTBotGame.ntj", "SCRIPT_END");	
     }
 }
-
+var tgt;
 function GS_FollowLeader(leader)
 {	
 	_player = GS_GetLeader(leader);
@@ -223,9 +223,17 @@ function GS_FollowLeader(leader)
 							NTC_Delay(200);
 						}
 					}
-					else						
-						if(_attack && !NTC_InTown())
-							GS_ClearPosition(_attackRange,true);
+					else if(_attack && !NTC_InTown()){
+						tgt = NTC_FindUnit(NTC_UNIT_MONSTER);
+						if (tgt) {
+							do {
+								if(tgt && tgt.IsAttackable() && (NTA_IsValidMonster(tgt) && GetDistance(me,tgt) <= _maxAttackRange && GetDistance(me, _leaderUnit) <= _maxAttackRange)){
+									GS_ClearPosition(_attackRange, true);
+								}
+								else continue;
+							} while(tgt.GetNext());
+						}
+					}
 				}
 			}
 			else if(me.areaid === _player.areaid && !_questing && !_extras){
@@ -257,27 +265,57 @@ function GS_FollowLeader(leader)
 							GS_AutoEnchant();
 						if(GetDistance(me,_leaderUnit) > _followRange && _leaderUnit.mode != 17){							
 							if(GS_GetCloserLeader(_leaderUnit)){
-								if(_attack)
-									GS_ClearPosition(_attackRange, true);			
+								if(_attack){
+									tgt = NTC_FindUnit(NTC_UNIT_MONSTER);
+									if (tgt) {
+										do {
+											if(tgt && tgt.IsAttackable() && (NTA_IsValidMonster(tgt) && GetDistance(me,tgt) <= _maxAttackRange && GetDistance(me, _leaderUnit) <= _maxAttackRange)){
+												if(GetDistance(me,tgt) > 1 && GetDistance(me,tgt) <= _maxAttackRange && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0)){
+													 GS_GetCloserMonster(tgt);
+													 NTA_Attack(tgt, true);
+												}
+												else if(GetDistance(me,tgt) > 1 && GetDistance(me,tgt) <= _maxAttackRange && (NTConfig_AttackSkill[1] != 0 || NTConfig_AttackSkill[3] != 0)){
+													 NTA_Attack(tgt, true);
+												}
+												 if(tgt.hp < 1){
+													 NTSI_PickItems();
+												 }
+											}
+											else continue;
+										} while(tgt.GetNext());
+									}
+								}
 							}
 							else if(!GS_GetCloserLeader(_leaderUnit) && GetDistance(me,_leaderUnit) > 10 && GetDistance(me,_leaderUnit) < 80 && GetDistance(me,_leaderUnit) != -1 && me.areaid == _leaderUnit.areaid){
 								GS_Unstuck(_leaderUnit);
-								//GS_Move(me.areaid, _leaderUnit.x, _leaderUnit.y, 2);
 							}
 						}
 						else if(GetDistance(me,_leaderUnit) <= _followRange+1 && GetDistance(me,_leaderUnit) != -1 && _leaderUnit.mode != 17){
 							if(_attack){
-								if(GS_ClearPosition(_attackRange, true)){
-									for(var i = 0 ; i < 100 && me.areaid == _player.areaid && GetDistance(me,_leaderUnit) < _followRange ; i++){
-										//GS_ClearPosition(_attackRange, true);
-										Delay(100);
-									}
+								tgt = NTC_FindUnit(NTC_UNIT_MONSTER);
+								if (tgt) {
+									do {
+										if(tgt && tgt.IsAttackable() && (NTA_IsValidMonster(tgt) && GetDistance(me,tgt) <= _maxAttackRange && GetDistance(me, _leaderUnit) <= _maxAttackRange)){
+											if(GetDistance(me,tgt) > 1 && GetDistance(me,tgt) <= _maxAttackRange && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0)){
+												 GS_GetCloserMonster(tgt);
+												 NTA_Attack(tgt, true);
+											}
+											else if(GetDistance(me,tgt) > 1 && GetDistance(me,tgt) <= _maxAttackRange && (NTConfig_AttackSkill[1] != 0 || NTConfig_AttackSkill[3] != 0)){
+												 NTA_Attack(tgt, true);
+											}
+											 if(tgt.hp < 1){
+												 NTSI_PickItems();
+											 }
+										}
+										else continue;
+									} while(tgt.GetNext());
 								}
 							}
-							else
-								for(var i = 0 ; i < 100 && me.areaid == _player.areaid && GetDistance(me,_leaderUnit) < _followRange ; i++){
+							else if(!_attack){
+								for(var i = 0 ; i < 100 && me.areaid == _player.areaid && GetDistance(me,_leaderUnit) <= _followRange ; i++){
 									Delay(100);
 								}
+							}
 						}
 					}		
 				}
@@ -285,16 +323,20 @@ function GS_FollowLeader(leader)
 			else if(_extras && _questing){
 				GS_Quester(_quest);
 			}
-		}return false;
+		}
 	}
+	else if(_player && paused)
+		GS_Idle(5, _player);
+	else
+		return false;
 }
 
 function WPleader(unit, name)
 {	
 	if(unit.name == name){
 		if(NTC_InTown())
-			NTTM_TownMove("waypoint");		
-		return NTM_TakeWaypoint(unit.areaid);
+			if(NTTM_TownMove("waypoint"))	
+				return NTM_TakeWaypoint(unit.areaid);
 	}
 	else if(unit.name != name){
 		unit = GetPlayerUnit();
@@ -302,13 +344,14 @@ function WPleader(unit, name)
 			do{
 				if(unit.name == name){
 					if(NTC_InTown())
-						NTTM_TownMove("waypoint");		
-					return NTM_TakeWaypoint(unit.areaid);
-				}				
+						if(NTTM_TownMove("waypoint"))
+							return NTM_TakeWaypoint(unit.areaid);
+				}
+				else
+					continue;
 			}while(unit.GetNext());
 		}
-	}	
-	return true;
+	}
 }
 
 function WPHome(town)
@@ -336,7 +379,7 @@ function GS_HaveItem()
 		
 	if(me.GetQuest(37, 1) && me.GetQuest(37, 2) && me.GetQuest(37, 3) && !me.GetQuest(37, 8)){
 		if(me.areaid == 109){
-			Pring(C_ORANGE + "Grabbing Scroll from Malah");
+			Print(C_ORANGE + "Grabbing Scroll from Malah");
 			GS_InteractNPC("malah");
 		}
 	}
@@ -459,8 +502,10 @@ function GS_InteractNPC(who)
 		if(NTT_VisitNpc(_npc)){
 			GS_CancelMenus();
 		}
+		return true;
 	}
-	return;
+	else
+		return false;
 }
 
 function GoEast()
@@ -480,7 +525,7 @@ function GoEast()
 						NTC_Delay(200);
 					}
 				}
-			}return true;
+			}
 		break;
 		case 40 :
 			NTTM_TownMove("meshif");
@@ -507,7 +552,6 @@ function GoEast()
 					NTTM_TownMove("portalspot");
 				}
 			}
-			return true;
 		break;
 		case 103 :
 			NTTM_TownMove("tyrael");
@@ -518,10 +562,8 @@ function GoEast()
 				}Delay(500);
 			}
 			GS_IsStrangePortal(4);
-			return true;
 		break;
 	}
-return;
 }
 
 function GS_UseStrangePortal(unit, unitarea)
@@ -580,7 +622,8 @@ function GS_NearWaypoint()
 
 function GS_TakeTelepad(leaderUnit)
 {	
-	var unit = GetUnit(NTC_UNIT_OBJECT);		
+	var unit = GetUnit(NTC_UNIT_OBJECT);	
+	if(!unit){return false;}
 	if(unit){
 		do{
 			if(unit.name == "Teleport Pad" && GetDistance(me, unit) < 6 && GetDistance(me, leaderUnit) > 11){
@@ -591,8 +634,7 @@ function GS_TakeTelepad(leaderUnit)
 				}
 			}
 		}while(unit.GetNext());
-	}return false;
-	
+	}	
 }
 
 function GS_IsStrangePortal(type)
@@ -676,7 +718,6 @@ function GS_WalkOutofTown(area, unit)
 		case 103 : if(NTC_InTown()){ NTTM_TownMove("exit"); } return GS_MoveTo(104, unit.x+1, unit.y); break;
 		case 109 : if(NTC_InTown()){ NTTM_TownMove("exit"); } return GS_MoveTo(110, unit.x+1, unit.y); break;
 	}
-	return false;
 }
 
 function GS_AutoEnchant()
@@ -729,7 +770,7 @@ function EnchantPlayer()
 	function EnchantMerc(){			
 		var mercOwner;
 		var _unit = NTC_FindUnit(NTC_UNIT_MERC);
-		
+		if(!_unit){return false;}
 		if (_unit){
 			do{
 				for(var i = 0 ; i < _EnchantPlayer.length ; i++){
@@ -748,7 +789,7 @@ function EnchantPlayer()
 					}
 				}
 			}while(_unit.GetNext());
-		}return false;
+		}
 		
 	}
 
@@ -769,15 +810,15 @@ function EnchantPlayer()
 
 	function GS_GetUnit(name){
 		var _unit = GetPlayerUnit();
-		
 		if (_unit){
 			do{
 				if (_unit.name === name){
 					return _unit;
 				}
+				else
+					continue;
 			}while(_unit.GetNext());
-		}			
-		return false;
+		}
 	}
 }
 
@@ -863,7 +904,6 @@ function GS_Moving(type)
 		case "Up" : return NTM_WalkTo(me.x,me.y-20 ); break;
 		case "Down" : return NTM_WalkTo(me.x,me.y+20 ); break;
 	}
-	return false;
 }
 
 function GS_Idle(type, unit)
@@ -875,14 +915,15 @@ function GS_Idle(type, unit)
 		case 2 : for(var i = 0 ; i < 100 && NTC_InTown(unit) ; i++){ NTC_Delay(100); } break;
 		case 3 : for(var i = 0 ; i < 100 && GS_OutsideTown(unit) ; i++){ NTC_Delay(100); } break;
 		case 4 : for(var i = 0 ; i < 100 && me.areaid != unit.areaid ; i++){ NTC_Delay(100); } break;
+		case 5 : for(var i = 0 ; i < 100 && paused ; i++){ NTC_Delay(200); } break;
 	}
-	return false;
 }
 
 function PortHome()
 {
 	var _portal = NTC_FindUnit(NTC_UNIT_OBJECT, 59);
 	var _preareaid = me.areaid;
+	if(!_portal){return false;}
 	if(_portal){
 		do{
 			if(_portal.mode == 2 && GetDistance(me, _portal) <= 30){
@@ -895,12 +936,13 @@ function PortHome()
 					NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _portal);						
 					Delay(500);					
 					if(me.areaid != _preareaid)
-						return;
+						return true;
 				}
 			}
+			else
+				continue;
 		} while(_portal.GetNext());
 	}
-	return false;
 }
 
 function TakePortal(leader)
@@ -910,6 +952,7 @@ function TakePortal(leader)
 	
 	var _portal = NTC_FindUnit(NTC_UNIT_OBJECT, 59);
 	var _preareaid = me.areaid;
+	if(!_portal){return false;}
 	if(_portal){
 		do{
 			if(_portal.mode == 2 && NTC_CheckOwner(_portal, leader) && GetDistance(me, _portal) <= 30){
@@ -923,15 +966,13 @@ function TakePortal(leader)
 					Delay(500);
 					
 					if(me.areaid != _preareaid)
-						return;
+						return true;
 				}
 			}
+			else
+				continue;
 		} while(_portal.GetNext());
 	}
-	if(NTC_InTown())
-		return true;
-	else 
-		return false;
 }
 
 function GS_GetCloserLeader(unit)
@@ -948,9 +989,7 @@ function GS_GetCloserLeader(unit)
 	else if(_tele && GetDistance(me, unit) > 15 && GetDistance(me, unit) != -1){
 		NTM_MoveTo(unit.areaid, unit.x+1, unit.y);
 	}
-	else
-		return false;
-		
+	else return false;		
 }
 
 function GS_Unstuck(unit)
@@ -968,24 +1007,21 @@ function GS_GetCloserMonster(monster)
 			if(NTM_WalkTo(monster.x+1, monster.y))
 				return true;
 		}
-	}
-	else
-		return false;
-		
+	}else return false;		
 }
 
 function GS_GetLeader(name)
 {
-	var _unit = GetPlayerUnit();
-	
+	var _unit = GetPlayerUnit();	
 	if (_unit) {
 		do {
 			if (_unit.name === name) {
 				return _unit;
 			}
+			else
+				continue;
 		} while (_unit.GetNext());
-	}	
-	return false;
+	}
 }
 
 function GS_CanLeaveTown(unit)
@@ -1000,8 +1036,7 @@ function GS_CanLeaveTown(unit)
 		return true;
 	else if(me.areaid == 109 && unit.areaid == 110)
 		return true;
-	else 
-		return false;
+	else return false;
 }
 
 function GS_CanPath(unit)
@@ -1060,8 +1095,7 @@ function GS_CanPath(unit)
 		return true;
 	else if(unit.areaid == 111 && me.areaid == 112 || unit.areaid == 112 && me.areaid == 111)
 		return true;
-	else
-		return false;
+	else return false;
 }
 
 function InTomb(who)
@@ -1083,7 +1117,7 @@ function InStairOpenArea(who)
 	while(who.areaid == 0)
 		NTC_Delay(NTC_DELAY_FRAME);		
 	_areaid = who.areaid;	
-	return (_areaid == 2 || _areaid == 3 || _areaid == 4 || _areaid == 5 || _areaid == 6 || _areaid == 7 || _areaid == 41 || _areaid == 42 
+	return (_areaid == 2 || _areaid == 3 || _areaid == 4 || _areaid == 5 || _areaid == 6 || _areaid == 7 || _areaid == 17 || _areaid == 41 || _areaid == 42 
 		|| _areaid == 43 || _areaid == 44 || _areaid == 46 || _areaid == 76 || _areaid == 77 || _areaid == 78 || _areaid == 79 || _areaid == 80 
 		|| _areaid == 81 || _areaid == 82 || _areaid == 83 || _areaid == 104 || _areaid == 105 || _areaid == 106 || _areaid == 107 || _areaid == 108 
 		|| _areaid == 110 || _areaid == 111 || _areaid == 112 || _areaid == 117);
@@ -1166,15 +1200,16 @@ function GS_OutsideTown(who)
 
 function GetLeaderUnit(name)
 {
-	var _unit = NTC_FindUnit(NTC_UNIT_PLAYER);	
+	var _unit = NTC_FindUnit(NTC_UNIT_PLAYER);
 	if (_unit) {
 		do {
 			if (_unit.name === name) {
 				return _unit;
 			}
+			else
+				continue;
 		} while (_unit.GetNext());
-	}	
-	return false;
+	}
 }
 
 function GS_MoveToArea(Dest) {  //stairbuilders NTVT_MoveToClosestPreSetUnit(); from NTVoyageTo.ntl
@@ -1230,7 +1265,6 @@ function GS_MoveStair(areaid, subareaid, offsetx, offsety, clearpath)
 		if(me.areaid == _player.areaid)
 			break;
 	}
-
 	return false;
 }
 
@@ -1353,7 +1387,6 @@ function GS_MoveToPresetUnit(areaid, unittype, classid, offsetx, offsety, clearp
 		if(i < 2)
 			NTC_Delay(500);
 	}
-
 	return false;
 }
 
@@ -1390,8 +1423,9 @@ function GS_WalkTo(x, y) { // kolton's updated walkto
 					return false;
 				}
 				
-				ClickMap(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, me.x + Random(-3, 3), me.y + Random(-3, 3));
-				NTC_Delay(40);
+				NTC_Delay(500);
+				ClickMap(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, me.x + Random(-8, 8), me.y + Random(-8, 8));
+				NTC_Delay(1500);
 				ClickMap(NTC_CLICK_LUP, NTC_SHIFT_NONE, null);
 				
 				continue MoveLoop;
@@ -1407,8 +1441,7 @@ function GS_WalkTo(x, y) { // kolton's updated walkto
 		if (attemptCount >= 3) {
 			return false;
 		}
-	}
-	
+	}	
 	return true;
 }
 

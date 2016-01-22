@@ -67,7 +67,7 @@ function NTM_MoveTo(areaid, x, y, retry, clearpath, canswitch)
 		if(!NTC_InTown()) { 
 			if((NTConfig_CheckSelfSafe.indexOf("01") != -1) && NTT_NeedPots()) {
 					Print("I need some more potions!");
-					return NTTMGR_VisitTown();		
+					NTTMGR_VisitTown();		
 			}
 		}
 		

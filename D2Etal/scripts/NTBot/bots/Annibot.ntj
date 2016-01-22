@@ -1,5 +1,6 @@
 //Written by goodstuff 8/03/15
-var DKiller = "";
+
+var identifyAnni = false; // Set true to ID anni's when picked, Picker must have a tome of identify and gold to keep it filled
 
 function NTMain()
 {	
@@ -10,8 +11,8 @@ function NTMain()
 	NT_LoadConfig();
 	NTSI_LoadNIPFiles("NTBot/item_configs");
 	NTA_Initialize();	
-	
-	Delay(1000);
+	if(identifyAnni)
+		NTTMGR_TownManager();
 	
 	if(me.diff == 0) {
 		NTTM_CheckAct(1);
@@ -29,57 +30,70 @@ function NTMain()
 	}
 	
 }
-
+var player, DKiller = "";
 function GS_GetDCloneLocation()
 {	
-	DKiller = NT_File("logs/AnniLog/AnniOwnerName.txt", 0);	
-	var player = GetPlayerUnit();
-	while(player.GetNext()){
-		if(player.name == DKiller){
-			if(GS_GetPlayerAct(player) == null){
-				Print(COLOR_14 + "Getting Area ID this will just take a few seconds.");				
-				while(GS_GetPlayerAct(player) == null)
-				{
-					Delay(200);
-					GS_GetPlayerAct(player);
-					if(GS_GetPlayerAct(player) != null){
-						Print(COLOR_14 + GS_GetPlayerAct(player));
-						break;
-					}
+	DKiller = NT_File("logs/AnniLog/AnniOwnerName.txt", 0);
+	while(!NTC_InMyParty(DKiller)){
+		Delay(200);
+	}
+	player = GS_GetLeader(DKiller);
+	if(player.name == DKiller){
+		if(GS_GetPlayerAct(player) == null){
+			Print(COLOR_14 + "Getting Area ID this will just take a few seconds.");				
+			while(player.areaid == 0)
+			{
+				Delay(200);
+				if(player.areaid != 0){
+					Print(COLOR_14 + player.areaid);
+					break;
 				}
 			}
-			if(me.areaid != GS_GetPlayerAct(player)){
-				if(!NTTM_TownMove("waypoint"))
-				{
-					NTC_SendMsgToScript("NTBotGame.ntj", "NTTM_TownMove()");
-					return;
-				}
-				NTM_TakeWaypoint(GS_GetPlayerAct(player));
-			}
-			Delay(200);
-			NT_File("logs/AnniLog/AnniOwner.txt", 1, 0);
-			if(!NTTM_TownMove("portalspot"))
+		}
+		Delay(200);
+		NT_File("logs/AnniLog/AnniOwner.txt", 1, 0);
+		if(me.areaid != GS_GetPlayerAct(player)){
+			if(!NTTM_TownMove("waypoint"))
 			{
 				NTC_SendMsgToScript("NTBotGame.ntj", "NTTM_TownMove()");
 				return;
 			}
-			for(var i = 0; i < 20 && NTC_InTown() ; i++){
-				if(!NTM_UsePortal("BluePortal", player.areaid)){
-					NTC_Delay(500);
-				}
-			}
-			if(me.areaid == player.areaid){
-				Delay(1000);
-				NTSI_PickItems();
-				if(haveAnni()){
-					NT_File("logs/AnniLog/Annilog.txt", 1, "anni");
-					NT_File("logs/AnniLog/Anni.txt", 1, "yes");
-				}
-				Delay(2000);
-				NTC_SendMsgToScript("NTBotGame.ntj", "SCRIPT_END");	
+			NTM_TakeWaypoint(GS_GetPlayerAct(player));
+		}
+		if(!NTTM_TownMove("portalspot"))
+		{
+			NTC_SendMsgToScript("NTBotGame.ntj", "NTTM_TownMove()");
+			return;
+		}
+		for(var i = 0; i < 20 && NTC_InTown() ; i++){
+			if(!NTM_UsePortal("BluePortal", player.areaid)){
+				NTC_Delay(500);
 			}
 		}
-		Delay(100);
+		if(me.areaid == player.areaid){
+			Delay(1000);
+			NTSI_PickItems();
+			if(haveAnni()){
+				NT_File("logs/AnniLog/Annilog.txt", 1, "anni");
+				NT_File("logs/AnniLog/Anni.txt", 1, "yes");
+			}
+			Delay(2000);
+			NTC_SendMsgToScript("NTBotGame.ntj", "SCRIPT_END");	
+		}
+	}
+}
+
+function GS_GetLeader(name)
+{
+	var _unit = GetPlayerUnit();	
+	if (_unit) {
+		do {
+			if (_unit.name === name) {
+				return _unit;
+			}
+			else
+				continue;
+		} while (_unit.GetNext());
 	}
 }
 
@@ -96,10 +110,11 @@ function GS_GetPlayerAct(unit)
 	if(unit.areaid > 108 && unit.areaid < 133)
 		return 109;
 }
-
+var annistats = "";
 function haveAnni() {	
 	var _anni = false;
 	var _items = me.GetItems();
+	var tome = NTT_GetTome();
 	if(!_items)
 		return false;	
 	for(var i = 0 ; i < _items.length ; i++) {
@@ -107,6 +122,15 @@ function haveAnni() {
 			if(_items[i].itemloc == 0){
 				Print(C_BROWN + "Picked up Anni!");
 				_anni = true;
+				if(identifyAnni){
+					if (tome && tome.GetStat(70) > 0) {
+						SetUIState(0x01, true);
+						NTC_PingDelay(200);
+						NTT_IdItem(tome, _items[i]);
+						NTC_PingDelay(500);
+						SetUIState(0x01, false);
+					}
+				}
 			}
 		}
 	}
