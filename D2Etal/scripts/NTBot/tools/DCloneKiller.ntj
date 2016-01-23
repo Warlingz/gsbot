@@ -1,18 +1,19 @@
 //Written by goodstuff 8/03/15
 
-//Do Not Edit
+//Do Not Edit These
 var _picker = "";
 var Rev = "";
 var CurScriptIndex = 0;
 var DetectAreaid;
 var _area;
+
 function NTMain(){
 	Include("libs/common/NTCommon.ntl");
 	NTC_IncludeLibs();
 	NTC_IncludeConfig("NTBot/char_configs");
 	NT_LoadConfig();		
 	
-	Print(C_ORANGE + "goodstuffs " + C_BROWN + "DClone Killer" + C_ORANGE + " Activated");
+	Print(C_ORANGE + "goodstuffs " + C_BROWN + "DClone Killer" + C_ORANGE + " Activated");	
 	GS_GetAreaInfo();
 	
 	if(!GS_KillDClone()){
@@ -84,14 +85,33 @@ function NTMain(){
 				break;
 		}
 	}
-	
-	GS_ScriptRev();
-	
-	if(CurScriptIndex == "" || CurScriptIndex == " ")
-		CurScriptIndex = 0;
-	Load("NTBot/bots/" + NTConfig_Script[CurScriptIndex]);
-	SetStatusText(Rev + " " + NTConfig_Script[CurScriptIndex]);
+
+	if(GS_ScriptRev()){	
+		if(CurScriptIndex == "" || CurScriptIndex == " " || CurScriptIndex == null)
+			CurScriptIndex = 0;
+		SetStatusText(Rev + " " + NTConfig_Script[CurScriptIndex]);
+		Load("NTBot/bots/" + NTConfig_Script[CurScriptIndex]);
+	}
+	else
+		ExitGame();
 }
+
+function GS_ScriptRev() {
+	var grabLine;
+	var grabInfo = FileOpen("logs/AnniLog/" + me.account + "-utility.txt", 0);
+	if(!grabInfo){
+		var grabInfo = FileOpen("logs/AnniLog/" + me.account + "-utility.txt", 1);
+	}
+	if(grabInfo){ 
+		grabLine = grabInfo.ReadLine();
+		Rev = grabLine.substring(0, grabLine.indexOf('/'));
+		CurScriptIndex = grabLine.substring(grabLine.indexOf('/') + 1, grabLine.length);
+		grabInfo.Close();
+		return true;
+	}
+	else return false;
+}
+	
 function GS_KillDClone()
 {
 	var _result = false;
@@ -122,6 +142,7 @@ function GS_KillDClone()
 	}	
 	return _result;
 }
+
 function GS_FindPicker() {
 	var count = 0;
 	var _unit;
@@ -154,6 +175,7 @@ function GS_FindPicker() {
 	}
 	
 }
+
 function GS_WaitFor(name)
 {
 	var paused = true;
@@ -178,108 +200,98 @@ function GS_WaitFor(name)
 		}while(unit.GetNext());
 	}while(paused && count < 140);
 }
-function GS_ScriptRev() {
-	var grabLine;
-	var grabInfo = FileOpen("logs/AnniLog/" + me.account + "-utility.txt", 0);
-	if(!grabInfo){
-		var grabInfo = FileOpen("logs/AnniLog/" + me.account + "-utility.txt", 1);
-	}
-	if(grabInfo){ 
-		grabLine = grabInfo.ReadLine();
-		Rev = grabLine.substring(0, grabLine.indexOf('/'));
-		CurScriptIndex = grabLine.substring(grabLine.indexOf('/') + 1, grabLine.length);
-		grabInfo.Close();	
-	}
-	return;
-}
+
 function GS_SearchForClone(areaid)
 {	
+	var dClone, _waypoint, _deltax, _deltay;
+	var _result = false;
+	
 	Print(C_ORANGE + "Searching for DClone");
 	GS_SendInfo(0);
-	var dClone, _result = false;
 	NTTM_CheckAct();
-	NTTM_TownMove("waypoint");
+	NTTM_TownMove("waypoint");	
 	switch(areaid)
 	{
 		case 1:
 		case 40:
 		case 75:
-		case 109:
-		break;
+		case 109: break;
 		case 83 :
-			var _waypoint;
-			var _deltax, _deltay;
-			NTM_TakeWaypoint(83);
-			NTP_DoPrecast(true, true);
-			_waypoint = NTC_FindUnit(NTC_UNIT_OBJECT, GetLocaleString(22526), 5);
-			if(!_waypoint){
-				NTC_SendMsgToScript("NTBotGame.ntj", "NTC_FindUnit()");
-				return;
+			if(NTM_TakeWaypoint(83)){
+				NTP_DoPrecast(true, true);
+				_waypoint = NTC_FindUnit(NTC_UNIT_OBJECT, GetLocaleString(22526), 5);
+				if(!_waypoint){
+					NTC_SendMsgToScript("NTBotGame.ntj", "NTC_FindUnit()");
+					return;
+				}
+				_deltax = _waypoint.x - 5699;
+				_deltay = _waypoint.y - 1584;
+				if(!NTM_MoveTo(me.areaid, 5800+_deltax, 1515+_deltay)){
+					NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
+					return;
+				}
+				_result = true;
 			}
-			_deltax = _waypoint.x - 5699;
-			_deltay = _waypoint.y - 1584;
-			if(!NTM_MoveTo(me.areaid, 5800+_deltax, 1515+_deltay)){
-				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
-				return;
-			}
-			_result = true;
 		break;
 		case 102 :
-			NTM_TakeWaypoint(101);
-			NTP_DoPrecast(true, true);
-			if(!NTM_MoveToStair(me.areaid, 102)){
-				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveToStair()");
-				return;
+			if(NTM_TakeWaypoint(101)){
+				NTP_DoPrecast(true, true);
+				if(!NTM_MoveToStair(me.areaid, 102)){
+					NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveToStair()");
+					return;
+				}
+				if(!NTM_TakeStair(102)){
+					NTC_SendMsgToScript("NTBotGame.ntj", "NTM_TakeStair()");
+					return;
+				}
+				if(!NTM_MoveTo(me.areaid, 17564, 8069)){
+					NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
+					return;
+				}
+				_result = true;
 			}
-			if(!NTM_TakeStair(102)){
-				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_TakeStair()");
-				return;
-			}
-			if(!NTM_MoveTo(me.areaid, 17564, 8069)){
-				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
-				return;
-			}
-			_result = true;
 		break;
 		case 110 :
-			NTM_TakeWaypoint(111);
-			NTP_DoPrecast(true, true);
-			if(!NTM_MoveTo(110, me.x+79, me.y+16)){
-				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
-				return;
+			if(NTM_TakeWaypoint(111)){
+				NTP_DoPrecast(true, true);
+				if(!NTM_MoveTo(110, me.x+79, me.y+16)){
+					NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
+					return;
+				}
+				if(!NTM_MoveToPresetUnit(me.areaid, NTC_UNIT_MONSTER, 776, -5, 5)) {
+					return;
+				}
+				_result = true;
 			}
-			if(!NTM_MoveToPresetUnit(me.areaid, NTC_UNIT_MONSTER, 776, -5, 5)) {
-				return;
-			}
-			_result = true;
 		break;
 		case 111 :
-			NTM_TakeWaypoint(111);
-			NTP_DoPrecast(true, true);			
-			if(!NTM_MoveTo(me.areaid, 3750, 5090)){
-				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
-				return;
+			if(NTM_TakeWaypoint(111)){
+				NTP_DoPrecast(true, true);			
+				if(!NTM_MoveTo(me.areaid, 3750, 5090)){
+					NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveTo()");
+					return;
+				}
+				_result = true;
 			}
-			_result = true;
 		break;
 		case 112 :
-			NTM_TakeWaypoint(112);
-			NTP_DoPrecast(true, true);			
-			if(!NTM_MoveToStair(me.areaid, 113)){
-				NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveToStair()");
-				return;
+			if(NTM_TakeWaypoint(112)){
+				NTP_DoPrecast(true, true);			
+				if(!NTM_MoveToStair(me.areaid, 113)){
+					NTC_SendMsgToScript("NTBotGame.ntj", "NTM_MoveToStair()");
+					return;
+				}
+				_result = true;
 			}
-			_result = true;
 		break;
-		default :GS_SendInfo(2);
-		break;
+		default : GS_SendInfo(2); break;
 	}
+	
 	if(!GS_KillDClone()){
 		Print(COLOR_8 + "No Luck..");
 		if(_result)
 			GS_SendInfo(1);
 	}
-
 }
 
 var m_vdata = "";

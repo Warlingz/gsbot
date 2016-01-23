@@ -1,6 +1,6 @@
 Features : 
 
-Updated to 87-BE and all the features that it entails.
+Updated to 97-BE and all the features that it entails.
 
 You can run bots/followers normally while you have auto rushees/rusher running, so long as you have the cdkeys to do so.
 This is the current bot with my Additions and Tool's I've created and updated over time.
@@ -29,6 +29,10 @@ Fully Automated Rusher/Rushee System : Currently setup to run an unlimited amoun
 		Rename to GSRushLeech3.ntj or similar and set new acc/char settings.
 	- RHPWatch 
 		If rushee(s) gets attacked or dies, rusher will assist or wait.
+	- Auto Set-Skills
+		Rusher will set skills depending on which they have, some classes may not be optimized. Best when using any type of sorc or Hammerdin.
+	- Auto Set-Belt
+		Rusher will use potions currently equipped, instead of dumping to match char config.
 	- Account information
 		Is stored in "scripts/logs/xCompleted Accounts", "scripts/logs/xCompleted Accounts Non Ladder", and accounts created but not complete "scripts/logs/SocketAccounts".
 	- INFO System
@@ -51,28 +55,33 @@ NTEnchanter.ntj :
 	
 DCloneKiller.ntj :
 	- if your bot(using Bot.ntj starter) has NTConfig_CheckCloneDiablo = true & NTConfig_DCloneHandler = 0 or 1 inside char config, bot will kill Dclone spawns.
+	- Checks current area for Dclone before moving to spawn elsewhere(NTConfig_SpawnArea in char config), has a backup search feature if spawning dclone at NTConfig_SpawnArea fails.
 	- Works with Annipicker.ntj & Annimuler.ntj.
 	
 ResetHelper.ntj :
 	- A new and improved ResetHelper.ntj has been included and is located in scripts/NTBot/bots/ResetHelper.ntj.
 	- New commands, rearranged commands to make sense/faster typing.
-	- Contains its own Enchanter function, sorc resethelpers should set NTConfig_Enchanter = false inside char config.
 	- So many additions to list, read the Readme-ResetHelper.txt.
+	- Open your char config and set to use script NTConfig_Script.push("ResetHelper.ntj");
 	
 Auto Anni Mule System : Requires a minimum of 3 cdkeys
 	- This was created during the epic "public dupe", so I didn't miss out on anni's while I was sleeping/working. I didn't remove it and it can be changed/added to for normal muling purposes.	
 	- NTConfig_DCloneHandler in bot char config(the one thats mfing\hunting and getting dspawns) must be set to NTConfig_DCloneHandler = 1;
 	- AnniPicker.ntj
+		Annipicker can pick anni anywhere ingame its dropped.
 		Uses char configs within (scripts/NTBot/bots/char_configs).
 		Uses scripts/NTBot/bots/Annibot.ntj.
-		Open your char config and add : NTConfig_Script.push("Annibot.ntj");
+		Open your char config and set to use script NTConfig_Script.push("AnniPicker.ntj");
+		Set NTConfig_PublicMode = true;
+		Set NTConfig_SoJWaitTime = 0; //incase an soj is sold while muling from hell game that spawned dclone
 		Use the unique.nip pickit or one that contains [Name] == SmallCharm && [Quality] == unique
+		Must be a character able to enter all available acts.
 		Must be a character able to enter Hell games.
 	- Annimuler.ntj
 		Auto creates accounts/characters, Set configs within starter file.
 		Only need to config the starter file, everything else is handled.
 	- Lobby Waiting System
-		Both Picker and Muler wait until needed.
+		Both Picker and Muler wait until needed, they'll back out to character screen and back to lobby every 15 minutes to keep from disconnecting.
 		Once a bot gets a dclone spawn, bot will kill(DCloneKiller.ntj) and auto call for picker.
 		Annipicker will enter game, pick anni and leave game.
 		Annimuler will then create a game, Annipicker will now join this game, drop anni and leave to wait in lobby for next.
@@ -95,7 +104,14 @@ List Creator.exe :
 	- This is a simpler way to create lists than the .bat file, very easy to use and displays all the accounts added to the list.
 	- You can also select one of the files and either press "Enter" or double-click it to open that file.
 	- Works exactly the same way the batch file does, but it leaves out the "delete me.txt" file which the batch file does not.
+	- Can quickly change folder path/file name.
 
+Create List for Account AntiExpire.bat
+	-Creates a List for Account AntiExpire, Edit the Folder Path/File Name to preference.
+	-Default works for accounts created on Ladder by auto rushee(s).
 
-
+Message Log Cleaner.bat
+	-Cleans the messagecomands log folder, which is used by the bots to join games, after several rushes this log starts to fill up.
+	-Run it when needed or in general before starting the bot.
+	-Also cleans the txt files in the scripts folder.
 Enjoy!

@@ -91,9 +91,26 @@ function NT_LoadConfig()
 		NTConfig_CSDodge 				= false;												// dodge in CS
 		
 	//------------------------------------------------------------------------------
-	// Boss Configuration
+	// ResetHelper Script
 	//------------------------------------------------------------------------------
 
+	//NTConfig_Script.push("ResetHelper.ntj");	// ResetHelper script followbot for low levels	
+		NTConfig_followRange = 3;				// max range from leader before catching up recommended between 2-6
+		NTConfig_attackRange = 12;				// this is the range they will search for monsters to attack recommended between 11-14
+		NTConfig_maxAttackRange = 16;			// this is the max range bot(s) will be from leader, if they are past this range and attacking they will stop and catch up recommended between 11-16
+		NTConfig_stairAttackRange = 7;			// in close quarter areas eg catacombs this use this range recommended half of _attackRange
+		NTConfig_stairMaxRange = 9;				// in close quarter areas eg catacombs this use this maxattack range recommended half of _maxAttackRange
+		NTConfig_printUsedCommands = true;		// prints when using a command, helps with learning commands
+		NTConfig_UseTelePads = true;			// if true bot(s) will auto use the telepads in Arcane Sanctuary
+		NTConfig_autoTown = false;				// if You(leader) dies the bot(s) will make a tp and town
+		
+	//------------------------------------------------------------------------------
+	// AnniPicker Script
+	//------------------------------------------------------------------------------
+
+	//NTConfig_Script.push("AnniPicker.ntj"); //AnniPicker must be able to enter hell games and all available acts.
+		NTConfig_IdentifyAnni = false; //If true the anni picker will id the annis as they're picked, needs tome of identify and gold to keep it filled.
+		
 	//------------------------------------------------------------------------------
 	// Act 1 Scripts
 	//------------------------------------------------------------------------------

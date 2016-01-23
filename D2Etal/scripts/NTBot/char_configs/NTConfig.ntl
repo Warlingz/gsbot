@@ -546,3 +546,16 @@ var Enchanter_BlackList = [];
 //DCloneKiller.ntj
 var NTConfig_DCloneHandler;
 var NTConfig_SpawnArea;
+
+//AnniPicker.ntj
+var NTConfig_IdentifyAnni;
+
+//ResetHelper.ntj
+var NTConfig_followRange;
+var NTConfig_attackRange;
+var NTConfig_maxAttackRange;
+var NTConfig_stairAttackRange;
+var NTConfig_stairMaxRange;
+var NTConfig_printUsedCommands;
+var NTConfig_UseTelePads;
+var NTConfig_autoTown;

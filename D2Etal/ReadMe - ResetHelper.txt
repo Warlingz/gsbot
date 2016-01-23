@@ -12,8 +12,8 @@ This script was made for the purposes of a Ladder Reset to have bots follow a ma
 		While in close quarter areas eg Catacombs, Tombs, etc. bots use a smaller range, helps alot to keep control of your bots.
 	Improved Pause -
 		The ";"(pause) command, will stop the bots following/attacking and wait till you've unpaused (does not pause script like before).
-	Auto Enchanter / Buffing -
-		If you have a sorc with enchant skill, she will enchant your party (settings at the top of the script). Bots will also precast their buffs w/o "buff" command.
+	Auto Buffing -
+		Bots will precast their buffs w/o "buff" command.
 	Leave Town -
 		If you use the "7" command and you're just outside of town, the bots will now walk outside town.
 	Auto Use Quest Items -

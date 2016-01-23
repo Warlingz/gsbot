@@ -1,56 +1,9 @@
 //goodstuff's Reset Helper 2.0
 //Credits to Kolton & Stairbuilder, used some of their code/functions
 
-// Follower Settings -
-var _followRange = 3;			// max range from leader before catching up recommended between 2-6
-var _attackRange = 12;			// this is the range they will search for monsters to attack recommended between 11-14
-var _maxAttackRange = 16;		// this is the max range bot(s) will be from leader, if they are past this range and attacking they will stop and catch up recommended between 11-16
-
-var _stairAttackRange = 7;		// in close quarter areas eg catacombs this use this range recommended half of _attackRange
-var _stairMaxRange = 9;			// in close quarter areas eg catacombs this use this maxattack range recommended half of _maxAttackRange
-
-var printUsedCommands = true;	// prints when using a command, helps with learning commands
-
-var _UseTelePads = true;		// if true bot(s) will auto use the telepads in Arcane Sanctuary
-var _autoTown = false;			// if You(leader) dies the bot(s) will make a tp and town
-
-//Enchanter Settings -
-var Enchant_Party = false;			// Enchant Party if have Enchant Skill | Default : true
-var Enchant_Merc = true;			// Enchant Party Mercs/Summons, Enchant_Party must be true | Default : true
-var printEnchants = true;			// Prints players/mercs being enchanted on screen | Default : true (recommended)
-									// Useful to catch anything being spammed(15+) with Enchant(which would need to be blacklisted below)
-									
-var doNotEnchant_Class = [];		// Choose which classes Not to Enchant | Default : [] Enchant Everyone
-
-var doNotEnchant_ClassMerc = [];	// Default : [2] ignores ALL Necromancers mercs & minions		
-									// Use this Format: [0,1,2] etc. Add or Remove to your Preference.
-									// 0:Amazon, 1:Sorceress, 2:Necromancer, 3:Paladin, 4:Barbarian, 5:Druid, 6:Assassin
-													
-var Enchant_BlackList = [			// People/Mercs to Exclude from Enchant Buff / Names Are Case Sensitive
-									// Add any mercs/summons being spammed(15+) with Enchant using printEnchants = true;				
-							"Lightning Sentry",		// Must be Blacklisted
-							"Charged Bolt Sentry",	// Must be Blacklisted 
-							"Blade Sentinel",		// Must be Blacklisted
-							"Mind Maw the Slasher",	// Must be Blacklisted
-							"Cycle of Life",		// Must be Blacklisted
-							"Dire Wolf",			// Must be Blacklisted
-							"Spirit Wolf",			// Must be Blacklisted
-							"Vine Creature",		// Must be Blacklisted
-							"Plague Poppy",			// Must be Blacklisted
-							"Hydra",				// Must be Blacklisted
-							"Rock Worm Young",		// Must be Blacklisted
-							"Blood Maggot Young",	// Must be Blacklisted
-							"Death Sentry",
-							"Raven",
-							"Oak Sage",
-							"Decoy",
-							"Enslaved",
-							"Necroskeleton",
-							"Necromage"
-							];
 							
 //Do Not Edit These
-var chanterVersion = "1.0", _EnchantPlayer = [], _canEnchant, lastposx, lastposy, firstCheck = true, busy = false;
+var busy = false;
 var _player, _leaderUnit, _townArea, _quest = "", _extras = false, _attack = true, paused = false, _questing = false, _tele = false;
 var usedItem = false, questItem = -1;
 var _staticattackrange, _staticmaxrange;
@@ -65,8 +18,8 @@ function NTMain()
 	NT_LoadConfig();
 	NTSI_LoadNIPFiles("NTBot/item_configs");	
 	NTA_Initialize();
-	_staticattackrange = _attackRange;//do not edit
-	_staticmaxrange = _maxAttackRange;//do not edit
+	_staticattackrange = NTConfig_attackRange;//do not edit
+	_staticmaxrange = NTConfig_maxAttackRange;//do not edit
 	
 	me.maxgametime = 0;	
 	NTConfig_SnagRange = 20; //keep this between 15-25
@@ -123,21 +76,21 @@ function chat(msg, type)
             if(_sender == NTConfig_Leader){
                 switch(_msg)
                 {								
-					case "1" : if(IsWayPoint(_player) && me.areaid != _player.areaid){ if(printUsedCommands) Print(C_WHITE + "Taking Leaders Waypoint"); return WPleader(_player, NTConfig_Leader); } else if(!IsWayPoint(_player) && !GS_OutsideTown(_player)) Print(C_RED + "Can't Waypoint there."); break;					
-					case "2" : if(NTC_InTown()){ if(printUsedCommands) Print(C_WHITE + "Taking Leaders Portal"); return TakePortal(NTConfig_Leader); } break;	
+					case "1" : if(IsWayPoint(_player) && me.areaid != _player.areaid){ if(NTConfig_printUsedCommands) Print(C_WHITE + "Taking Leaders Waypoint"); return WPleader(_player, NTConfig_Leader); } else if(!IsWayPoint(_player) && !GS_OutsideTown(_player)) Print(C_RED + "Can't Waypoint there."); break;					
+					case "2" : if(NTC_InTown()){ if(NTConfig_printUsedCommands) Print(C_WHITE + "Taking Leaders Portal"); return TakePortal(NTConfig_Leader); } break;	
 					case "3" : if(!WPHome(_townArea)) return false; break;	
-					case "4" : if(!NTC_InTown()){ if(printUsedCommands) Print(C_WHITE + "Using TP to Town"); PortHome(); if(NTC_InTown() && !GS_HaveItem()) return NTTMGR_TownManager(); } break;	
-					case "5" : if(!NTC_InTown(me)){ if(printUsedCommands) Print(C_WHITE + "TPing to Town"); NTM_MakeTP(true);  if(NTC_InTown() && !GS_HaveItem()) return NTTMGR_TownManager(); } break;		
+					case "4" : if(!NTC_InTown()){ if(NTConfig_printUsedCommands) Print(C_WHITE + "Using TP to Town"); PortHome(); if(NTC_InTown() && !GS_HaveItem()) return NTTMGR_TownManager(); } break;	
+					case "5" : if(!NTC_InTown(me)){ if(NTConfig_printUsedCommands) Print(C_WHITE + "TPing to Town"); NTM_MakeTP(true);  if(NTC_InTown() && !GS_HaveItem()) return NTTMGR_TownManager(); } break;		
 					case "6" : return NTC_CancelOut(1); break;	
-					case "7" : if(GS_OutsideTown(_player) && GS_CanLeaveTown(_player)){ if(printUsedCommands) Print(C_WHITE + "Leaving Town"); GS_WalkOutofTown(me.areaid, _player); } else if((GS_OutsideTown(_player) && !GS_CanLeaveTown(_player)) || !GS_OutsideTown(_player) && !GS_CanLeaveTown(_player)) Print(C_RED + "I can't leave town from here, I must be in same act and you must be just outside town"); break;
-					case "b" : if(printUsedCommands) Print(C_WHITE + "Grabbing Corpse"); return NTT_GetCorpses(); break;	
+					case "7" : if(GS_OutsideTown(_player) && GS_CanLeaveTown(_player)){ if(NTConfig_printUsedCommands) Print(C_WHITE + "Leaving Town"); GS_WalkOutofTown(me.areaid, _player); } else if((GS_OutsideTown(_player) && !GS_CanLeaveTown(_player)) || !GS_OutsideTown(_player) && !GS_CanLeaveTown(_player)) Print(C_RED + "I can't leave town from here, I must be in same act and you must be just outside town"); break;
+					case "b" : if(NTConfig_printUsedCommands) Print(C_WHITE + "Grabbing Corpse"); return NTT_GetCorpses(); break;	
 					case ";" : if(!paused){ paused = true; Print(C_RED + "------------------------| PAUSED |------------------------"); } else if(paused){ paused = false; Print(C_WHITE + "-----------------------| UnPaused |-----------------------"); } return paused; break;		
 					case "tele" : var canTele = NTC_GetSkillLevel(54); if(canTele && !_tele){ Print(C_GREEN + "Teleport On"); _tele = true; } else if(canTele && _tele){ Print(C_GREEN + "Teleport Off"); _tele = false; } else if(!canTele) Print(C_RED + "I Don't Have Teleport"); break;	
 					case "wp" : return GS_GrabWayPoint(); break;	
 					case "mh" : return me.revealautomap = true; break;	
 					case "atk" : if(!_attack){ _attack = true; Print(C_WHITE + "------------- Attacking Resumed -------------"); } else if(_attack){ _attack = false; Print(C_RED + "------------- Not Attacking -------------"); } return _attack; break;	
-					case "buff" : NTP_DoPrecast(true); if(me.classid == 1){ _canEnchant = NTC_GetSkillLevel(52); if(_canEnchant){ Print(COLOR_4 + "AutoEnchanter " + C_GREEN + chanterVersion + COLOR_4 + " Active"); } } break;	
-					case "goeast" : if(printUsedCommands) Print(C_WHITE + "Moving East"); return GoEast(); break;
+					case "buff" : NTP_DoPrecast(true); break;	
+					case "goeast" : if(NTConfig_printUsedCommands) Print(C_WHITE + "Moving East"); return GoEast(); break;
 					case "akara" : return GS_InteractNPC("akara"); break;
 					case "alkor" : return GS_InteractNPC("alkor"); break;
 					case "charsi" : return GS_InteractNPC("charsi"); break;
@@ -227,8 +180,8 @@ function GS_FollowLeader(leader)
 						tgt = NTC_FindUnit(NTC_UNIT_MONSTER);
 						if (tgt) {
 							do {
-								if(tgt && tgt.IsAttackable() && (NTA_IsValidMonster(tgt) && GetDistance(me,tgt) <= _maxAttackRange && GetDistance(me, _leaderUnit) <= _maxAttackRange)){
-									GS_ClearPosition(_attackRange, true);
+								if(tgt && tgt.IsAttackable() && (NTA_IsValidMonster(tgt) && GetDistance(me,tgt) <= NTConfig_maxAttackRange && GetDistance(me, _leaderUnit) <= NTConfig_maxAttackRange)){
+									GS_ClearPosition(NTConfig_attackRange, true);
 								}
 								else continue;
 							} while(tgt.GetNext());
@@ -246,73 +199,37 @@ function GS_FollowLeader(leader)
 					}
 				}
 				else if(!NTC_InTown(_player) && !NTC_InTown()){		
-					if(InStairOpenArea() && _attackRange != _staticattackrange){						
-						_attackRange = _staticattackrange ? _staticattackrange : _attackRange; 
-						_maxAttackRange = _staticmaxrange ? _staticmaxrange : _maxAttackRange;
+					if(InStairOpenArea() && NTConfig_attackRange != _staticattackrange){						
+						NTConfig_attackRange = _staticattackrange ? _staticattackrange : NTConfig_attackRange; 
+						NTConfig_maxAttackRange = _staticmaxrange ? _staticmaxrange : NTConfig_maxAttackRange;
 					}
-					if(InStair() && _attackRange != _stairAttackRange){										
-						_attackRange = _stairAttackRange ? _stairAttackRange : _attackRange;
-						_maxAttackRange = _stairMaxRange ? _stairMaxRange : _maxAttackRange;
+					if(InStair() && NTConfig_attackRange != NTConfig_stairAttackRange){										
+						NTConfig_attackRange = NTConfig_stairAttackRange ? NTConfig_stairAttackRange : NTConfig_attackRange;
+						NTConfig_maxAttackRange = NTConfig_stairMaxRange ? NTConfig_stairMaxRange : NTConfig_maxAttackRange;
 					}
 					
 					if(GetDistance(me,_leaderUnit) != -1 && me.areaid == _player.areaid){
 						NTP_DoPrecast(false);						
-						if(_autoTown && _leaderUnit.mode == 17)
+						if(NTConfig_autoTown && _leaderUnit.mode == 17)
 							NTM_MakeTP(true);
-						if(me.areaid == 74 && _UseTelePads)
+						if(me.areaid == 74 && NTConfig_UseTelePads)
 							GS_TakeTelepad(_leaderUnit);
-						if(Enchant_Party && me.classid == 1)
-							GS_AutoEnchant();
-						if(GetDistance(me,_leaderUnit) > _followRange && _leaderUnit.mode != 17){							
+						if(GetDistance(me,_leaderUnit) > NTConfig_followRange && _leaderUnit.mode != 17){							
 							if(GS_GetCloserLeader(_leaderUnit)){
 								if(_attack){
-									tgt = NTC_FindUnit(NTC_UNIT_MONSTER);
-									if (tgt) {
-										do {
-											if(tgt && tgt.IsAttackable() && (NTA_IsValidMonster(tgt) && GetDistance(me,tgt) <= _maxAttackRange && GetDistance(me, _leaderUnit) <= _maxAttackRange)){
-												if(GetDistance(me,tgt) > 1 && GetDistance(me,tgt) <= _maxAttackRange && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0)){
-													 GS_GetCloserMonster(tgt);
-													 NTA_Attack(tgt, true);
-												}
-												else if(GetDistance(me,tgt) > 1 && GetDistance(me,tgt) <= _maxAttackRange && (NTConfig_AttackSkill[1] != 0 || NTConfig_AttackSkill[3] != 0)){
-													 NTA_Attack(tgt, true);
-												}
-												 if(tgt.hp < 1){
-													 NTSI_PickItems();
-												 }
-											}
-											else continue;
-										} while(tgt.GetNext());
-									}
+									GS_ClearMonsters(NTConfig_maxAttackRange);
 								}
 							}
 							else if(!GS_GetCloserLeader(_leaderUnit) && GetDistance(me,_leaderUnit) > 10 && GetDistance(me,_leaderUnit) < 80 && GetDistance(me,_leaderUnit) != -1 && me.areaid == _leaderUnit.areaid){
 								GS_Unstuck(_leaderUnit);
 							}
 						}
-						else if(GetDistance(me,_leaderUnit) <= _followRange+1 && GetDistance(me,_leaderUnit) != -1 && _leaderUnit.mode != 17){
+						else if(GetDistance(me,_leaderUnit) <= NTConfig_followRange+1 && GetDistance(me,_leaderUnit) != -1 && _leaderUnit.mode != 17){
 							if(_attack){
-								tgt = NTC_FindUnit(NTC_UNIT_MONSTER);
-								if (tgt) {
-									do {
-										if(tgt && tgt.IsAttackable() && (NTA_IsValidMonster(tgt) && GetDistance(me,tgt) <= _maxAttackRange && GetDistance(me, _leaderUnit) <= _maxAttackRange)){
-											if(GetDistance(me,tgt) > 1 && GetDistance(me,tgt) <= _maxAttackRange && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0)){
-												 GS_GetCloserMonster(tgt);
-												 NTA_Attack(tgt, true);
-											}
-											else if(GetDistance(me,tgt) > 1 && GetDistance(me,tgt) <= _maxAttackRange && (NTConfig_AttackSkill[1] != 0 || NTConfig_AttackSkill[3] != 0)){
-												 NTA_Attack(tgt, true);
-											}
-											 if(tgt.hp < 1){
-												 NTSI_PickItems();
-											 }
-										}
-										else continue;
-									} while(tgt.GetNext());
-								}
+								GS_ClearMonsters(NTConfig_maxAttackRange);
 							}
 							else if(!_attack){
-								for(var i = 0 ; i < 100 && me.areaid == _player.areaid && GetDistance(me,_leaderUnit) <= _followRange ; i++){
+								for(var i = 0 ; i < 100 && me.areaid == _player.areaid && GetDistance(me,_leaderUnit) <= NTConfig_followRange ; i++){
 									Delay(100);
 								}
 							}
@@ -330,7 +247,79 @@ function GS_FollowLeader(leader)
 	else
 		return false;
 }
-
+function GS_ClearMonsters(range)
+{	
+	var monster, _distance, _mingid, _minshamangid, _mindistance, _minshamandistance;
+	var _skiplist;
+	var _spectype = [0x08, 0x02, 0x04, 0x0A, 0x10, 0x01];
+	for(var i = 0; i < _spectype.length && GetDistance(me, _leaderUnit) <= range && !NTC_InTown() && !paused; i++){
+		monster = NTC_FindUnit(NTC_UNIT_MONSTER);
+		_skiplist = new Array();
+		_minshamandistance = 100000;
+		_mindistance = 100000;
+		if (monster) {
+			do {
+				if (_skiplist.indexOf(monster.gid) < 0) {
+					if (monster.IsAttackable() && (monster.spectype & _spectype[i])){
+						if (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(me, _leaderUnit) <= range){
+							_distance = GetDistance(me, monster);
+							if (_distance < range) {
+								_mingid = monster.gid;
+								_mindistance = _distance;
+							}
+							if ((MonstersToAttackFirst.indexOf(monster.classid) > -1) && GetDistance(monster, _leaderUnit) <= range){
+								_minshamangid = monster.gid;
+								_minshamandistance = _distance;
+							}
+							if (_minshamandistance < 100000){
+								monster = NTC_FindUnit(NTC_UNIT_MONSTER, _minshamangid);		
+								if(monster && monster.IsAttackable() && (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(me, _leaderUnit) <= range)){
+									if(GetDistance(me,monster) > 1 && GetDistance(me,monster) <= range && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0)){
+										 GS_GetCloserMonster(monster);
+										while(monster.IsAttackable() && (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(monster, _leaderUnit) <= range) && monster.hp > 1){				 
+											NTA_Attack(monster, true);
+										}
+									}
+									else if(GetDistance(me,monster) > 1 && GetDistance(me,monster) <= range && (NTConfig_AttackSkill[1] != 0 || NTConfig_AttackSkill[3] != 0)){
+										while(monster.IsAttackable() && (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(monster, _leaderUnit) <= range) && monster.hp > 1){				 
+											NTA_Attack(monster, true);
+										}
+									}
+									 if(monster.hp < 1){
+										 NTSI_PickItems();
+									 }
+								}
+							}
+							else if (_mindistance < 100000){			
+								monster = NTC_FindUnit(NTC_UNIT_MONSTER, _mingid);		
+								if(monster && monster.IsAttackable() && (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(me, _leaderUnit) <= range)){
+									if(GetDistance(me,monster) > 1 && GetDistance(me,monster) <= range && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0)){
+										 GS_GetCloserMonster(monster);
+										while(monster.IsAttackable() && (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(monster, _leaderUnit) <= range) && monster.hp > 1){				 
+											NTA_Attack(monster, true);
+										}
+									}
+									else if(GetDistance(me,monster) > 1 && GetDistance(me,monster) <= range && (NTConfig_AttackSkill[1] != 0 || NTConfig_AttackSkill[3] != 0)){
+										while(monster.IsAttackable() && (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(monster, _leaderUnit) <= range) && monster.hp > 1){				 
+											NTA_Attack(monster, true);
+										}
+									}
+									 if(monster.hp < 1){
+										 NTSI_PickItems();
+									 }
+								}
+							}
+						}
+					}
+					else { 
+						_skiplist.push(monster.gid);
+					}
+				}
+			} while(monster.GetNext());
+		}
+		else return false;
+	}
+}
 function WPleader(unit, name)
 {	
 	if(unit.name == name){
@@ -358,7 +347,7 @@ function WPHome(town)
 {
 	if(!NTC_InTown()){
 		if(GS_NearWaypoint() || me.areaid == 46 || me.areaid == 74){
-			if(printUsedCommands)
+			if(NTConfig_printUsedCommands)
 				Print(C_WHITE + "Using Waypoint to Town");
 			NTM_TakeWaypoint(town);
 		}
@@ -720,108 +709,6 @@ function GS_WalkOutofTown(area, unit)
 	}
 }
 
-function GS_AutoEnchant()
-{	
-	if(!NTC_InTown() && me.classid == 1 && !busy && me.mode != 0 && me.mode != 17){
-		if(firstCheck){
-			_canEnchant = NTC_GetSkillLevel(52); 
-			if(_canEnchant){ 
-				firstCheck = false; 
-				Print(COLOR_4 + "AutoEnchanter " + C_GREEN + chanterVersion + COLOR_4 + " Active"); 
-			}
-		}
-		if(_canEnchant)
-			EnchantPlayer();
-	}
-}
-
-function EnchantPlayer()
-{			
-	var _unit = NTC_FindUnit(NTC_UNIT_PLAYER);
-	if(_canEnchant && _unit){
-		busy = true;
-		if(me.areaid == 131){ lastposx = me.x; lastposy = me.y; }			
-		do{			
-			if (Enchant_BlackList.indexOf(_unit.name) == -1 && doNotEnchant_Class.indexOf(_unit.classid) == -1 && _unit.areaid == me.areaid && _unit.name != me.name && NTC_InMyParty(_unit.name) && !_unit.GetState(16) && _unit.mode != 0 && _unit.mode != 17){
-				if(_EnchantPlayer.indexOf(_unit.name) == -1 && Enchant_Merc)
-					_EnchantPlayer.push(_unit.name);
-				if(!_unit.GetState(16) && me.mp >= 25){
-					if(GetDistance(me,_unit) < 15){
-						if(!NTC_CastSkill(52, NTC_HAND_RIGHT, _unit))
-							return false;
-					}
-					else if(GetDistance(me,_unit) > 20){
-						if(GS_GetCloserLeader(_unit)){	
-							if(!NTC_CastSkill(52, NTC_HAND_RIGHT, _unit))
-								return false;
-						}
-					}
-					if(_unit.GetState(16)){
-						if(printEnchants){
-							Print(COLOR_8 + "Enchanted Player : " + COLOR_4 + _unit.name);
-						}
-					}
-				} if(me.areaid == 131 && me.x != lastposx && me.y != lastposy) if(!_tele)NTM_WalkTo(lastposx, lastposy); else if(_tele)NTM_MoveTo(me.areaid, lastposx, lastposy);
-			}
-		}while (_unit.GetNext()); if(Enchant_Merc) EnchantMerc(); busy = false;
-	}
-	
-	return false;			
-	function EnchantMerc(){			
-		var mercOwner;
-		var _unit = NTC_FindUnit(NTC_UNIT_MERC);
-		if(!_unit){return false;}
-		if (_unit){
-			do{
-				for(var i = 0 ; i < _EnchantPlayer.length ; i++){
-					if (NTC_CheckOwner(_unit, _EnchantPlayer[i]) && !_unit.GetState(16) && _unit.mode != 12 && _unit.mode != 0){
-						mercOwner = GS_GetUnit(_EnchantPlayer[i]);
-						if(Enchant_BlackList.indexOf(_unit.name) == -1 && doNotEnchant_ClassMerc.indexOf(mercOwner.classid) == -1){
-							if(!_unit.GetState(16) && me.mp >= 25){
-								if(GetDistance(me,_unit) < 15){
-									if(printEnchants)
-										Print(COLOR_9 + "Enchanting [ " + COLOR_4 + mercOwner.name + "'s" + COLOR_9 + " ] Merc : " + COLOR_0 + _unit.name);																						
-									if(!NTC_CastSkill(52, NTC_HAND_RIGHT, _unit))
-										return false;
-								}
-							} if(me.areaid == 131 && me.x != lastposx && me.y != lastposy) NTM_MoveTo(me.areaid, lastposx, lastposy);
-						}
-					}
-				}
-			}while(_unit.GetNext());
-		}
-		
-	}
-
-	function ClassIDToName(classid){
-		var id2name;
-		
-		switch(classid){
-			case 0 : id2name = "Amazon"; break;
-			case 1 : id2name = "Sorceress"; break;
-			case 2 : id2name = "Necromancer"; break;
-			case 3 : id2name = "Paladin"; break;
-			case 4 : id2name = "Barbarian"; break;
-			case 5 : id2name = "Druid"; break;
-			case 6 : id2name = "Assassin"; break;
-		}
-		return id2name;
-	}
-
-	function GS_GetUnit(name){
-		var _unit = GetPlayerUnit();
-		if (_unit){
-			do{
-				if (_unit.name === name){
-					return _unit;
-				}
-				else
-					continue;
-			}while(_unit.GetNext());
-		}
-	}
-}
-
 function GS_Quester(quest)
 {
 	//Currently not being used, maybe i'll add more to this and implement it at a later point
@@ -979,7 +866,7 @@ function GS_GetCloserLeader(unit)
 { 
 
 	if(!_tele || GetDistance(me, unit) < 15){		
-		if(GetDistance(me, unit) > _followRange){
+		if(GetDistance(me, unit) > NTConfig_followRange){
 			if(NTM_WalkTo(unit.x+1, unit.y))
 				return true;
 			else
@@ -1002,7 +889,7 @@ function GS_Unstuck(unit)
 
 function GS_GetCloserMonster(monster)
 { 
-	if(GetDistance(me, monster) < _maxAttackRange){		
+	if(GetDistance(me, monster) < NTConfig_maxAttackRange){		
 		if(GetDistance(me, monster) > 1){
 			if(NTM_WalkTo(monster.x+1, monster.y))
 				return true;
@@ -1621,13 +1508,13 @@ function GS_ClearPosition(range, pickitem, safelevel) {
 	_orgx = me.x;
 	_orgy = me.y;
 
-	for (var i = 0; i < _spectype.length && GetDistance(me, _leaderUnit) <= _maxAttackRange && !NTC_InTown() && !paused; i++) {
+	for (var i = 0; i < _spectype.length && GetDistance(me, _leaderUnit) <= NTConfig_maxAttackRange && !NTC_InTown() && !paused; i++) {
 		_skiplist = new Array();
 		var	_gid_lastKnownHealth = new Array();
 		var	_gid_goodattackcount = new Array();
 
-		while (_attackcount < (i + 1) * 100 && !NTC_InTown() && GetDistance(me, _leaderUnit) <= _maxAttackRange && !paused) {
-			if(GetDistance(me, _leaderUnit) > _maxAttackRange)
+		while (_attackcount < (i + 1) * 100 && !NTC_InTown() && GetDistance(me, _leaderUnit) <= NTConfig_maxAttackRange && !paused) {
+			if(GetDistance(me, _leaderUnit) > NTConfig_maxAttackRange)
 				break;
 			_minshamandistance = 100000;
 			_mindistance = 100000;
@@ -1636,20 +1523,15 @@ function GS_ClearPosition(range, pickitem, safelevel) {
 
 			if (_target) {
 				do {
-					if(GetDistance(me, _leaderUnit) > _maxAttackRange)
+					if(GetDistance(me, _leaderUnit) > NTConfig_maxAttackRange)
 						break;
 					if (_skiplist.indexOf(_target.gid) < 0) {
 						if (_target.IsAttackable() && (_target.spectype & _spectype[i])) {
-							if (GetDistance(_orgx, _orgy, _target.x, _target.y) <= range && NTA_IsValidMonster(_target) && GetDistance(me,_target) <= _maxAttackRange && GetDistance(me, _leaderUnit) <= _maxAttackRange) {
+							if (GetDistance(_orgx, _orgy, _target.x, _target.y) <= range && NTA_IsValidMonster(_target) && GetDistance(me,_target) <= NTConfig_maxAttackRange && GetDistance(me, _leaderUnit) <= NTConfig_maxAttackRange) {
 								_distance = GetDistance(me, _target);
 								if (_distance < _mindistance) {
 									_mingid = _target.gid;
 									_mindistance = _distance;
-										if(GetDistance(me,_target) > 1 && GetDistance(me,_target) <= _maxAttackRange && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0)){
-											 //Print(C_DARK_GREEN + "Getting Closer 1468 - " + _target.name); 
-											 GS_GetCloserMonster(_target);
-											 NTA_Attack(_target, (_attackcount % 30) == 0);
-										}
 								}
 								if ((MonstersToAttackFirst.indexOf(_target.classid) > -1) && _distance < _minshamandistance) {
 									_minshamangid = _target.gid;
@@ -1673,7 +1555,7 @@ function GS_ClearPosition(range, pickitem, safelevel) {
 							if (_gid_goodattackcount[_minshamangid] == undefined) {
 								_gid_goodattackcount[_minshamangid] = 1; 
 								_gid_lastKnownHealth[_minshamangid] = _target.hp; 
-								if(GetDistance(me,_target) > 1 && GetDistance(me,_target) <= _maxAttackRange && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0)){
+								if(GetDistance(me,_target) > 1 && GetDistance(me,_target) <= NTConfig_maxAttackRange && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0)){
 									 //Print(C_DARK_GREEN + "Getting Closer 1496 - " + _target.name); 
 									 GS_GetCloserMonster(_target);
 									 NTA_Attack(_target, (_attackcount % 30) == 0);
@@ -1697,7 +1579,7 @@ function GS_ClearPosition(range, pickitem, safelevel) {
 						}
 					}
 
-					if(GetDistance(me,_target) > 1 && GetDistance(me,_target) <= _maxAttackRange && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0)){
+					if(GetDistance(me,_target) > 1 && GetDistance(me,_target) <= NTConfig_maxAttackRange && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0)){
 						 //Print(C_DARK_GREEN + "Getting Closer 1520 - " + _target.name); 
 						 GS_GetCloserLeader(_target);
 						 NTA_Attack(_target, (_attackcount % 30) == 0);
@@ -1751,7 +1633,7 @@ function GS_ClearPosition(range, pickitem, safelevel) {
 						}
 					}
 
-					if(GetDistance(me,_target) > 1 && GetDistance(me,_target) <= _maxAttackRange && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0)){
+					if(GetDistance(me,_target) > 1 && GetDistance(me,_target) <= NTConfig_maxAttackRange && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0)){
 						 //Print(C_DARK_GREEN + "Getting Closer 1575 - " + _target.name); 
 						 GS_GetCloserMonster(_target);
 						 NTA_Attack(_target, (_attackcount % 30) == 0);

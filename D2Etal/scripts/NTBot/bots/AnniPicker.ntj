@@ -1,7 +1,5 @@
 //Written by goodstuff 8/03/15
 
-var identifyAnni = false; // Set true to ID anni's when picked, Picker must have a tome of identify and gold to keep it filled
-
 function NTMain()
 {	
 	Include("libs/common/NTCommon.ntl");
@@ -11,7 +9,7 @@ function NTMain()
 	NT_LoadConfig();
 	NTSI_LoadNIPFiles("NTBot/item_configs");
 	NTA_Initialize();	
-	if(identifyAnni)
+	if(NTConfig_IdentifyAnni)
 		NTTMGR_TownManager();
 	
 	if(me.diff == 0) {
@@ -122,7 +120,7 @@ function haveAnni() {
 			if(_items[i].itemloc == 0){
 				Print(C_BROWN + "Picked up Anni!");
 				_anni = true;
-				if(identifyAnni){
+				if(NTConfig_IdentifyAnni){
 					if (tome && tome.GetStat(70) > 0) {
 						SetUIState(0x01, true);
 						NTC_PingDelay(200);

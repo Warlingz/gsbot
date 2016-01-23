@@ -13,5 +13,9 @@ cd "scripts\logs\messagecomands"
 
 del *.txt
 
+cd ..\..
+
+del *.txt
+
 if "%errorlevel%" == "1" ( echo ERROR: The File could not be Deleted, Make sure the Folder Path Exist's) else ( echo                          Folder Cleaned! )
 timeout /t 30
