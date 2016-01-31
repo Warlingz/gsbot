@@ -8,28 +8,95 @@ You can find any additional information @ www.projectetal.com/forums/index.php?t
 var _npc;
 var lifeChunked = false;
 
-function NTR_CoverRushee(area)
-{	
-	area = me.areaid;
+function NTR_MovetoRushee(){
+
 	var _player = GetPlayerUnit();
 	
+	do{
+		if(_player.name !== me.name && _player.areaid === me.areaid){
+			return TelePlayer(_player);
+		}
+	}while(_player.GetNext());
+	
+	function TelePlayer(unit){
+		var _unit = GetLeaderUnit(unit.name);
+
+		if(GetDistance(me, _unit) > 2){
+			NT_GetCloserIntS(_unit);
+				return true;
+		}
+		else if(GetDistance(me, _unit) == -1 && me.areaid == unit.areaid){
+			if(NTM_MoveTo(me.areaid, unit.x, unit.y))
+					return true;
+		}
+		else
+			return false;
+	}
+}
+function NTR_WaitforLeech( range, seconds){
+	
+	var count = 0;
+	rusheeleech = NTR_GetPlayer(RusheeLeech);
+	
+	var _player = GetPlayerUnit();
 	while(_player.GetNext()){
-		if(_player.name !== me.name && _player.areaid === area){
-			if(!TelePlayer())
-				break;
+		var _leechUnit = GetLeaderUnit(_player.name);
+		if(_player.name == rusheeleech.name){
+			if(GetDistance(me, _leechUnit) == -1 || GetDistance(me, _leechUnit) > range){		
+				Print(COLOR_5 + "Waiting for RusheeLeecher");
+				while((GetDistance(me, _leechUnit) == -1 || GetDistance(me, _leechUnit) > range) && count < seconds){
+					_leechUnit = GetLeaderUnit(_player.name);
+					count++;
+					NTC_Delay(1000);
+				}
+			}
 		}
 	}
-	function TelePlayer(){	
+}
+
+function NTR_WaitforRushee(range, seconds)
+{	
+	rushee = NTR_GetPlayer(Rushee);
+	var _player = GetPlayerUnit();	
+	var _leaderUnit = GetLeaderUnit(_player.name);
+	var count = 0;
+		
+	while(_player.GetNext()){
+		_leaderUnit = GetLeaderUnit(_player.name);
+		if(_player.name == rushee.name){
+			if(GetDistance(me, _leaderUnit) == -1 || GetDistance(me, _leaderUnit) > range){		
+				Print(COLOR_5 + "Waiting for Rushee");			
+				while((GetDistance(me, _leaderUnit) == -1 || GetDistance(me, _leaderUnit) > range) && count < seconds){
+					_leaderUnit = GetLeaderUnit(_player.name);
+					count++;
+					NTC_Delay(1000);
+				}
+			}
+		}
+	}
+}
+
+function NTR_CoverRushee()
+{	
+	var _player = GetPlayerUnit();
 	
-		var _leaderUnit = GetLeaderUnit(_player.name);
+	do{
+		if(_player.name !== me.name && _player.areaid === me.areaid){
+			return TelePlayer(_player);
+		}
+	}while(_player.GetNext());
+	
+	function TelePlayer(unit){	
+	
+		var _leaderUnit = GetLeaderUnit(unit.name);
 	
 		if(GetDistance(me, _leaderUnit) > 2){
 			NT_GetCloserIntS(_leaderUnit);
 			if(NTA_ClearPosition(25))
 				return true;
 		}
-		else if(GetDistance(me, _leaderUnit) == -1 && me.areaid == _player.areaid){
-			if(NTM_MoveTo(me.areaid, _player.x, _player.y))
+		else if(GetDistance(me, _leaderUnit) == -1 && me.areaid == unit.areaid){
+			if(NTM_MoveTo(me.areaid, unit.x, unit.y))
 				if(NTA_ClearPosition(25))
 					return true;
 		}
@@ -37,7 +104,7 @@ function NTR_CoverRushee(area)
 			return false;
 	}
 }
-function GetRushee(name)
+function NTR_GetPlayer(name)
 {
 	var _unit = GetPlayerUnit();
 	
@@ -55,7 +122,7 @@ function NTR_GoRushee()
 {	
 	var _rushee = NTR_GetRushee();
 	var _player = GetPlayerUnit();
-	var rushee = GetRushee(_rushee);
+	var rushee = NTR_GetPlayer(_rushee);
 	var _msg;
 	
 	switch(me.areaid)
@@ -78,7 +145,7 @@ function NTR_GoRushee()
 	}
 
 	do{
-		rushee = GetRushee(_rushee);
+		rushee = NTR_GetPlayer(_rushee);
 		if(_player.name == rushee.name && _player.areaid == me.areaid){
 			TelePlayer();
 			NTM_MakeTP();
@@ -216,7 +283,7 @@ function NTR_Death(area)
 	
 	var _area = GetArea();
 	var _player = GetPlayerUnit();
-	var _rusher = GetRushee(NTConfig_Leader);
+	var _rusher = NTR_GetPlayer(NTConfig_Leader);
 		
 	switch(area){
 		case 8 :
@@ -599,7 +666,8 @@ function NTR_TalkNPC(who)
 		case "tyrael" : _npc = NTC_FindUnit(NTC_UNIT_NPC, GetLocaleString(1013), 5); break;
 		case "anya" : _npc = NTC_FindUnit(NTC_UNIT_NPC, NTC_NPC_ID_ANYA_TOWN, 5); break;
 		case "malah" : _npc = NTC_FindUnit(NTC_UNIT_NPC, 513, 5); break;		
-	} 
+	}
+	Delay(500);
 	if(_npc){
 		if(NTT_VisitNpc(_npc)){
 			for(var i = 0; i < 5 ; i++){
@@ -642,8 +710,6 @@ function NTR_ReturnToTyrael(type)
 			}
 		break;
 		case 1:
-			if(!NTTM_TownMove("portalspot")){ return false; }
-			NTC_Delay(500, 1000);
 		break;
 	}
 	return true;
@@ -668,29 +734,30 @@ function NTR_TalktoJeryhn()
 	return false;
 }
 
-function NTR_TalkJer()
+function NTR_TalkJer(type)
 {	
-	var _npc;	
+	var _npc;
 	NTC_Delay(200, 500);
 	if(me.areaid == 40){
 		Print(C_DARK_GREEN + "Talking to Jerhyn");
 		if(!NTR_TalkNPC("palace")){
 			return false;
-		}
+		}	
 	}
 	return true;
+	
 }
 function NTR_GoDrognan()
 {
-	NTC_Delay(100);
+	var _npc;
 	if(me.areaid == 40){
 		Print(C_DARK_GREEN + "Talking to Drognan");
 		if(!NTR_TalkNPC("drognan")){
 			return false;
-		}
+		}	
 		NTR_CheckLocation();
- 	}
-	return true;
+	}
+	return true;	
 }
 function NTR_GoAlkor()
 {
@@ -711,13 +778,9 @@ function NTR_TalkTyraelSpirit()
       	if(_npc){
 			NTM_MoveTo(_npc.areaid, _npc.x, _npc.y);
 			NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _npc);
-			for(var i = 0 ;i < 4 ; i+=1){
-				NTC_CancelMenus();
+			for(var i = 0 ;i < 2 ; i+=1){
 				NTC_Delay(100);
-				if((i % 4) == 0){
-					NTC_Delay(100);
-					NTC_CancelOut(0);
-				}
+				NTC_CancelMenus();
 			}
 		}				
 	}
@@ -773,14 +836,34 @@ function NTR_GoTyrael()
 		_npc = NTC_FindUnit(NTC_UNIT_NPC, GetLocaleString(1013), 5);      
 		if(_npc){
 			if(NTT_VisitNpc(_npc)){
-				for(var i = 0 ; i < 5 ; i++){
+				for(var i = 0 ; i < 2 ; i++){
 					NTC_Delay(200);
 					NTC_CancelMenus();
+					NTC_CancelOut(0);
 				}
 			}
 		}
 		NTC_Delay(200, 500);
-		NTR_GoHarrogath();										
+		for(var i = 0 ; i < 100 && me.areaid != 109 ; i+=1){
+			if(!NTR_GoHarrogath()){
+					NTC_Delay(1000);
+				}
+		}									
+	}
+	return;
+}
+function NTR_MovetoTyrael()
+{
+	var _npc;
+	NTC_Delay(100);
+	if(me.areaid == 103){
+		NTC_Delay(200, 500);
+		NTTM_TownMove("tyrael");
+		for(var i = 0 ; i < 100 && me.areaid != 109 ; i+=1){
+			if(!NTR_GoHarrogath()){
+					NTC_Delay(1000);
+				}
+		}				
 	}
 	return;
 }
@@ -869,12 +952,10 @@ function NTR_UseScrollOfTownPortal()
 	var i;
 	var _usescroll = me.GetItems(529);
 	var returnCheck = false;
-	if(_usescroll.length == 0){
-		Print("Don't have: " + COLOR_17 + "a Scroll of Town Portal");		
+	if(_usescroll.length == 0){	
 		returnCheck = true;
 	}
 	if(returnCheck){
-		Print(COLOR_17 + "No Scroll in Inventory");
 		return false;
 	}	
 	else if(!returnCheck){
@@ -895,11 +976,9 @@ function NTR_UseScrollOfTownPortal()
 				break;
 			}
 		}
-	me.Cancel(1);
-	if(_usescroll.length > 0)
-		return true;
-	else
-		return false;
+		me.Cancel(1);	
+		Delay(200);		
+		return NTR_TakePortal();
 	}
 }
 function NTR_OpenAmmy()
@@ -920,65 +999,92 @@ function NTR_OpenAmmy()
 
 function NTR_CheckQuest()
 {
-	var cube = me.GetItems(549);
-	var staff = me.GetItems(92);
-	var ammy = me.GetItems(521);
-	var horadricstaff = me.GetItems(91);
-	if(cube.length > 0 && ammy.length > 0 && staff.length > 0 || horadricstaff.length > 0){
-		NT_File("logs/questlog/QuestStatus.txt", 1, "false");			
+	var cube, staff, ammy, horadricstaff;
+	
+	switch(me.areaid)
+	{
+		case 1 :
+			break;
+		case 40 :
+			cube = me.GetItems(549);
+			staff = me.GetItems(92);
+			ammy = me.GetItems(521);
+			horadricstaff = me.GetItems(91);
+			if(cube.length > 0 && ammy.length > 0 && staff.length > 0 || horadricstaff.length > 0){
+				NT_File("logs/questlog/QuestStatus.txt", 1, "false");			
+			}
+			if(cube.length < 1 && ammy.length > 0 && staff.length > 0){
+				NT_File("logs/questlog/QuestStatus.txt", 1, "CTS");			
+			}
+			else if(horadricstaff.length > 0 && me.GetQuest(13, 0) && me.GetQuest(13, 2)){
+				NT_File("logs/questlog/QuestStatus.txt", 1, "summoner");			
+			}
+			else if(me.GetQuest(13, 0) && me.GetQuest(13, 2) && me.GetQuest(13, 12)){
+				NT_File("logs/questlog/QuestStatus.txt", 1, "duriel");			
+			}
+			else if(me.GetQuest(13, 0) && me.GetQuest(13, 2)&& horadricstaff.length < 1){
+				NT_File("logs/questlog/QuestStatus.txt", 1, "duriel");			
+			}
+			else if(me.GetQuest(13, 0) && me.GetQuest(13, 12) && horadricstaff.length < 1 || me.GetQuest(13,0)){
+				NT_File("logs/questlog/QuestStatus.txt", 1, "duriel");			
+			}
+			else					
+				NT_File("logs/questlog/QuestStatus.txt", 1, "false");
+			break;
+		case 75 :
+			break;
+		case 103 :
+			break;
+		case 109 :
+			break;
 	}
-	if(cube.length < 1 && ammy.length > 0 && staff.length > 0){
-		NT_File("logs/questlog/QuestStatus.txt", 1, "CTS");			
-	}
-	else if(horadricstaff.length > 0 && me.GetQuest(13, 0) && me.GetQuest(13, 2)){
-		NT_File("logs/questlog/QuestStatus.txt", 1, "summoner");			
-	}
-	else if(me.GetQuest(13, 0) && me.GetQuest(13, 2) && me.GetQuest(13, 12)){
-		NT_File("logs/questlog/QuestStatus.txt", 1, "duriel");			
-	}
-	else if(me.GetQuest(13, 0) && me.GetQuest(13, 2)&& horadricstaff.length < 1){
-		NT_File("logs/questlog/QuestStatus.txt", 1, "duriel");			
-	}
-	else if(me.GetQuest(13, 0) && me.GetQuest(13, 12) && horadricstaff.length < 1 || me.GetQuest(13,0)){
-		NT_File("logs/questlog/QuestStatus.txt", 1, "duriel");			
-	}
-	else					
-		NT_File("logs/questlog/QuestStatus.txt", 1, "false");
 }
 
 function NTR_CheckQuestItem()
 {
-	var cube = me.GetItems(549);
-	var staff = me.GetItems(92);
-	var ammy = me.GetItems(521);
-	var horadricstaff = me.GetItems(91);
+	var cube, staff, ammy, horadricstaff;
 	
-	NTR_CheckQuest();
-	
-	if(horadricstaff.length > 0 && cube.length > 0){
-		return NT_File("logs/questlog/QuestItem.txt", 1, "horadricstaff");
+	switch(me.areaid)
+	{
+		case 1 :
+			break;
+		case 40 :
+			cube = me.GetItems(549);
+			staff = me.GetItems(92);
+			ammy = me.GetItems(521);
+			horadricstaff = me.GetItems(91);
+			if(horadricstaff.length > 0 && cube.length > 0){
+				return NT_File("logs/questlog/QuestItem.txt", 1, "horadricstaff");
+			}
+			else if(cube.length > 0 && ammy.length > 0 && staff.length > 0){
+				NT_File("logs/questlog/QuestItem.txt", 1, "horadricstaff");
+				NTR_CubeStaff();
+			}
+			else if(cube.length > 0 && ammy.length < 1 && staff.length > 0){		
+				return NT_File("logs/questlog/QuestItem.txt", 1, "both");
+			}
+			else if(cube.length > 0 && ammy.length > 0 && staff.length < 1){		
+				return NT_File("logs/questlog/QuestItem.txt", 1, "ammy");
+			}
+			else if(cube.length > 0 && ammy.length < 1 && staff.length < 1){		
+				return NT_File("logs/questlog/QuestItem.txt", 1, "cube");
+			}
+			else if(cube.length < 1 && ammy.length < 1 && staff.length < 1){		
+				return NT_File("logs/questlog/QuestItem.txt", 1, "none");
+			}
+			else if(cube.length < 1 && ammy.length > 0 && staff.length > 0){		
+				return NT_File("logs/questlog/QuestItem.txt", 1, "JC");
+			}
+			else
+				return false;
+		case 75 :
+			break;
+		case 103 :
+			break;
+		case 109 :
+			break;
+		
 	}
-	else if(cube.length > 0 && ammy.length > 0 && staff.length > 0){
-		NT_File("logs/questlog/QuestItem.txt", 1, "horadricstaff");
-		NTR_CubeStaff();
-	}
-	else if(cube.length > 0 && ammy.length < 1 && staff.length > 0){		
-		return NT_File("logs/questlog/QuestItem.txt", 1, "both");
-	}
-	else if(cube.length > 0 && ammy.length > 0 && staff.length < 1){		
-		return NT_File("logs/questlog/QuestItem.txt", 1, "ammy");
-	}
-	else if(cube.length > 0 && ammy.length < 1 && staff.length < 1){		
-		return NT_File("logs/questlog/QuestItem.txt", 1, "cube");
-	}
-	else if(cube.length < 1 && ammy.length < 1 && staff.length < 1){		
-		return NT_File("logs/questlog/QuestItem.txt", 1, "none");
-	}
-	else if(cube.length < 1 && ammy.length > 0 && staff.length > 0){		
-		return NT_File("logs/questlog/QuestItem.txt", 1, "JC");
-	}
-	else
-		return false;
 }
 
 function NTR_PickItems() {
@@ -1229,17 +1335,12 @@ function NTR_OpenAltar()
 function NTR_GoHarrogath()
 {
 	var _gath = NTM_TakeUnit(NTC_UNIT_OBJECT, GetLocaleString(22646));
-	if(me.areaid == 103){
-		if(!_gath){return false;}
-		if(_gath){ 
-			NTC_Delay(100);
-         	NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _gath); 			
-		}
-	}
-	if(me.areaid == 0 || me.areaid == 109)
+	if(!_gath){return false;}
+	if(_gath){ 
+		NTC_Delay(100);
+		NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _gath);
 		return true;
-	else
-		return false;
+	}
 }
 function NTR_GetHammer()
 {
@@ -1356,7 +1457,7 @@ function NTR_Hammer()
 }
 function NTR_ClearSpot(delay)
 {
-	for (i = 0; i < 5; i++){
+	for (var i = 0; i < 2; i++){
 		NTC_Delay(delay);//wait for monsters to draw near
 		NTA_ClearPosition(20);
 	}
@@ -1453,11 +1554,11 @@ function NTR_ClearLevel(pickitem, safelevel) {
 	while (_rooms.length > 0) {
 		_mindistance = 100000;
 		
-		if(me.GetQuest(1, 4) || me.GetQuest(1,12) && me.GetQuest(1,0)){
+		if((me.GetQuest(1,4) && me.GetQuest(1,1)) || (me.GetQuest(1,4) && !me.GetQuest(1,0))){
 			NTR_LeaveDen();
 			break;
 		}
-		for (i = 0; i < _rooms.length && !me.GetQuest(1,4) ; i++) {
+		for (i = 0; i < _rooms.length && !me.GetQuest(1,4); i++) {
 			_distance = GetDistance(me.x, me.y, _rooms[i][0], _rooms[i][1]);
 
 			if (_distance < _mindistance) {
@@ -1477,6 +1578,7 @@ function NTR_ClearLevel(pickitem, safelevel) {
 
 function NTR_ClearDen(pickitem, safelevel) {
 	var i;
+	var count = 0;
 	var _room, _rooms;
 	var _distance, _minindex, _mindistance;
 	_room = GetRoom();
@@ -1496,7 +1598,7 @@ function NTR_ClearDen(pickitem, safelevel) {
 	do {
 		_rooms.push([parseFloat(_room.x * 5 + _room.xsize * 5 / 2), parseFloat(_room.y * 5 + _room.ysize * 5 / 2)]);
 	} while(_room.GetNext());
-	while (!NTC_IsQuesterOut() && _rooms.length > 0) {
+	while (!NTC_IsQuesterOut() && _rooms.length > 0){
 		_mindistance = 100000;
 		for (i = 0; i < _rooms.length; i++) {
 			_distance = GetDistance(me.x, me.y, _rooms[i][0], _rooms[i][1]);
@@ -1519,28 +1621,36 @@ function NTR_ClearDen(pickitem, safelevel) {
 	return true;
 }
 
-function NTR_Den()
-{
-	while(me.areaid == 8 && !me.GetQuest(1, 4) && !me.GetQuest(1, 1)){
-		NTR_ClearLevel(false);
-	}
-}
 function NTR_LeaveDen()
 {
 	if(me.GetQuest(1, 4) && me.GetQuest(1, 1) && me.areaid == 8){
 		Print(C_DARK_GREEN + "Den Quest Complete");
 		NTC_Delay(300);
 		if(!NTR_UseScrollOfTownPortal()){
-			Say("Cant TownPortal");
+			Say("portal me");
+			Delay(4000);
+			if(!NTR_TakePortal()){
+				Delay(2000);
+				NTR_TakePortal
+			}
 		}
-		Say("portal me");
-		
-		NTC_Delay(1500);
-		
-		NTR_TakePortal();
+		if(me.areaid === 1)
+			NTR_GoAkara();
+		return;
 	}
-	if(me.areaid === 1)
-		return NTR_GoAkara();
+	else{
+		if(!NTR_UseScrollOfTownPortal()){
+			Say("portal me");
+			Delay(4000);
+			if(!NTR_TakePortal()){
+				Delay(2000);
+				NTR_TakePortal
+			}
+		}
+		else if(me.areaid == 1){
+			return;
+		}
+	}
 }
 function GetLeaderUnit(name){
 	var _unit = NTC_FindUnit(NTC_UNIT_PLAYER);	
@@ -1600,31 +1710,6 @@ function NTR_RusheeLeecherHere() {
 	}
 }
 
-function NTR_FindRushee() {
-	var count = 0;
-	var _unit;
-	var found = false;	
-	var _rushee; 
-	
-	do{
-        NTC_Delay(2000);
-		_rushee = NTR_RetrieveRusheeName();
-		_unit = GetPlayerUnit();
-		do {
-		  if (_unit.name == _rushee)
-		  {
-			found = true;
-			break;
-		  }
-		} while (_unit.GetNext());
-		count ++;
-	} while ((!found) && (count < 10));	
-	
-	if (count<10) {
-		return _rushee;
-	}
-}
-
 function NTR_GetRushee() {
 	var count = 0;
 	var _unit;
@@ -1650,56 +1735,34 @@ function NTR_GetRushee() {
 	}
 }
 
-function NTR_LeechFindRusher() {
+function NTR_FindRusher(counter) {
 	var count = 0;
 	var _unit;
 	var found = false;	
 	var _rusher; 
 	
 	do{
-        NTC_Delay(2000);
-		_rusher = NTR_RetrieveRusherName();
-		_unit = GetPlayerUnit();
-		do {
-		  if (_unit.name == _rusher)
-		  {
-			found = true;
-			break;
-		  }
-		} while (_unit.GetNext());
-		count ++;
-	} while ((!found) && (count < 5));	
+		if (count < counter) {
+			NTC_Delay(2000);
+			_rusher = NTR_RetrieveRusherName();
+			_unit = GetPlayerUnit();
+			do {
+			  if (_unit.name == _rusher)
+			  {
+				found = true;
+				break;
+			  }
+			} while (_unit.GetNext());
+			count ++;
+		}
+		else if(count >= counter) {
+			Print(COLOR_8 + "Taking too long to find rusher. Exiting game");
+			ExitGame();
+		}
+	} while ((!found) && (count < counter));	
 	
-	if (count<5) {
-		return _rusher;
-	}
-	else {
-		Print(COLOR_8 + "Taking too long to find rusher. Exiting game");
-		ExitGame();
-	}
-}
-
-function NTR_FindRusher() {
-	var count = 0;
-	var _unit;
-	var found = false;	
-	var _rusher; 
-	
-	do{
-        NTC_Delay(2000);
-		_rusher = NTR_RetrieveRusherName();
-		_unit = GetPlayerUnit();
-		do {
-		  if (_unit.name == _rusher)
-		  {
-			found = true;
-			break;
-		  }
-		} while (_unit.GetNext());
-		count ++;
-	} while ((!found) && (count < 40));	
-	
-	if (count<40) {
+	if (count < counter) {
+		Print(COLOR_8 + "Found Rusher : " + _rusher);
 		return _rusher;
 	}
 	else {
@@ -1722,6 +1785,20 @@ function NTR_RetrieveRusheePos() {
             _pos = me.charloc;
         
 	return _pos;
+}
+
+function NTR_IncrementRusheePos() {
+	var _pos;
+        
+	_pos = NTR_RetrieveRusheePos();
+	NT_File("logs/loc/rushbot-"+ me.account + "-rusheepos.txt", 1, ++_pos);        
+}
+
+function NTR_ZeroRusheePos() {
+	var _pos;
+        
+	_pos = NTR_RetrieveRusheePos();
+	NT_File("logs/loc/rushbot-"+ me.account + "-rusheepos.txt", 1, 0);        
 }
 
 function NTR_RetrieveRusheeAccPos() {
@@ -1768,20 +1845,6 @@ function NTR_IncrementRusheeAccPos() {
 		_newpos = parseInt(_pos) + 2;	
 		NT_File("logs/loc/rushbot-"+ me.account + "-Accnumber.txt", 1, _newpos); 
 	}
-}
-
-function NTR_IncrementRusheePos() {
-	var _pos;
-        
-	_pos = NTR_RetrieveRusheePos();
-	NT_File("logs/loc/rushbot-"+ me.account + "-rusheepos.txt", 1, ++_pos);        
-}
-
-function NTR_ZeroRusheePos() {
-	var _pos;
-        
-	_pos = NTR_RetrieveRusheePos();
-	NT_File("logs/loc/rushbot-"+ me.account + "-rusheepos.txt", 1, 0);        
 }
 
 function NTR_MoveOut(target, range) {

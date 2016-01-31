@@ -70,7 +70,7 @@ Auto Anni Mule System : Requires a minimum of 3 cdkeys
 	- AnniPicker.ntj
 		Annipicker can pick anni anywhere ingame its dropped.
 		Uses char configs within (scripts/NTBot/bots/char_configs).
-		Uses scripts/NTBot/bots/Annibot.ntj.
+		Uses scripts/NTBot/bots/AnniPicker.ntj.
 		Open your char config and set to use script NTConfig_Script.push("AnniPicker.ntj");
 		Set NTConfig_PublicMode = true;
 		Set NTConfig_SoJWaitTime = 0; //incase an soj is sold while muling from hell game that spawned dclone

@@ -225,7 +225,7 @@ function GS_Loading()
 	Print(C_ORANGE + "Loading One Moment Please..");
 	SetSkills();
 	Delay(600);	
-	Rushee = NTR_FindRushee();
+	Rushee = NTR_GetRushee();
 	Delay(500);
 	GetPlayer();	
 	Delay(500);
@@ -245,32 +245,30 @@ function GS_Loading()
 var qitem, qstatus;
 function WhatToDO()
 {	
-	rushee = GetRushee(Rushee);
+	rushee = NTR_GetPlayer(Rushee);
 	
 	if(rushee){
 		if(rushee.areaid == 0){
 			Print(C_ORANGE + "One Moment Please, Figuring out where to go..");
 		}
+		qitem = NT_File("logs/questlog/QuestItem.txt", 0);
+		qstatus = NT_File("logs/questlog/QuestStatus.txt", 0);
+		
 		switch(me.areaid)
 		{
-			case 1 : 
-					if(!busy && !andy && rushee.areaid == 1)
+			default :
+					if(!busy && !andy && rushee.areaid == 1){
 						DoAndy();
-					break;			
-			case 40 : 			
-					qitem = NT_File("logs/questlog/QuestItem.txt", 0);
-					qstatus = NT_File("logs/questlog/QuestStatus.txt", 0);						
-					if(rushee.areaid == 1)
-						DoAndy();
+					}
 					else if(!busy && !duriel && qitem == "none" && rushee.areaid == 40){
 						DoCube(); DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
-					} 
+					}
 					else if(!busy && !duriel && qitem == "JC" && qstatus == "CTS" && rushee.areaid == 40){
 						DoCube(); Delay(5000); DoSummoner(); DoDuriel();
-					} 
+					}
 					else if(!busy && !duriel && qitem == "cube" && qstatus != "duriel"  && qstatus != "summoner" && rushee.areaid == 40){
 						DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
-					} 
+					}
 					else if(!busy && !duriel && qitem == "cube" && qstatus == "duriel" && rushee.areaid == 40){
 						DoDuriel();
 					}
@@ -279,10 +277,10 @@ function WhatToDO()
 					}
 					else if(!busy && !duriel && qitem == "ammy" && rushee.areaid == 40){
 						DoStaff(); DoSummoner(); DoDuriel();
-					} 
+					}
 					else if(!busy && !duriel && qitem == "both" && rushee.areaid == 40){
 						DoAmmy(); DoSummoner(); DoDuriel();
-					} 
+					}
 					else if(!busy && !duriel && qitem == "horadricstaff" && (qstatus == "false" || !qstatus ) && rushee.areaid == 40){
 						DoSummoner(); DoDuriel();
 					}
@@ -291,64 +289,13 @@ function WhatToDO()
 					}
 					else if(!busy && rushee.areaid == 75){
 						DoTrav(); DoMeph(); 
-					} 
-					else if(!busy && !diablo && rushee.areaid == 103) 
-						DoDiablo(); 
-					else if(!busy && !shenk && rushee.areaid == 109) 
-						DoShenk(); 
-					break;
-			case 75 : 
-					if(!busy && rushee.areaid == 1)
-						DoAndy();
-					else if(!busy && !duriel && rushee.areaid == 40){
-						DoCube(); DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
-					} 
-					else if(!busy && !meph && rushee.areaid == 75){ 
-						DoTrav(); DoMeph(); 
-					} 
-					else if(!busy && !diablo && rushee.areaid == 103) 
-						DoDiablo(); 
-					else if(!busy && !shenk && rushee.areaid == 109) 
-						DoShenk(); 
-					break;
-			case 103 : 
-					if(!busy && rushee.areaid == 1)
-						DoAndy();
-					else if(!busy && !duriel && rushee.areaid == 40){
-						DoCube(); DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
-					} 
-					else if(!busy && !meph && rushee.areaid == 75){ 
-						DoTrav(); DoMeph(); 
-					} 
-					else if(rushee.areaid == 109){						
-						if(!NTTM_TownMove("waypoint"))
-						{
-							NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
-							return;
-						}
-						if (!NTM_TakeWaypoint(109)) {
-							NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
-							return;
-						}
 					}
-					else if(!busy && !diablo && rushee.areaid == 103) 
-						DoDiablo(); 
-					else if(!busy && !shenk && rushee.areaid == 109) 
+					else if(!busy && !diablo && rushee.areaid == 103){
+						DoDiablo();
+					}
+					else if(!busy && !shenk && rushee.areaid == 109){
 						DoShenk(); 
-					break;
-			case 109 : 
-					if(!busy && rushee.areaid == 1)
-						DoAndy();
-					else if(!busy && !duriel && rushee.areaid == 40){
-						DoCube(); DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
-					} 
-					else if(!busy && !meph && rushee.areaid == 75){ 
-						DoTrav(); DoMeph(); 
-					} 
-					else if(!busy && !diablo && rushee.areaid == 103) 
-						DoDiablo(); 
-					else if(!busy && !shenk && rushee.areaid == 109) 
-						DoShenk(); 
+					}
 					else if(!busy && shenk) 
 						NTC_SendMsgToScript("NTRushGame.ntj", "end"); 
 					break;
@@ -388,7 +335,8 @@ function chat(msg, type)
 					break;
 					
 				case "portal me" :
-					NTM_MakeTP();
+					if(NTR_MovetoRushee())
+						NTM_MakeTP();
 					break;
 				case "mh" :
 					me.revealautomap = true;
@@ -409,99 +357,34 @@ function chat(msg, type)
 
 }
 
-function Rush(area){
-	
-	area = me.areaid;
-		
+function Rush(){
+			
 	if(!busy){
-		rushee = GetRushee(Rushee);
-		switch(area)
+		rushee = NTR_GetPlayer(Rushee);
+		switch(me.areaid)
 		{
-			case 1 : 
-					if(!busy && !andy && rushee.areaid == 1)
+			default : 
+					if(!busy && !andy && rushee.areaid == 1){
 						DoAndy();
-					else if(!busy && !duriel && rushee.areaid == 40){
-						DoCube(); DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
-					} 
-					else if(!busy && rushee.areaid == 75){
-						DoTrav(); DoMeph(); 
-					} 
-					else if(!busy && !diablo && rushee.areaid == 103) 
-						DoDiablo(); 
-					else if(!busy && !shenk && rushee.areaid == 109) 
-						DoShenk(); 
-					break;			
-			case 40 : 
-					if(!busy && rushee.areaid == 1)
-						DoAndy();
-					else if(!busy && !duriel && rushee.areaid == 40){
-						DoCube(); DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
-					} 
-					else if(!busy && rushee.areaid == 75){
-						DoTrav(); DoMeph(); 
-					} 
-					else if(!busy && !diablo && rushee.areaid == 103) 
-						DoDiablo(); 
-					else if(!busy && !shenk && rushee.areaid == 109) 
-						DoShenk(); 
-					break;		
-			case 75 : 
-					if(!busy && rushee.areaid == 1)
-						DoAndy();
-					else if(!busy && !duriel && rushee.areaid == 40){
-						DoCube(); DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
-					} 
-					else if(!busy && !meph && rushee.areaid == 75){ 
-						DoTrav(); DoMeph(); 
-					} 
-					else if(!busy && !diablo && rushee.areaid == 103) 
-						DoDiablo(); 
-					else if(!busy && !shenk && rushee.areaid == 109) 
-						DoShenk(); 
-					break;
-			case 103 : 
-					if(!busy && rushee.areaid == 1)
-						DoAndy();
-					else if(!busy && !duriel && rushee.areaid == 40){
-						DoCube(); DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
-					} 
-					else if(!busy && !meph && rushee.areaid == 75){ 
-						DoTrav(); DoMeph(); 
-					} 
-					else if(rushee.areaid == 109){						
-						if(!NTTM_TownMove("waypoint"))
-						{
-							NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
-							return;
-						}
-						if (!NTM_TakeWaypoint(109)) {
-							NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
-							return;
-						}
 					}
-					else if(!busy && !diablo && rushee.areaid == 103) 
-						DoDiablo(); 
-					else if(!busy && !shenk && rushee.areaid == 109) 
-						DoShenk(); 
-					break;
-			case 109 : 
-					if(!busy && rushee.areaid == 1)
-						DoAndy();
 					else if(!busy && !duriel && rushee.areaid == 40){
 						DoCube(); DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
-					} 
-					else if(!busy && !meph && rushee.areaid == 75){ 
+					}
+					else if(!busy && rushee.areaid == 75){
 						DoTrav(); DoMeph(); 
-					} 
-					else if(!busy && !diablo && rushee.areaid == 103) 
-						DoDiablo(); 
-					else if(!busy && !shenk && rushee.areaid == 109) 
+					}
+					else if(!busy && !diablo && rushee.areaid == 103){						
+						DoDiablo();
+					}
+					else if(!busy && !shenk && rushee.areaid == 109){
 						DoShenk(); 
-					else if(!busy && shenk) 
+					}
+					else if(!busy && shenk)
 						NTC_SendMsgToScript("NTRushGame.ntj", "end"); 
 					break;
 		}
-	}return;
+	}
+	return;
 }
 
 function DoAndy()
@@ -1097,69 +980,6 @@ function DoDuriel()
 	
 }
 
-function WaitforLeech(area, range, seconds){
-	
-	var count = 0;
-	rusheeleech = GetRushee(RusheeLeech);
-	
-	var _player = GetPlayerUnit();		
-	switch(area)
-	{
-		case 75 :
-			while(_player.GetNext()){
-				var _leechUnit = GetLeaderUnit(_player.name);
-				if(_player.name == rusheeleech.name){
-					if(GetDistance(me, _leechUnit) == -1 || GetDistance(me, _leechUnit) > range){		
-						Print(COLOR_5 + "Waiting for RusheeLeecher");
-						while((GetDistance(me, _leechUnit) == -1 || GetDistance(me, _leechUnit) > range) && count < seconds){
-							_leechUnit = GetLeaderUnit(_player.name);
-							count++;
-							NTC_Delay(1000);
-						}
-					}
-				}
-			}
-		break;
-		case 109 :
-			while(_player.GetNext()){
-				var _leechUnit = GetLeaderUnit(_player.name);
-				if(_player.name == rusheeleech.name){
-					if(GetDistance(me, _leechUnit) == -1 || GetDistance(me, _leechUnit) > 80){	
-						Print(COLOR_5 + "Waiting for RusheeLeecher");
-						while((GetDistance(me, _leechUnit) == -1 || GetDistance(me, _leechUnit) > 80) && count < seconds){
-							_leechUnit = GetLeaderUnit(_player.name);
-							count++;
-							NTC_Delay(1000);
-						}
-					}
-				}
-			}
-		break;
-	}
-}
-
-function WaitforRushee(range, seconds)
-{	
-	rushee = GetRushee(Rushee);
-	var _player = GetPlayerUnit();	
-	var _leaderUnit = GetLeaderUnit(_player.name);
-	var count = 0;
-		
-	while(_player.GetNext()){
-		var _leaderUnit = GetLeaderUnit(_player.name);
-		if(_player.name == rushee.name){
-			if(GetDistance(me, _leaderUnit) == -1 || GetDistance(me, _leaderUnit) > range){		
-				Print(COLOR_5 + "Waiting for Rushee");			
-				while((GetDistance(me, _leaderUnit) == -1 || GetDistance(me, _leaderUnit) > range) && count < seconds){
-					_leaderUnit = GetLeaderUnit(_player.name);
-					count++;
-					NTC_Delay(1000);
-				}
-			}
-		}
-	}
-}
-
 function DoTrav()
 {
 	Print(COLOR_3 + "Starting Travincal");
@@ -1186,9 +1006,9 @@ function DoTrav()
 	}
 
 	if(WaitforLeecher){
-		WaitforLeech(75, 30, 35);
+		NTR_WaitforLeech(30, 25);
 	}
-	WaitforRushee(30, 35);
+	NTR_WaitforRushee(30, 25);
 	
 	if(!NTM_TakeWaypoint(83)) {
 		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
@@ -1314,7 +1134,7 @@ function DoMeph()
 		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveTo()");
 		return;
 	}
-	if(DoKillCouncils) {	
+	if(DoKillCouncils || NTConfig_KillCouncils) {	
 		if(!NTM_MoveTo(me.areaid, 17617, 8068)) {
 			NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveTo()");
 			return;
@@ -1521,7 +1341,7 @@ function DoShenk()
 	NTTMGR_TownManager();
 
 	if(WaitforLeecher){
-		WaitforLeech(109, 25, 50);
+		NTR_WaitforLeech(80, 25);
 	}
 	
 	if(!NTTM_TownMove("waypoint")) {
@@ -1576,20 +1396,6 @@ function DoShenk()
 	shenk = true;
 	andy = true;
 	
-}
-
-function GetRushee(name)
-{
-	var _unit = GetPlayerUnit();
-	
-	if (_unit) {
-		do {
-			if (_unit.name === name) {
-				return _unit;
-			}
-		} while (_unit.GetNext());
-	}	
-	return false;
 }
 
 function GetPlayer() // using Rugruth's NTR_FindRusher() modified to get Rushee name

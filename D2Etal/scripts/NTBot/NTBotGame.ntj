@@ -1,6 +1,6 @@
 var CurScriptIndex = 0;
 var LastScript = false;
-var Rev = "BE-97.24";
+var Rev = "BE-97.25";
 
 var SoJNotify = false;
 var CloneDiabloString = GetLocaleString(11005);
@@ -11,6 +11,7 @@ var InitLife;
 var Corpses = 0;
 var checkActOnce = false;
 var endtime = null;
+var d2monitor = "WindowsForms10.Window.8.app.0.378734a";
 
 function D2NTStatus(where, time, message) { return SendCopyData('D2NT Manager', null, where << 16 | time, message); }
 function NTMain()
@@ -30,11 +31,9 @@ function NTMain()
 	NT_LoadConfig();
 	NTE_InitializeStats();
 	//Print(NTConfig_FreeSpace);
-
 	if (NTConfig_MinIngameTime > 0) {
 		endtime = GetTickCount() + 1000 * 60 * NTConfig_MinIngameTime;
-	}
-
+	}	
 	if(!me.gamename && me.GetStat(12) > 90 && !me.playertype) { Say("/players 5"); } // For softcore SP players to increase MF and such
 
 	if(NTConfig_FreeSpace == 0)
@@ -255,12 +254,12 @@ function NT_GameMsgEvents(msg, type)
 			break;
 		case 4:
             if(msg.indexOf(CloneDiabloString) != -1) {
-				NT_File("logs/AnniLog/AnniIP.txt", 1, "[IP:" + me.gameserverip.split(".")[3] + "]"); 
+
+				SendToD2Monitor("[IP:" + me.gameserverip.split(".")[3] + "] DClone Spawned");
+				
                 CloneDiabloNotify = true;
                 SoJNotify = false;
-                NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_4 + CloneDiabloString);				
-				var dClone = NT_File("logs/mylogs/Diablo.txt", 0);
-				if(!dClone) NT_File("logs/mylogs/Diablo.txt", 1, 0);
+                NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_4 + CloneDiabloString);
                 NT_LogDclone();//log event to file
 				
 				if(NTConfig_DCloneHandler > -1){
@@ -297,7 +296,7 @@ function NT_GameMsgEvents(msg, type)
 					NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_4 + "Not waiting for DClone - not in a hell game");
 				}
 				if(me.diff == 2) {
-					NT_File("logs/AnniLog/SojSales.txt", 1, msg);
+					SendToD2Monitor(msg.substring(0, msg.length - 13));
 					SoJNotify = true;
 					SoJElapsedTime = 0;             
 					NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_4 + msg);

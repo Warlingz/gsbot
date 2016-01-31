@@ -14,7 +14,7 @@ function NTMain()
 	
 	Print(C_WHITE + "Ladder - " + _ladder);
 	
-	NTConfig_Leader = NTR_LeechFindRusher();
+	NTConfig_Leader = NTR_FindRusher(20);
 	
 	RegisterEvent(EVENT_GAMEMSG, chat);
 
@@ -24,17 +24,17 @@ function NTMain()
 	while(NTC_InMyParty(NTConfig_Leader)){
 		if(me.hp < 1 && !NTC_InTown()){
 			NTR_Death();
-		}		
-		if(NTC_InTown() && me.hp < me.hpmax){
-			NTR_Heal();
-		}		
-		if(!NTC_InTown() && me.mode != 17 && me.mode != 0 && me.hp < me.hpmax){
-			NTR_HPCheck();
-		}		
+		}
 		if(me.hp > 1){
+			if(NTC_InTown() && me.hp < me.hpmax){
+				NTR_Heal();
+			}		
+			if(!NTC_InTown() && me.mode != 17 && me.mode != 0 && me.hp < me.hpmax){
+				NTR_HPCheck();
+			}
 			Questing(me.areaid);
-		}		
-		NTC_Delay(100);		
+		}
+		NTC_Delay(100);
 	}
 					
 }
@@ -58,20 +58,6 @@ function Questing(area)
 				LocationChecka1 = true;
 				return LocationChecka1;
 			}
-			break;
-			
-		case 8 :
-				NTC_Delay(1000);
-			if((!me.GetQuest(1, 4) && !me.GetQuest(1, 1) || !me.GetQuest(1,12) && !me.GetQuest(1,0)) && me.areaid == 8){
-				NTC_Delay(1000);
-				NTR_ClearLevel(NTConfig_Leader);
-			}
-			else if((me.GetQuest(1, 4) && me.GetQuest(1, 1) || me.GetQuest(1,12) && me.GetQuest(1,0)) && me.areaid == 8){
-				NTC_PingDelay(300);
-				if(!NTR_UseScrollOfTownPortal()){
-					Say("Cant TownPortal");
-				}
-			}		
 			break;
 		case 40 : // ACT 2 ---------------------------------------------
 				NTC_Delay(1000);
@@ -232,7 +218,7 @@ var i;
 					case "Diablo is dead!" :
 						NTC_PingDelay(100, 3000);
 						if(me.areaid == 103)
-							NTR_GoTyrael();
+							NTR_MovetoTyrael();
 						break;		
 				// ACT 5 Case's---------------------------------------------
 					case "Shenk up!" :

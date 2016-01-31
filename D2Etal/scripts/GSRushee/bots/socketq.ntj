@@ -12,7 +12,7 @@ function NTMain()
 
 	NT_LoadConfig();
 	NTSI_LoadNIPFiles("GSRushee/item_configs");
-
+	
 	_ladder = me.ladder;
 	
 	Print(C_WHITE + "Ladder - " + _ladder);
@@ -21,28 +21,28 @@ function NTMain()
 		NTR_CheckQuestItem();		
 	}
 	
-	NTConfig_Leader = NTR_FindRusher();
+	NTConfig_Leader = NTR_FindRusher(40);
 	
 	RegisterEvent(EVENT_GAMEMSG, chat);
 	
 	while(!NTC_InMyParty(NTConfig_Leader)){
 		NTC_Delay(500);
 	}
-	
+		
 	while(NTC_InMyParty(NTConfig_Leader)){
 		if(me.hp < 1 && !NTC_InTown()){
 			NTR_Death();
-		}		
-		if(NTC_InTown() && me.hp < me.hpmax){
-			NTR_Heal();
-		}		
-		if(!NTC_InTown() && me.mode != 17 && me.mode != 0 && me.hp < me.hpmax){
-			NTR_HPCheck();
-		}		
+		}
 		if(me.hp > 1){
+			if(NTC_InTown() && me.hp < me.hpmax){
+				NTR_Heal();
+			}		
+			if(!NTC_InTown() && me.mode != 17 && me.mode != 0 && me.hp < me.hpmax){
+				NTR_HPCheck();
+			}
 			Questing(me.areaid);
-		}		
-		NTC_Delay(100);		
+		}
+		NTC_Delay(100);
 	}
 					
 }
@@ -66,12 +66,7 @@ function Questing(area)
 				LocationChecka1 = true;
 				return LocationChecka1;
 			}
-			break;
-			
-		case 8 :
-			NTC_Delay(1000);
-			NTR_ClearLevel(false);
-			break;
+			break;			
 		case 40 : // ACT 2 ---------------------------------------------
 			NTC_Delay(1000);		
 			if(NTC_InTown() && !LocationChecka2){

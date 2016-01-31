@@ -35,7 +35,7 @@ function NTMain()
 	while(NTC_InMyParty(NTConfig_Leader)){
 		if(me.mode != 17 && me.mode != 0)
 			GS_FollowLeader(NTConfig_Leader);
-		NTC_Delay(150);
+		NTC_Delay(10);
 	}
 	
 	NTC_SendMsgToScript("NTBotGame.ntj", "SCRIPT_END");	
@@ -217,16 +217,16 @@ function GS_FollowLeader(leader)
 						if(GetDistance(me,_leaderUnit) > NTConfig_followRange && _leaderUnit.mode != 17){							
 							if(GS_GetCloserLeader(_leaderUnit)){
 								if(_attack){
-									GS_ClearMonsters(NTConfig_maxAttackRange);
+									GS_ClearMonsters(NTConfig_attackRange, _leaderUnit);
 								}
 							}
 							else if(!GS_GetCloserLeader(_leaderUnit) && GetDistance(me,_leaderUnit) > 10 && GetDistance(me,_leaderUnit) < 80 && GetDistance(me,_leaderUnit) != -1 && me.areaid == _leaderUnit.areaid){
 								GS_Unstuck(_leaderUnit);
 							}
 						}
-						else if(GetDistance(me,_leaderUnit) <= NTConfig_followRange+1 && GetDistance(me,_leaderUnit) != -1 && _leaderUnit.mode != 17){
+						else if(GetDistance(me,_leaderUnit) <= NTConfig_followRange+2 && GetDistance(me,_leaderUnit) != -1 && _leaderUnit.mode != 17){
 							if(_attack){
-								GS_ClearMonsters(NTConfig_maxAttackRange);
+								GS_ClearMonsters(NTConfig_attackRange, _leaderUnit);
 							}
 							else if(!_attack){
 								for(var i = 0 ; i < 100 && me.areaid == _player.areaid && GetDistance(me,_leaderUnit) <= NTConfig_followRange ; i++){
@@ -247,12 +247,12 @@ function GS_FollowLeader(leader)
 	else
 		return false;
 }
-function GS_ClearMonsters(range)
+function GS_ClearMonsters(range, leaderunit)
 {	
 	var monster, _distance, _mingid, _minshamangid, _mindistance, _minshamandistance;
 	var _skiplist;
 	var _spectype = [0x08, 0x02, 0x04, 0x0A, 0x10, 0x01];
-	for(var i = 0; i < _spectype.length && GetDistance(me, _leaderUnit) <= range && !NTC_InTown() && !paused; i++){
+	for(var i = 0; i < _spectype.length && GetDistance(me, leaderunit) <= NTConfig_maxAttackRange && !NTC_InTown() && !paused; i++){
 		monster = NTC_FindUnit(NTC_UNIT_MONSTER);
 		_skiplist = new Array();
 		_minshamandistance = 100000;
@@ -261,27 +261,28 @@ function GS_ClearMonsters(range)
 			do {
 				if (_skiplist.indexOf(monster.gid) < 0) {
 					if (monster.IsAttackable() && (monster.spectype & _spectype[i])){
-						if (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(me, _leaderUnit) <= range){
+						if (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(me, leaderunit) <= NTConfig_maxAttackRange){
 							_distance = GetDistance(me, monster);
 							if (_distance < range) {
 								_mingid = monster.gid;
 								_mindistance = _distance;
 							}
-							if ((MonstersToAttackFirst.indexOf(monster.classid) > -1) && GetDistance(monster, _leaderUnit) <= range){
+							if ((MonstersToAttackFirst.indexOf(monster.classid) > -1) && GetDistance(monster, leaderunit) <= NTConfig_maxAttackRange){
 								_minshamangid = monster.gid;
 								_minshamandistance = _distance;
 							}
 							if (_minshamandistance < 100000){
 								monster = NTC_FindUnit(NTC_UNIT_MONSTER, _minshamangid);		
-								if(monster && monster.IsAttackable() && (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(me, _leaderUnit) <= range)){
+								if(monster && monster.IsAttackable() && (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(me, leaderunit) <= NTConfig_maxAttackRange)){
 									if(GetDistance(me,monster) > 1 && GetDistance(me,monster) <= range && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0)){
 										 GS_GetCloserMonster(monster);
-										while(monster.IsAttackable() && (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(monster, _leaderUnit) <= range) && monster.hp > 1){				 
+										while(monster.IsAttackable() && (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(monster, leaderunit) <= NTConfig_maxAttackRange) && monster.hp > 1){				 
+											GS_GetCloserMonster(monster);
 											NTA_Attack(monster, true);
 										}
 									}
 									else if(GetDistance(me,monster) > 1 && GetDistance(me,monster) <= range && (NTConfig_AttackSkill[1] != 0 || NTConfig_AttackSkill[3] != 0)){
-										while(monster.IsAttackable() && (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(monster, _leaderUnit) <= range) && monster.hp > 1){				 
+										while(monster.IsAttackable() && (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(monster, leaderunit) <= NTConfig_maxAttackRange) && monster.hp > 1){				 
 											NTA_Attack(monster, true);
 										}
 									}
@@ -292,15 +293,16 @@ function GS_ClearMonsters(range)
 							}
 							else if (_mindistance < 100000){			
 								monster = NTC_FindUnit(NTC_UNIT_MONSTER, _mingid);		
-								if(monster && monster.IsAttackable() && (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(me, _leaderUnit) <= range)){
+								if(monster && monster.IsAttackable() && (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(me, leaderunit) <= NTConfig_maxAttackRange)){
 									if(GetDistance(me,monster) > 1 && GetDistance(me,monster) <= range && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0)){
 										 GS_GetCloserMonster(monster);
-										while(monster.IsAttackable() && (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(monster, _leaderUnit) <= range) && monster.hp > 1){				 
+										while(monster.IsAttackable() && (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(monster, leaderunit) <= NTConfig_maxAttackRange) && monster.hp > 1){				 
+											GS_GetCloserMonster(monster);
 											NTA_Attack(monster, true);
 										}
 									}
 									else if(GetDistance(me,monster) > 1 && GetDistance(me,monster) <= range && (NTConfig_AttackSkill[1] != 0 || NTConfig_AttackSkill[3] != 0)){
-										while(monster.IsAttackable() && (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(monster, _leaderUnit) <= range) && monster.hp > 1){				 
+										while(monster.IsAttackable() && (NTA_IsValidMonster(monster) && GetDistance(me,monster) <= range && GetDistance(monster, leaderunit) <= NTConfig_maxAttackRange) && monster.hp > 1){				 
 											NTA_Attack(monster, true);
 										}
 									}
@@ -632,11 +634,11 @@ function GS_IsStrangePortal(type)
 	
 	switch(type)
 	{
-		case 0 : _portal = NTM_TakeUnit(NTC_UNIT_OBJECT, 60); break; //RedPortals
-		case 1 : _portal = NTM_TakeUnit(NTC_UNIT_OBJECT, 298); break; //Arcane
-		case 2 : _portal = NTM_TakeUnit(NTC_UNIT_OBJECT, 100); break; //Duriel
-		case 3 : _portal = NTM_TakeUnit(NTC_UNIT_OBJECT, 342); break; //Mephistos Portal
-		case 4 : _portal = NTM_TakeUnit(NTC_UNIT_OBJECT, 566); break; //Harrogath
+		case 0 : _portal = NTC_FindUnit(NTC_UNIT_OBJECT, 60); break; //RedPortals
+		case 1 : _portal = NTC_FindUnit(NTC_UNIT_OBJECT, 298); break; //Arcane
+		case 2 : _portal = NTC_FindUnit(NTC_UNIT_OBJECT, 100); break; //Duriel
+		case 3 : _portal = NTC_FindUnit(NTC_UNIT_OBJECT, 342); break; //Mephistos Portal
+		case 4 : _portal = NTC_FindUnit(NTC_UNIT_OBJECT, 566); break; //Harrogath
 		case 5 : _portal = NTC_FindUnit(NTC_UNIT_OBJECT, 563, 1); break; //WorldstoneChamber
 	}
 	if(!_portal){ Print(C_RED + "Cant take Portal"); return false;}
