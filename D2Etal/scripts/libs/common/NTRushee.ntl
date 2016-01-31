@@ -1467,6 +1467,30 @@ function NTR_ClearSpot(delay)
 	}
 }
 
+function NTR_FindRushee() {
+	var count = 0;
+	var _unit;
+	var found = false;	
+	var _rushee; 
+	
+	do{
+        NTC_Delay(2000);
+		_rushee = NTR_RetrieveRusheeName();
+		_unit = GetPlayerUnit();
+		do {
+		  if (_unit.name == _rushee)
+		  {
+			found = true;
+			break;
+		  }
+		} while (_unit.GetNext());
+		count ++;
+	} while ((!found) && (count < 10));	
+	
+	if (count<10) {
+		return _rushee;
+	}
+}
 function NTR_ClearRushee(area)
 {	
 	area = me.areaid;
