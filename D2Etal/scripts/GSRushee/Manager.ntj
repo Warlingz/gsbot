@@ -1,6 +1,6 @@
 var CurScriptIndex = 0;
 var LastScript = false;
-var Rev = "GSRushee v2.25  ";
+var Rev = "GSRushee v2.26  ";
 
 var InitLife;
 var Corpses = 0;

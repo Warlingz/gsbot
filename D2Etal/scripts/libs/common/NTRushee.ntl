@@ -778,9 +778,13 @@ function NTR_TalkTyraelSpirit()
       	if(_npc){
 			NTM_MoveTo(_npc.areaid, _npc.x, _npc.y);
 			NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _npc);
-			for(var i = 0 ;i < 2 ; i+=1){
-				NTC_Delay(100);
+			for(var i = 0 ;i < 4 ; i+=1){
 				NTC_CancelMenus();
+				NTC_Delay(100);
+				if((i % 4) == 0){
+					NTC_Delay(100);
+					NTC_CancelOut(0);
+				}
 			}
 		}				
 	}
