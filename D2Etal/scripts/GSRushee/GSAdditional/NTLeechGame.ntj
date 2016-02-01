@@ -1,6 +1,6 @@
 var CurScriptIndex = 0;
 var LastScript = false;
-var Rev = "GSLeecher v2.28  ";
+var Rev = "GSLeecher v2.29  ";
 
 var SoJNotify = false;
 var CloneDiabloString = GetLocaleString(11005);

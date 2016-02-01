@@ -253,11 +253,7 @@ function WhatToDO()
 		}
 		switch(me.areaid)
 		{
-			case 1 : 
-					if(!busy && !andy && rushee.areaid == 1)
-						DoAndy();
-					break;			
-			case 40 : 			
+			default : 		
 					qitem = NT_File("logs/questlog/QuestItem.txt", 0);
 					qstatus = NT_File("logs/questlog/QuestStatus.txt", 0);						
 					if(rushee.areaid == 1)
@@ -296,61 +292,6 @@ function WhatToDO()
 						DoDiablo(); 
 					else if(!busy && !shenk && rushee.areaid == 109) 
 						DoShenk(); 
-					break;
-			case 75 : 
-					if(!busy && rushee.areaid == 1)
-						DoAndy();
-					else if(!busy && !duriel && rushee.areaid == 40){
-						DoCube(); DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
-					} 
-					else if(!busy && !meph && rushee.areaid == 75){ 
-						DoTrav(); DoMeph(); 
-					} 
-					else if(!busy && !diablo && rushee.areaid == 103) 
-						DoDiablo(); 
-					else if(!busy && !shenk && rushee.areaid == 109) 
-						DoShenk(); 
-					break;
-			case 103 : 
-					if(!busy && rushee.areaid == 1)
-						DoAndy();
-					else if(!busy && !duriel && rushee.areaid == 40){
-						DoCube(); DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
-					} 
-					else if(!busy && !meph && rushee.areaid == 75){ 
-						DoTrav(); DoMeph(); 
-					} 
-					else if(rushee.areaid == 109){						
-						if(!NTTM_TownMove("waypoint"))
-						{
-							NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
-							return;
-						}
-						if (!NTM_TakeWaypoint(109)) {
-							NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
-							return;
-						}
-					}
-					else if(!busy && !diablo && rushee.areaid == 103) 
-						DoDiablo(); 
-					else if(!busy && !shenk && rushee.areaid == 109) 
-						DoShenk(); 
-					break;
-			case 109 : 
-					if(!busy && rushee.areaid == 1)
-						DoAndy();
-					else if(!busy && !duriel && rushee.areaid == 40){
-						DoCube(); DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
-					} 
-					else if(!busy && !meph && rushee.areaid == 75){ 
-						DoTrav(); DoMeph(); 
-					} 
-					else if(!busy && !diablo && rushee.areaid == 103) 
-						DoDiablo(); 
-					else if(!busy && !shenk && rushee.areaid == 109) 
-						DoShenk(); 
-					else if(!busy && shenk) 
-						NTC_SendMsgToScript("NTRushGame.ntj", "end"); 
 					break;
 		}
 	}
@@ -418,74 +359,7 @@ function Rush(area){
 		rushee = GetRushee(Rushee);
 		switch(area)
 		{
-			case 1 : 
-					if(!busy && !andy && rushee.areaid == 1)
-						DoAndy();
-					else if(!busy && !duriel && rushee.areaid == 40){
-						DoCube(); DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
-					} 
-					else if(!busy && rushee.areaid == 75){
-						DoTrav(); DoMeph(); 
-					} 
-					else if(!busy && !diablo && rushee.areaid == 103) 
-						DoDiablo(); 
-					else if(!busy && !shenk && rushee.areaid == 109) 
-						DoShenk(); 
-					break;			
-			case 40 : 
-					if(!busy && rushee.areaid == 1)
-						DoAndy();
-					else if(!busy && !duriel && rushee.areaid == 40){
-						DoCube(); DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
-					} 
-					else if(!busy && rushee.areaid == 75){
-						DoTrav(); DoMeph(); 
-					} 
-					else if(!busy && !diablo && rushee.areaid == 103) 
-						DoDiablo(); 
-					else if(!busy && !shenk && rushee.areaid == 109) 
-						DoShenk(); 
-					break;		
-			case 75 : 
-					if(!busy && rushee.areaid == 1)
-						DoAndy();
-					else if(!busy && !duriel && rushee.areaid == 40){
-						DoCube(); DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
-					} 
-					else if(!busy && !meph && rushee.areaid == 75){ 
-						DoTrav(); DoMeph(); 
-					} 
-					else if(!busy && !diablo && rushee.areaid == 103) 
-						DoDiablo(); 
-					else if(!busy && !shenk && rushee.areaid == 109) 
-						DoShenk(); 
-					break;
-			case 103 : 
-					if(!busy && rushee.areaid == 1)
-						DoAndy();
-					else if(!busy && !duriel && rushee.areaid == 40){
-						DoCube(); DoAmmy(); DoStaff(); DoSummoner(); DoDuriel();
-					} 
-					else if(!busy && !meph && rushee.areaid == 75){ 
-						DoTrav(); DoMeph(); 
-					} 
-					else if(rushee.areaid == 109){						
-						if(!NTTM_TownMove("waypoint"))
-						{
-							NTC_SendMsgToScript("NTRushGame.ntj", "NTTM_TownMove()");
-							return;
-						}
-						if (!NTM_TakeWaypoint(109)) {
-							NTC_SendMsgToScript("NTRushGame.ntj", "NTM_TakeWaypoint()");
-							return;
-						}
-					}
-					else if(!busy && !diablo && rushee.areaid == 103) 
-						DoDiablo(); 
-					else if(!busy && !shenk && rushee.areaid == 109) 
-						DoShenk(); 
-					break;
-			case 109 : 
+			default :
 					if(!busy && rushee.areaid == 1)
 						DoAndy();
 					else if(!busy && !duriel && rushee.areaid == 40){
@@ -1315,7 +1189,7 @@ function DoMeph()
 		NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveTo()");
 		return;
 	}
-	if(DoKillCouncils) {	
+	if(DoKillCouncils || NTConfig_KillCouncils) {	
 		if(!NTM_MoveTo(me.areaid, 17617, 8068)) {
 			NTC_SendMsgToScript("NTRushGame.ntj", "NTM_MoveTo()");
 			return;

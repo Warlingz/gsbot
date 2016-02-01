@@ -1713,9 +1713,9 @@ function NTC_IsItemLooted(itemcode)
 }
 
 var d2monitor = "WindowsForms10.Window.8.app.0.378734a";
-function SendToD2Monitor(msg)
+function SendToD2Monitor(type, msg)
 {
-	SendCopyData(d2monitor, null, 66, msg);
+	SendCopyData(d2monitor, null, type, msg);
 }
 
 // this is a simple info storage that returns the areaid from a wp id

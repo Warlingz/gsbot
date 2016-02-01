@@ -1,6 +1,6 @@
 var CurScriptIndex = 0;
 var LastScript = false;
-var Rev = "BE-97.28";
+var Rev = "BE-97.29";
 
 var SoJNotify = false;
 var CloneDiabloString = GetLocaleString(11005);
@@ -11,7 +11,6 @@ var InitLife;
 var Corpses = 0;
 var checkActOnce = false;
 var endtime = null;
-var d2monitor = "WindowsForms10.Window.8.app.0.378734a";
 
 function D2NTStatus(where, time, message) { return SendCopyData('D2NT Manager', null, where << 16 | time, message); }
 function NTMain()
@@ -31,6 +30,7 @@ function NTMain()
 	NT_LoadConfig();
 	NTE_InitializeStats();
 	//Print(NTConfig_FreeSpace);
+		
 	if (NTConfig_MinIngameTime > 0) {
 		endtime = GetTickCount() + 1000 * 60 * NTConfig_MinIngameTime;
 	}	
@@ -255,7 +255,7 @@ function NT_GameMsgEvents(msg, type)
 		case 4:
             if(msg.indexOf(CloneDiabloString) != -1) {
 
-				SendToD2Monitor("[IP:" + me.gameserverip.split(".")[3] + "] DClone Spawned");
+				SendToD2Monitor(666, "[IP:" + me.gameserverip.split(".")[3] + "] DClone Spawned");
 				
                 CloneDiabloNotify = true;
                 SoJNotify = false;
@@ -296,7 +296,7 @@ function NT_GameMsgEvents(msg, type)
 					NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_4 + "Not waiting for DClone - not in a hell game");
 				}
 				if(me.diff == 2) {
-					SendToD2Monitor(msg.substring(0, msg.length - 13));
+					SendToD2Monitor(333, msg.substring(0, msg.length - 13));
 					SoJNotify = true;
 					SoJElapsedTime = 0;             
 					NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_4 + msg);

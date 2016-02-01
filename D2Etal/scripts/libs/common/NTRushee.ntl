@@ -1029,7 +1029,7 @@ function NTR_CheckQuest()
 			else if(me.GetQuest(13, 0) && me.GetQuest(13, 2)&& horadricstaff.length < 1){
 				NT_File("logs/questlog/QuestStatus.txt", 1, "duriel");			
 			}
-			else if(me.GetQuest(13, 0) && me.GetQuest(13, 12) && horadricstaff.length < 1 || me.GetQuest(13,0)){
+			else if(me.GetQuest(13, 0) && me.GetQuest(13, 12) && horadricstaff.length < 1 || me.GetQuest(13,0) || me.GetQuest(14, 3)){
 				NT_File("logs/questlog/QuestStatus.txt", 1, "duriel");			
 			}
 			else					
@@ -1047,7 +1047,7 @@ function NTR_CheckQuest()
 function NTR_CheckQuestItem()
 {
 	var cube, staff, ammy, horadricstaff;
-	
+	NTR_CheckQuest();
 	switch(me.areaid)
 	{
 		case 1 :
