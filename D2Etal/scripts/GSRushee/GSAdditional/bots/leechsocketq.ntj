@@ -121,7 +121,7 @@ var i;
 						break;  
 				// ACT 2 Case's---------------------------------------------
 					case "Cube up!" :
-						NTC_Delay(500, 2000);
+						NTC_Delay(1000, 2000);
 						if(me.areaid == 40){
 							if(NTM_UsePortal("BluePortal", 60, NTConfig_Leader)){
 								ara = me.areaid;
@@ -130,11 +130,14 @@ var i;
 								NTR_TakePortal();
 							}
 						}
+						if(NTC_InTown()){
+							NTM_WalkTo(5167,5065);
+						}
 						break;
 
 					case "Leeches Talk to Tyrael!" :
 						if(me.areaid == 40){
-							NTC_Delay(3500, 4000);													
+							NTC_Delay(4000, 4200);													
 							if(!NTR_TalkJer()){								
 								var rusheepos = NTR_RetrieveRusheePos();
 								NTC_Delay(200);		
@@ -268,6 +271,7 @@ var i;
 								NTC_Delay(100);
 								NTC_SendLogToOOG(NTC_LOG_COMMON, C_BROWN + "Completed Account Rush [ " + COLOR_5 + _account + C_BROWN + " ]".split("\n")[0] + ";" 
 								+ COLOR_1 + "------------------------------\n" + C_ORANGE + "RushLeech : [ " + rusheepos + " ]\n" + COLOR_2 + "Account Complete!" + "\n" + C_BROWN + "Ladder - " + _ladder + "\n" + C_WHITE + "My Last Area : " + ara + "-" + _area.name + "\n" + C_BROWN + "Rushee Name : " + me.charname + "\n" + C_ORANGE + "Account : " + _account + "\n" + COLOR_1 + "---------------------------------");								
+								SendToD2Monitor(0, COLOR_11 + "Completed Account [" + COLOR_3 + _account + COLOR_11 + "]");
 							}
 															
 						}

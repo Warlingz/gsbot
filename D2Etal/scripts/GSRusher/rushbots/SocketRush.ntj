@@ -282,7 +282,7 @@ function WhatToDO()
 					else if(!busy && !duriel && qitem == "horadricstaff" && (qstatus == "false" || !qstatus ) && rushee.areaid == 40){
 						DoSummoner(); DoDuriel();
 					}
-					else if(!busy && !duriel && qitem == "horadricstaff" && (qstatus == "true") && rushee.areaid == 40){
+					else if(!busy && !duriel && qitem == "horadricstaff" && ((qstatus == "true") || (qstatus == "summoner")) && rushee.areaid == 40){
 						DoDuriel();
 					}
 					else if(!busy && rushee.areaid == 75){

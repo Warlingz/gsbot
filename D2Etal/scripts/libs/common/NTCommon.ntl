@@ -1334,10 +1334,10 @@ function NTC_GetLocation(index)
 
 function NTC_CancelMenus() { // more koreans
 	while ((GetUIState(0x01) || GetUIState(0x08) || GetUIState(0x0C) || GetUIState(0x0F) || GetUIState(0x14) ||
-		GetUIState(0x17) || GetUIState(0x19) || GetUIState(0x1A) || GetUIState(0x24)) && !GetUIState(0x09)){
+		GetUIState(0x17) || GetUIState(0x19) || GetUIState(0x1A) || GetUIState(0x24))){
 
-		for (var i = 0; i < 40; i++){
-			if ((i % 20) == 0){
+		for (var i = 0; i < 10 && ((GetUIState(0x01) && GetUIState(0x08) && GetUIState(0x0C) && GetUIState(0x0F) && GetUIState(0x14) && GetUIState(0x17) && GetUIState(0x19) && GetUIState(0x1A) && GetUIState(0x24)) || !GetUIState(0x09)); i++){
+			if ((i % 5) == 0){
 				me.Cancel(1);
 			}
 			Delay(100);
@@ -1715,9 +1715,19 @@ function NTC_IsItemLooted(itemcode)
 var d2monitor = "WindowsForms10.Window.8.app.0.378734a";
 function SendToD2Monitor(type, msg)
 {
+	if(arguments.length < 2)
+		msg = "";
 	SendCopyData(d2monitor, null, type, msg);
 }
-
+function D2MonitorColors()
+{
+	SendToD2Monitor(0, COLOR_0 + "color 0" + COLOR_1 + " color 1");
+	SendToD2Monitor(0, COLOR_2 + "color 2" + COLOR_3 + " color 3");
+	SendToD2Monitor(0, COLOR_4 + "color 4" + COLOR_5 + " color 5");
+	SendToD2Monitor(0, COLOR_6 + "color 6" + COLOR_7 + " color 7");
+	SendToD2Monitor(0, COLOR_8 + "color 8" + COLOR_9 + " color 9");
+	SendToD2Monitor(0, COLOR_10 + "color 10" + COLOR_11 + " color 11");
+}
 // this is a simple info storage that returns the areaid from a wp id
 var NTC_WPIdToAreaId = [];
 NTC_WPIdToAreaId[0] = 1;

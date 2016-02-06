@@ -670,9 +670,13 @@ function NTR_TalkNPC(who)
 	Delay(500);
 	if(_npc){
 		if(NTT_VisitNpc(_npc)){
-			for(var i = 0; i < 5 ; i++){
+			for(var i = 0 ;i < 4 ; i+=1){
 				NTC_CancelMenus();
 				NTC_Delay(100);
+				if((i % 4) == 0){
+					NTC_Delay(100);
+					NTC_CancelOut(0);
+				}
 			}
 		}
 		return true;
@@ -823,7 +827,14 @@ function NTR_TalkTyrael()
 		_npc = NTC_FindUnit(NTC_UNIT_NPC, GetLocaleString(1013), 5);      
 		if(_npc){
 			if(NTT_VisitNpc(_npc)){
-				NTC_CancelMenus();
+				for(var i = 0 ;i < 4 ; i+=1){
+					NTC_CancelMenus();
+					NTC_Delay(100);
+					if((i % 4) == 0){
+						NTC_Delay(100);
+						NTC_CancelOut(0);
+					}
+				}
 			}
 		}
 		NTR_CheckLocation();
@@ -840,19 +851,22 @@ function NTR_GoTyrael()
 		_npc = NTC_FindUnit(NTC_UNIT_NPC, GetLocaleString(1013), 5);      
 		if(_npc){
 			if(NTT_VisitNpc(_npc)){
-				for(var i = 0 ; i < 2 ; i++){
-					NTC_Delay(200);
+				for(var i = 0 ;i < 4 ; i+=1){
 					NTC_CancelMenus();
-					NTC_CancelOut(0);
+					NTC_Delay(100);
+					if((i % 4) == 0){
+						NTC_Delay(100);
+						NTC_CancelOut(0);
+					}
+				}
+				NTC_Delay(200, 500);
+				for(var i = 0 ; i < 100 && me.areaid != 109 ; i+=1){
+					if(!NTR_GoHarrogath()){
+							NTC_Delay(1000);
+						}
 				}
 			}
 		}
-		NTC_Delay(200, 500);
-		for(var i = 0 ; i < 100 && me.areaid != 109 ; i+=1){
-			if(!NTR_GoHarrogath()){
-					NTC_Delay(1000);
-				}
-		}									
 	}
 	return;
 }
@@ -1113,6 +1127,8 @@ function NTR_Pickit() {
 	var _item;
 	_item = NTC_FindUnit(NTC_UNIT_ITEM);	
 	do {
+		if(me.hp < 1)
+			NTR_Death();
 		if(_item.classid == 549 || _item.classid == 521 || _item.classid == 92 || _item.classid == 90 || _item.classid == 552 || _item.classid == 548){
 			if(NTSI_PickUpItemInt(_item)){
 				Print("Picked up "+ NTC_ItemQualityToD2Color[_item.quality] + _item.name.split("\n")[0]);

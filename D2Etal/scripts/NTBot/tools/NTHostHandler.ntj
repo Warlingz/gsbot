@@ -137,7 +137,7 @@ function DumbassCity(msg, type)
 					do{
 						if(GetPlayerFlag(me.gid, _dumbass.gid, 9)){
 							_dumbass = stripColorCodes(_dumbass.name);
-							SendToD2Monitor(700, "Hostile");
+							SendToD2Monitor(700, "Hostiled by : " + Names[Names.indexOf(_dumbass)]);
 
 							HostLog = FileOpen("logs/HostileLogs/" + me.charname + ".txt", 2);
 							if(!HostLog) HostLog = FileOpen("logs/HostileLogs/" + me.charname + ".txt", 2);

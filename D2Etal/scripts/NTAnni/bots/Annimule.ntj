@@ -29,6 +29,7 @@ function NTMain()
 			NTSI_PickItems();
 		}
 		Print(C_BROWN + "Picked up Anni!");
+		SendToD2Monitor(0, COLOR_2 + "Anni Muled Successfully");
 	}
 	NTC_Delay(1200, 300);
 	NTSI_PickItems();

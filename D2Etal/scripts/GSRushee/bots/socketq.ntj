@@ -581,7 +581,8 @@ var i;
 									NTC_Delay(100);
 								}
 								NTC_SendLogToOOG(NTC_LOG_COMMON, C_BROWN + "Completed Account Rush [ " + COLOR_5 + _account + C_BROWN + " ]".split("\n")[0] + ";" 
-								+ COLOR_1 + "------------------------------\n" + C_ORANGE + "Rush : [ " + rusheepos + " ]\n" + COLOR_2 + "Account Complete!" + "\n" + C_BROWN + "Ladder - " + _ladder + "\n" + C_WHITE + "My Last Area : " + ara + "-" + _area.name + "\n" + C_BROWN + "Rushee Name : " + me.charname + "\n" + C_ORANGE + "Account : " + _account + "\n" + COLOR_1 + "---------------------------------");						
+								+ COLOR_1 + "------------------------------\n" + C_ORANGE + "Rush : [ " + rusheepos + " ]\n" + COLOR_2 + "Account Complete!" + "\n" + C_BROWN + "Ladder - " + _ladder + "\n" + C_WHITE + "My Last Area : " + ara + "-" + _area.name + "\n" + C_BROWN + "Rushee Name : " + me.charname + "\n" + C_ORANGE + "Account : " + _account + "\n" + COLOR_1 + "---------------------------------");
+								SendToD2Monitor(0, COLOR_11 + "Completed Account [" + COLOR_3 + _account + COLOR_11 + "]");
 							}
 															
 						}

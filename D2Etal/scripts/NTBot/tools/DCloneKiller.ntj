@@ -336,7 +336,7 @@ function GS_GetAreaInfo()
 {	
 	_area = GetArea();
 	DetectAreaid = me.areaid;
-	GS_GetNearByMonsters();	
+	GS_GetNearByMonsters();
 	NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_5 + "DClone Detected : " + COLOR_3 + "[Moving to SpawnArea]".split("\n")[0] + ";" + 
 		COLOR_4 + "-------------------------------------\n" + 
 		COLOR_4 + "DClone Detected\nMy Area : [" + COLOR_2 +_area.name + COLOR_4 + "]\n" +
@@ -353,6 +353,8 @@ function GS_SendInfo(type)
 	GS_GetNearByMonsters();
 	switch(type){
 		case 0:
+			SendToD2Monitor(0, COLOR_11 + spawnTypeToString());
+			SendToD2Monitor(0, COLOR_11 + "SpawnArea Failed : " + COLOR_5 + "[Searching]");
 			NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_8 + "SpawnArea Failed :" + COLOR_5 + " [Searching for DClone] ".split("\n")[0] + ";" + 
 				COLOR_4 + "-------------------------------------\n" + 
 				COLOR_1 + "Failed to Spawn DClone\n" + 
@@ -365,6 +367,7 @@ function GS_SendInfo(type)
 				COLOR_4 + "---------------------------------------");
 		break;
 		case 1:
+			SendToD2Monitor(0, COLOR_1 + "Failed: [" + COLOR_5 + area.name + COLOR_1 + "]" );
 			NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_1 + "Search For DClone Failed : My Area [" + COLOR_5 + area.name + COLOR_1 + "] ".split("\n")[0] + ";" + 
 				COLOR_4 + "-------------------------------------\n" + 
 				COLOR_1 + "Search For DClone Failed\n" + 
@@ -377,6 +380,7 @@ function GS_SendInfo(type)
 				COLOR_4 + "---------------------------------------");
 		break;
 		case 2:
+			SendToD2Monitor(0, COLOR_1 + "Failed: [" + COLOR_5 + area.name + COLOR_1 + "]" );
 			NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_1 + "Couldn't Search for DClone : Area[" + COLOR_5 + _area.name + COLOR_1 + "] ".split("\n")[0] + ";" + 
 				COLOR_4 + "-----------------------------------------\n" + 
 				COLOR_1 + "Search For DClone Failed\n" + 
@@ -385,6 +389,7 @@ function GS_SendInfo(type)
 				COLOR_4 + "-----------------------------------------------");
 		break;
 		case 3:
+			SendToD2Monitor(0, COLOR_4 + "Slayed Diablo Clone");
 			NTC_SendLogToOOG(NTC_LOG_COMMON, COLOR_4 + "Slayed Diablo Clone".split("\n")[0] + ";" + 
 				COLOR_4 + "-------------------------------------\n" + 
 				COLOR_4 + "Slayed DClone Successfully\n" +
