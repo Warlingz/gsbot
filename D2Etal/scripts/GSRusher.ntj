@@ -180,6 +180,7 @@ var lastGameFailed     = false;
 var sayChatMsgAfterGame = false;
 
 Include("libs/controlInfo.ntl");
+Include("libs/common/NTCommon.ntl");
 Include("libs/common/NTColorConverter.ntl");
 
 var controlData = new controlInfo();
@@ -547,6 +548,7 @@ function locationAction(location)
         break;
 
     case 8: // Main Menu
+		SendToD2Monitor(900, "Rusher");
         if(controlData.getCurrentRealmIndex() == me.gatewayid)
         {
             outputGameLength();

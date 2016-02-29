@@ -180,7 +180,7 @@ function NTR_HPCheck()
 	var hpDiff = me.hpmax - currhpDiff;
 	var p = .85;
 
-	if(!NTC_InTown() && me.hp < me.hpmax*p && !lifeChunked && me.mode != 17 && me.mode != 0){
+	if(!NTC_InTown() && me.areaid != 8 && me.hp < me.hpmax*p && !lifeChunked && me.mode != 17 && me.mode != 0){
 		for(var i = 0; i < 200 && !NTC_InTown() && me.mode != 17 && me.mode != 0 ; i++){
 			NTC_Delay(300);
 			if(i < 1)
@@ -294,17 +294,16 @@ function NTR_Death(area)
 					}
 					if(me.areaid == 8 && me.areaid !== _rusher.areaid && !NTC_InTown()){
 						NTC_Delay(100);
-						Print(COLOR_1 + "Rusher let me die at " + COLOR_5 + _area.name);
+						Print(COLOR_1 + "I died at " + COLOR_5 + _area.name);
 						NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_1 + "Death at " + COLOR_5 + _area.name.split("\n")[0]+ ";" + COLOR_4 + "------------------------------\n" + COLOR_1 + "Death Occured" + "\n" + COLOR_2 + "Area: " +_area.name + "\n" + COLOR_4 + "---------------------------------");
 						NTC_Delay(100);
-						Say("I died I need a sec");
 						me.Cancel(0);
 						NTC_Delay(200);
 						if(GetUIState(0x09, true)){
 							NTC_CancelOut(1);
 						}
 						NTC_Delay(500);
-						NTR_GoAkara();
+						NTR_CheckLocation();
 					}
 				}
 			}
@@ -1127,7 +1126,7 @@ function NTR_Pickit() {
 	var _item;
 	_item = NTC_FindUnit(NTC_UNIT_ITEM);	
 	do {
-		if(me.hp < 1)
+		if(me.hp < 1 && !NTC_InTown())
 			NTR_Death();
 		if(_item.classid == 549 || _item.classid == 521 || _item.classid == 92 || _item.classid == 90 || _item.classid == 552 || _item.classid == 548){
 			if(NTSI_PickUpItemInt(_item)){
@@ -1158,6 +1157,7 @@ function NTR_CubeStaff()
 }
 function NTR_PlaceStaff() 
 {
+	var _orifice;
 	var _horadricstaff = me.GetItems(91);
 	if(_horadricstaff.length == 0){			
 		Print("Don't have: " + COLOR_17 + "Horadric Staff");
@@ -1165,19 +1165,19 @@ function NTR_PlaceStaff()
 	}	
 	for(var b = 0; b < 1; b++){
         if(_horadricstaff && _horadricstaff.length > 0 && _horadricstaff[0].itemloc == 0){  
-			var _orifice = NTC_FindUnit(NTC_UNIT_OBJECT, 152);  
+			_orifice = NTC_FindUnit(NTC_UNIT_OBJECT, 152);  
         } 
         if(_orifice){  
 			if(GetDistance(me, _orifice) > 3)  
-			NTM_MoveTo(_orifice.areaid,_orifice.x+2, _orifice.y);  
+				NTM_MoveTo(_orifice.areaid,_orifice.x+2, _orifice.y);  
 
 			NTC_DoClick(NTC_CLICK_LDOWN, NTC_SHIFT_NONE, _orifice);  
-			NTC_Delay(1000);  
-        }	
-        NTC_ItemToCursor(_horadricstaff[0]); 
-        NTC_Delay(500);  
-        SubmitItem();   
-        NTC_Delay(1000);   
+			NTC_Delay(1000);        
+			NTC_ItemToCursor(_horadricstaff[0]);
+			NTC_Delay(500);
+			SubmitItem();
+			NTC_Delay(1000);
+		}
         _horadricstaff = me.GetItems(91);   
         if((!_horadricstaff || _horadricstaff.length < 1) && !me.itemoncursor){  
 			NTM_MoveToPresetUnit(me.areaid, NTC_UNIT_OBJECT, 152, -1, 2);  
@@ -1459,7 +1459,7 @@ function NTR_SSCheck()
 	}
 	else if(_soulStone.length < 1){
 		Print(COLOR_1 + "Soulstone Missing!");
-		NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_11 + "Soulstone Missing");		
+		NTC_SendLogToOOG(NTC_LOG_COMMON, me.charname + ": " + COLOR_11 + "Soulstone Missing");
 		NTR_GoCain();
 	}
 }
@@ -1598,8 +1598,9 @@ function NTR_ClearLevel(pickitem, safelevel) {
 	while (_rooms.length > 0) {
 		_mindistance = 100000;
 		
+		if(me.hp < 1)
+			NTR_Death();
 		if((me.GetQuest(1,4) && me.GetQuest(1,1)) || (me.GetQuest(1,4) && !me.GetQuest(1,0))){
-			NTR_LeaveDen();
 			break;
 		}
 		for (i = 0; i < _rooms.length && !me.GetQuest(1,4); i++) {
@@ -1617,6 +1618,7 @@ function NTR_ClearLevel(pickitem, safelevel) {
 		}
 		_rooms.splice(_minindex, 1);
 	}
+	NTR_LeaveDen();
 	return true;
 }
 

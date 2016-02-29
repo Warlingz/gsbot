@@ -633,6 +633,17 @@ function NTA_ClearLevel(pickitem, safelevel) {
 	return true;
 }
 
+function GS_GetCloserMonster(monster)
+{ 
+	if(GetDistance(me, monster) > 1){		
+		if(!NTM_WalkTo(monster.x+1, monster.y))
+			return true;
+	}
+	else
+		return false;
+		
+}
+
 function NTA_ClearRoom(pickitem, safelevel) {
 	var _room;
 	var _spectype = [0x0A, 0x01];
@@ -679,8 +690,7 @@ function NTA_ClearRoom(pickitem, safelevel) {
 						if (_target.IsAttackable() && (_target.spectype & _spectype[i])) {
 							if (_room.UnitInRoom(_target) && NTA_IsValidMonster(_target)) {
 								if (MonstersToAttackFirst.indexOf(_target.classid) > -1) {
-									_distance = GetDistance(me, _target);
-
+									_distance = GetDistance(me, _target);									
 									if (_distance < _minshamandistance) {
 										_minshamangid = _target.gid;
 										_minshamandistance = _distance;
@@ -703,6 +713,9 @@ function NTA_ClearRoom(pickitem, safelevel) {
 				_target = NTC_FindUnit(NTC_UNIT_MONSTER, _minshamangid);
 
 				if (_target) {
+					if(GetDistance(me,_target) > 1 && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0))
+						 GS_GetCloserMonster(_target);
+					
 					_result = NTA_Attack(_target, (_attackcount % 30) == 0);
 
 					if (_gid_lastKnownHealth[_minshamangid] == undefined) {
@@ -751,6 +764,8 @@ function NTA_ClearRoom(pickitem, safelevel) {
 				_target = NTC_FindUnit(NTC_UNIT_MONSTER, _mingid);
 
 				if (_target) {
+					if(GetDistance(me,_target) > 1 && (NTConfig_AttackSkill[1] == 0 || NTConfig_AttackSkill[3] == 0))
+						 GS_GetCloserMonster(_target);
 					_result = NTA_Attack(_target, (_attackcount % 30) == 0);
 
 					if (_gid_lastKnownHealth[_mingid] == undefined) {

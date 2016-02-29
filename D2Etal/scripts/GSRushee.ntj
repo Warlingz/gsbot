@@ -123,6 +123,7 @@ var currentAcc = "";
 var currentAccPassword = "";
 Include("libs/controlInfo.ntl");
 Include("libs/common/NTRushee.ntl");
+Include("libs/common/NTCommon.ntl");
 Include("libs/common/NTColorConverter.ntl");
 
 var rusheepos = 0;
@@ -375,6 +376,7 @@ function locationAction(location)
 		break;
 
 	case 8: // Main Menu
+		SendToD2Monitor(900, "Rushee");
 		if(controlData.getCurrentRealmIndex() == me.gatewayid)
 		{
 			outputGameLength();

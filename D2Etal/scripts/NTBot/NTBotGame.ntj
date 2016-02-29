@@ -1,6 +1,6 @@
 var CurScriptIndex = 0;
 var LastScript = false;
-var Rev = "BE-97.30";
+var Rev = "BE-97.31";
 
 var SoJNotify = false;
 var CloneDiabloString = GetLocaleString(11005);
@@ -280,8 +280,6 @@ function NT_GameMsgEvents(msg, type)
                     }
                     NTC_StopScript(NTConfig_Script[CurScriptIndex]);
                     NTC_Delay(200);
-
-                    NTTM_CheckAct();
 					
 					if(NTConfig_DCloneHandler > -1){
 						NT_File("logs/AnniLog/" + me.account + "-utility.txt", 1, Rev + "/" + CurScriptIndex);

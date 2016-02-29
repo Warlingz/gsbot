@@ -52,15 +52,20 @@ function Questing(area)
 			NTC_Delay(500);
 			break;
 		case 1 : // ACT 1 ---------------------------------------------
-				NTC_Delay(1000);
+			NTC_Delay(1000);
 			if(NTC_InTown() && !LocationChecka1){			
 				NTR_CheckLocation();
 				LocationChecka1 = true;
 				return LocationChecka1;
 			}
+			if(me.GetQuest(1, 4) && me.GetQuest(1, 1)){
+				Print(C_DARK_GREEN + "Den Quest Complete");
+				NTC_Delay(300);
+				NTR_GoAkara();
+			}
 			break;
 		case 40 : // ACT 2 ---------------------------------------------
-				NTC_Delay(1000);
+			NTC_Delay(1000);
 			if( NTC_InTown() && !LocationChecka2){
 				NTR_CheckLocation();
 				LocationChecka2 = true;
@@ -69,7 +74,7 @@ function Questing(area)
 			break;
 			
 		case 75 : // ACT 3 ---------------------------------------------
-				NTC_Delay(1000);
+			NTC_Delay(1000);
 			if((!me.GetQuest(22,12) && !me.GetQuest(22,0)) && !LocationChecka3){
 				NTR_CheckLocation();
 				LocationChecka3 = true;
@@ -131,7 +136,8 @@ var i;
 							}
 						}
 						if(NTC_InTown()){
-							NTM_WalkTo(5167,5065);
+							var mx = 5167 + Random(-5,3);
+							NTM_WalkTo(mx,5065);
 						}
 						break;
 
@@ -271,7 +277,7 @@ var i;
 								NTC_Delay(100);
 								NTC_SendLogToOOG(NTC_LOG_COMMON, C_BROWN + "Completed Account Rush [ " + COLOR_5 + _account + C_BROWN + " ]".split("\n")[0] + ";" 
 								+ COLOR_1 + "------------------------------\n" + C_ORANGE + "RushLeech : [ " + rusheepos + " ]\n" + COLOR_2 + "Account Complete!" + "\n" + C_BROWN + "Ladder - " + _ladder + "\n" + C_WHITE + "My Last Area : " + ara + "-" + _area.name + "\n" + C_BROWN + "Rushee Name : " + me.charname + "\n" + C_ORANGE + "Account : " + _account + "\n" + COLOR_1 + "---------------------------------");								
-								SendToD2Monitor(0, COLOR_11 + "Completed Account [" + COLOR_3 + _account + COLOR_11 + "]");
+								SendToD2Monitor(0, COLOR_4 + "Completed Account [" + COLOR_11 + _account + COLOR_4 + "]");
 							}
 															
 						}
@@ -293,6 +299,10 @@ var i;
 							NTC_Delay(300);
 							NTC_SendMsgToScript("NTLeechGame.ntj", "SCRIPT_END");
 						}						
+						break;
+					case "tt" :
+						SendToD2Monitor(666, ""); 
+						SendToD2Monitor(666, "[IP:" + me.gameserverip.split(".")[3] + "] DClone Spawned Game : " + me.gamename);
 						break;
                 }
             }

@@ -66,7 +66,7 @@ function Questing(area)
 				LocationChecka1 = true;
 				return LocationChecka1;
 			}
-			break;			
+			break;
 		case 40 : // ACT 2 ---------------------------------------------
 			NTC_Delay(1000);		
 			if(NTC_InTown() && !LocationChecka2){
@@ -115,6 +115,7 @@ var i;
                 switch(_msg){				
 				// ACT 1 Case's---------------------------------------------
 					case "Den up!" :
+						NTA_Initialize();
 						NTC_Delay(200);
 						if(me.areaid == 1){
 							NTM_UsePortal("BluePortal", 8, NTConfig_Leader);
@@ -582,7 +583,7 @@ var i;
 								}
 								NTC_SendLogToOOG(NTC_LOG_COMMON, C_BROWN + "Completed Account Rush [ " + COLOR_5 + _account + C_BROWN + " ]".split("\n")[0] + ";" 
 								+ COLOR_1 + "------------------------------\n" + C_ORANGE + "Rush : [ " + rusheepos + " ]\n" + COLOR_2 + "Account Complete!" + "\n" + C_BROWN + "Ladder - " + _ladder + "\n" + C_WHITE + "My Last Area : " + ara + "-" + _area.name + "\n" + C_BROWN + "Rushee Name : " + me.charname + "\n" + C_ORANGE + "Account : " + _account + "\n" + COLOR_1 + "---------------------------------");
-								SendToD2Monitor(0, COLOR_11 + "Completed Account [" + COLOR_3 + _account + COLOR_11 + "]");
+								SendToD2Monitor(0, COLOR_4 + "Completed Account [" + COLOR_11 + _account + COLOR_4 + "]");
 							}
 															
 						}
@@ -622,6 +623,9 @@ var i;
 						break;
 					case "Quest item" :
 						NTR_CheckQuestItem();
+						break;
+					case "tt" :
+						SendToD2Monitor(666, "[IP:" + me.gameserverip.split(".")[3] + "] DClone Spawned Game : " + me.gamename);
 						break;
                 }
             }
